@@ -95,64 +95,84 @@ class _DayViewScreenState extends ConsumerState<DayViewScreen> {
                 Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Tithika',
-                        style: TextStyle(
-                          color: TithikaColors.ink,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          if (!isToday)
-                            GestureDetector(
-                              onTap: () {
-                                ref.read(selectedDateProvider.notifier).state =
-                                    today;
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 4),
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                      color: TithikaColors.shukla
-                                          .withValues(alpha: 0.6)),
-                                  borderRadius: BorderRadius.circular(20),
-                                  color: TithikaColors.shukla
-                                      .withValues(alpha: 0.08),
-                                ),
-                                child: Text(
-                                  'Today',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall
-                                      ?.copyWith(
-                                        color: TithikaColors.shukla,
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 12,
-                                      ),
-                                ),
+                  child: SizedBox(
+                    height: 40,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        // Absolutely centered Today button
+                        if (!isToday)
+                          GestureDetector(
+                            onTap: () {
+                              ref
+                                  .read(selectedDateProvider.notifier)
+                                  .state = today;
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                    color: TithikaColors.shukla
+                                        .withValues(alpha: 0.6)),
+                                borderRadius: BorderRadius.circular(20),
+                                color: TithikaColors.shukla
+                                    .withValues(alpha: 0.08),
+                              ),
+                              child: Text(
+                                'Today',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(
+                                      color: TithikaColors.shukla,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 12,
+                                    ),
                               ),
                             ),
-                          IconButton(
-                            icon: const Icon(Icons.calendar_month_rounded,
-                                color: TithikaColors.inkSoft, size: 22),
-                            onPressed: () => context.go('/month'),
-                            tooltip: 'Month view',
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.tune_rounded,
-                                color: TithikaColors.inkSoft, size: 22),
-                            onPressed: () => context.go('/settings'),
-                            tooltip: 'Settings',
+                        // Left: app name
+                        const Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Tithika',
+                            style: TextStyle(
+                              color: TithikaColors.ink,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
                           ),
-                        ],
-                      ),
-                    ],
+                        ),
+                        // Right: action icons
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.celebration_rounded,
+                                    color: TithikaColors.inkSoft, size: 22),
+                                onPressed: () => context.go('/festivals'),
+                                tooltip: 'Festivals',
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.calendar_month_rounded,
+                                    color: TithikaColors.inkSoft, size: 22),
+                                onPressed: () => context.go('/month'),
+                                tooltip: 'Month view',
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.tune_rounded,
+                                    color: TithikaColors.inkSoft, size: 22),
+                                onPressed: () => context.go('/settings'),
+                                tooltip: 'Settings',
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 Expanded(

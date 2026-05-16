@@ -51,7 +51,7 @@ class TithiService {
     final tithi = _tithiAt(referenceJd);
     final nakshatra = _nakshatraAt(referenceJd);
     final sunZodiacSign = _sunZodiacSign(referenceJd);
-    final lunarMonth = _lunarMonth(referenceJd, tithi.number);
+    final (lunarMonth, isAdhika) = _lunarMonthAndAdhika(referenceJd, tithi.number);
     final sunZodiacEntryToday =
         _sunZodiacSign(referenceJd - 1.0) != sunZodiacSign;
 
@@ -78,6 +78,7 @@ class TithiService {
       sunZodiacSign: sunZodiacSign,
       sunZodiacEntryToday: sunZodiacEntryToday,
       secondaryTithi: secondaryTithi,
+      isAdhika: isAdhika,
     );
   }
 
@@ -161,41 +162,40 @@ class TithiService {
     return (_ephe.siderealSunLongitude(jd) / 30.0).floor().clamp(0, 11);
   }
 
-  // ── Lunar month (Purnimanta) ─────────────────────────────────────────────────
+  // ── Lunar month (Purnimanta + Adhika detection) ──────────────────────────────
 
-  /// Determines the Purnimanta month for the given [sunriseJd].
+  /// Determines the Amanta lunar month for [sunriseJd] and whether it is an
+  /// Adhika (intercalary) month.
   ///
-  /// In Purnimanta, the month ENDS at Purnima.  The month name comes from the
-  /// sidereal sun sign at the Purnima that ends it.  We always search FORWARD
-  /// for the next (upcoming) Purnima, which is the one that ends the current
-  /// month regardless of whether we are in Shukla or Krishna paksha.
-  ///
-  /// The binary-search in [_nextBoundaryJd] breaks down when the search
-  /// window spans >180° of elongation travel, so instead of a fixed window
-  /// we estimate the days remaining to the next Purnima and search within a
-  /// tight ±2-day bracket around that estimate.
-  LunarMonth _lunarMonth(double sunriseJd, int tithiNum) {
-    const purnimaAngle = 180.0;
-
+  /// Rule (Wikipedia / drikpanchang): a month is Adhika when the sun does NOT
+  /// transit into a new sidereal rashi between two consecutive Amavasyas.
+  /// Month name = sun sign at the previous Amavasya (Amanta base).
+  (LunarMonth, bool) _lunarMonthAndAdhika(double sunriseJd, int tithiNum) {
     final curElong = _elongation(sunriseJd);
 
-    // Degrees left until the next 180° crossing.
-    // In Shukla (0–180): travel = 180 - elong.
-    // In Krishna (180–360): travel = (360 - elong) + 180 = 540 - elong.
-    final degreesLeft = curElong <= purnimaAngle
-        ? purnimaAngle - curElong
-        : 540.0 - curElong;
-    final daysLeft = degreesLeft / _elongationRatePerDay;
+    // Find previous Amavasya (elongation = 0°).
+    // Estimate puts the search window ~2 days before the true crossing so the
+    // window starts with elongation still approaching 0° (d > 180 → not reached).
+    final daysSincePrev = curElong / _elongationRatePerDay;
+    final prevAmavasyaJd = _nextBoundaryJd(
+      sunriseJd - daysSincePrev - 2.0, 0.0, _elongation, maxDays: 5.0);
 
-    // Search in a ±2-day window around the estimate — well within the 180°
-    // threshold that the binary search requires.
-    final searchFrom = sunriseJd + daysLeft - 2.0;
-    final purnimaJd = _nextBoundaryJd(searchFrom, purnimaAngle, _elongation,
-        maxDays: 4.0);
+    // Find next Amavasya similarly.
+    final daysToNext = (360.0 - curElong) / _elongationRatePerDay;
+    final nextAmavasyaJd = _nextBoundaryJd(
+      sunriseJd + daysToNext - 2.0, 0.0, _elongation, maxDays: 5.0);
 
-    final sunSignAtPurnima =
-        (_ephe.siderealSunLongitude(purnimaJd) / 30.0).floor().clamp(0, 11);
-    return LunarMonth.values[sunSignAtPurnima];
+    final signAtPrev =
+        (_ephe.siderealSunLongitude(prevAmavasyaJd) / 30.0).floor().clamp(0, 11);
+    final signAtNext =
+        (_ephe.siderealSunLongitude(nextAmavasyaJd) / 30.0).floor().clamp(0, 11);
+
+    // Same rashi at both new moons = no Sankranti within = Adhika month.
+    final isAdhika = signAtPrev == signAtNext;
+
+    // Month name = prevAmavasya sign (Amanta base).
+    // Correct for regular months, Adhika months, and Nija months after Adhika.
+    return (LunarMonth.values[signAtPrev], isAdhika);
   }
 
   // ── Binary search ───────────────────────────────────────────────────────────

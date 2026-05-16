@@ -61,7 +61,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         // Reverse geocode failed — proceed with coordinates and generic name.
       }
 
-      final tzId = await FlutterTimezone.getLocalTimezone();
+      final tzId = (await FlutterTimezone.getLocalTimezone()).identifier;
       final tzOffset = DateTime.now().timeZoneOffset;
       final location = AppLocation(
         lat: pos.latitude,
@@ -95,10 +95,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       if (mounted) context.go(Routes.dayView);
     }
   }
-
-  // ── Skip ─────────────────────────────────────────────────────────────────────
-
-  void _skip() => context.go(Routes.dayView);
 
   // ── Build ─────────────────────────────────────────────────────────────────────
 
@@ -157,18 +153,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                           ),
                     ),
                   ],
-                  const SizedBox(height: 16),
-                  GestureDetector(
-                    onTap: _skip,
-                    child: Text(
-                      'Skip for now',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: TithikaColors.inkMuted,
-                            decoration: TextDecoration.underline,
-                            decorationColor: TithikaColors.inkMuted,
-                          ),
-                    ),
-                  ),
                 ],
               ),
             ),

@@ -76,7 +76,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         }
       } catch (_) {}
 
-      final tzId = await FlutterTimezone.getLocalTimezone();
+      final tzId = (await FlutterTimezone.getLocalTimezone()).identifier;
       final tzOffset = DateTime.now().timeZoneOffset;
       final location = AppLocation(
         lat: pos.latitude,

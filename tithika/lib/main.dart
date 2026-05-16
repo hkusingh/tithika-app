@@ -37,11 +37,12 @@ void main() async {
     ],
   );
   // Pre-warm ephemeris, city database, and moon image in parallel.
+  // Timeout guards against a silent hang in Sweph.init() on some simulators.
   await Future.wait([
     container.read(ephemerisServiceProvider.future),
     container.read(citySearchServiceProvider.future),
     _precacheMoonImage(),
-  ]);
+  ]).timeout(const Duration(seconds: 15), onTimeout: () => []);
   await Future.delayed(const Duration(seconds: 1));
 
   runApp(

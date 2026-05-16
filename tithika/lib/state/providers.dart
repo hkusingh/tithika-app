@@ -3,9 +3,24 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/app_location.dart';
 import '../models/app_settings.dart';
 import '../models/day_data.dart';
+import '../models/lunar_month.dart';
+import '../models/paksha.dart';
 import '../services/festival_detector.dart';
 import '../services/providers.dart' as svc;
 import 'app_settings_notifier.dart';
+
+// ── Month system adjustment ───────────────────────────────────────────────────
+
+/// Base month naming from [_lunarMonthAndAdhika] is Amanta (prevAmavasya sign).
+/// For Purnimanta display, non-Adhika Krishna paksha belongs to the NEXT month.
+DayData _applyMonthSystem(DayData raw, MonthSystem system) {
+  if (system == MonthSystem.amanta) return raw;
+  if (!raw.isAdhika && raw.tithi.paksha == Paksha.krishna) {
+    final next = LunarMonth.values[(raw.lunarMonth.index + 1) % 12];
+    return raw.copyWith(lunarMonth: next);
+  }
+  return raw;
+}
 
 // ── Settings ─────────────────────────────────────────────────────────────────
 
@@ -39,6 +54,7 @@ final dayDataProvider = FutureProvider<DayData?>((ref) async {
   final tithiSvc = await ref.watch(svc.tithiServiceProvider.future);
   final date = ref.watch(selectedDateProvider);
   final location = ref.watch(effectiveLocationProvider);
+  final monthSystem = ref.watch(appSettingsProvider).monthSystem;
 
   final raw = tithiSvc.calculateForDate(
     localDate: date,
@@ -47,8 +63,10 @@ final dayDataProvider = FutureProvider<DayData?>((ref) async {
     tzOffset: location.tzOffsetAt(date),
   );
 
-  final festivalName = FestivalDetector.detect(raw);
-  return raw.copyWith(festivalName: festivalName);
+  final adjusted = _applyMonthSystem(raw, monthSystem);
+  final purnimanta = _applyMonthSystem(raw, MonthSystem.purnimanta);
+  final festivalName = FestivalDetector.detect(purnimanta);
+  return adjusted.copyWith(festivalName: festivalName);
 });
 
 // ── Day strip (4 days: selected−1, selected, selected+1, selected+2) ──────────
@@ -57,6 +75,7 @@ final stripDaysProvider = FutureProvider<List<DayData>>((ref) async {
   final tithiSvc = await ref.watch(svc.tithiServiceProvider.future);
   final selected = ref.watch(selectedDateProvider);
   final location = ref.watch(effectiveLocationProvider);
+  final monthSystem = ref.watch(appSettingsProvider).monthSystem;
   return List.generate(4, (i) {
     final date = DateTime(selected.year, selected.month, selected.day)
         .add(Duration(days: i - 1));
@@ -66,7 +85,9 @@ final stripDaysProvider = FutureProvider<List<DayData>>((ref) async {
       lon: location.lon,
       tzOffset: location.tzOffsetAt(date),
     );
-    return raw.copyWith(festivalName: FestivalDetector.detect(raw));
+    final adjusted = _applyMonthSystem(raw, monthSystem);
+    final purnimanta = _applyMonthSystem(raw, MonthSystem.purnimanta);
+    return adjusted.copyWith(festivalName: FestivalDetector.detect(purnimanta));
   });
 });
 
@@ -88,6 +109,7 @@ final monthDataProvider =
     FutureProvider.family<Map<int, DayData>, (int, int)>((ref, args) async {
   final tithiSvc = await ref.watch(svc.tithiServiceProvider.future);
   final location = ref.watch(effectiveLocationProvider);
+  final monthSystem = ref.watch(appSettingsProvider).monthSystem;
   final (year, month) = args;
   final daysInMonth = DateTime(year, month + 1, 0).day;
   return {
@@ -100,7 +122,92 @@ final monthDataProvider =
           lon: location.lon,
           tzOffset: location.tzOffsetAt(date),
         );
-        return raw.copyWith(festivalName: FestivalDetector.detect(raw));
+        final adjusted = _applyMonthSystem(raw, monthSystem);
+        final purnimanta = _applyMonthSystem(raw, MonthSystem.purnimanta);
+        return adjusted.copyWith(festivalName: FestivalDetector.detect(purnimanta));
       }(),
   };
+});
+
+// ── Hindu month transitions ───────────────────────────────────────────────────
+
+class NextHinduMonthInfo {
+  final LunarMonth month;
+  final DateTime date;
+  final DateTime startUtc;
+  final Duration tzOffset;
+
+  const NextHinduMonthInfo({
+    required this.month,
+    required this.date,
+    required this.startUtc,
+    required this.tzOffset,
+  });
+}
+
+/// Returns all Hindu (Purnimanta) month transitions that START within the
+/// given Gregorian (year, month). Derives from already-cached monthDataProvider
+/// so no extra ephemeris calls are made.
+final hinduMonthTransitionsProvider =
+    FutureProvider.family<List<NextHinduMonthInfo>, (int, int)>((ref, args) async {
+  final (year, month) = args;
+  final monthData = await ref.watch(monthDataProvider(args).future);
+  final location = ref.watch(effectiveLocationProvider);
+
+  final transitions = <NextHinduMonthInfo>[];
+  LunarMonth? prev;
+  final days = monthData.keys.toList()..sort();
+  for (final d in days) {
+    final data = monthData[d]!;
+    if (prev != null && data.lunarMonth != prev) {
+      final date = DateTime(year, month, d);
+      transitions.add(NextHinduMonthInfo(
+        month: data.lunarMonth,
+        date: date,
+        startUtc: data.tithi.start,
+        tzOffset: location.tzOffsetAt(date),
+      ));
+    }
+    prev = data.lunarMonth;
+  }
+  return transitions;
+});
+
+// ── Year festival list ────────────────────────────────────────────────────────
+
+class FestivalEntry {
+  final DateTime date;
+  final DayData data;
+
+  const FestivalEntry({required this.date, required this.data});
+}
+
+/// All festival days for [year] at the effective location.
+/// Iterates all 365/366 days — pure arithmetic, no I/O, completes in < 1s.
+final yearFestivalsProvider =
+    FutureProvider.family<List<FestivalEntry>, int>((ref, year) async {
+  final tithiSvc = await ref.watch(svc.tithiServiceProvider.future);
+  final location = ref.watch(effectiveLocationProvider);
+  final monthSystem = ref.watch(appSettingsProvider).monthSystem;
+
+  final entries = <FestivalEntry>[];
+  for (var month = 1; month <= 12; month++) {
+    final daysInMonth = DateTime(year, month + 1, 0).day;
+    for (var day = 1; day <= daysInMonth; day++) {
+      final date = DateTime(year, month, day);
+      final raw = tithiSvc.calculateForDate(
+        localDate: date,
+        lat: location.lat,
+        lon: location.lon,
+        tzOffset: location.tzOffsetAt(date),
+      );
+      final adjusted = _applyMonthSystem(raw, monthSystem);
+      final purnimanta = _applyMonthSystem(raw, MonthSystem.purnimanta);
+      final enriched = adjusted.copyWith(festivalName: FestivalDetector.detect(purnimanta));
+      if (enriched.festivalName != null) {
+        entries.add(FestivalEntry(date: date, data: enriched));
+      }
+    }
+  }
+  return entries;
 });

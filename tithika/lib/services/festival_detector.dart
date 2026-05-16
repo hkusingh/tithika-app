@@ -21,19 +21,16 @@ abstract final class FestivalDetector {
     }
 
     // ── Tithi-based festivals ────────────────────────────────────────────────
+    // No tithi-based festivals in Adhika (intercalary) months.
+    if (day.isAdhika) return null;
+
     // Month follows Purnimanta convention: month ends at Purnima.
     // Krishna paksha days belong to the month whose Purnima comes next.
     // e.g. Dhanteras (Kartika Krishna 13) → lunarMonth = kartika.
     return switch ((m, t)) {
       // Chaitra
-      (LunarMonth.chaitra, 1)  => 'Chaitra Navratri (Day 1)',
-      (LunarMonth.chaitra, 2)  => 'Chaitra Navratri (Day 2)',
-      (LunarMonth.chaitra, 3)  => 'Chaitra Navratri (Day 3)',
-      (LunarMonth.chaitra, 4)  => 'Chaitra Navratri (Day 4)',
-      (LunarMonth.chaitra, 5)  => 'Chaitra Navratri (Day 5)',
-      (LunarMonth.chaitra, 6)  => 'Chaitra Navratri (Day 6)',
-      (LunarMonth.chaitra, 7)  => 'Chaitra Navratri (Day 7)',
-      (LunarMonth.chaitra, 8)  => 'Chaitra Navratri (Day 8)',
+      (LunarMonth.chaitra, 1)  => 'Chaitra Navratri',
+      (LunarMonth.chaitra, 8)  => 'Maha Ashtami',
       (LunarMonth.chaitra, 9)  => 'Ram Navami',           // Shukla 9
       (LunarMonth.chaitra, 15) => 'Hanuman Jayanti',      // Purnima
       (LunarMonth.chaitra, 16) => 'Holi',                 // Krishna 1 = Rangwali Holi
@@ -62,15 +59,9 @@ abstract final class FestivalDetector {
       (LunarMonth.bhadrapada, 14) => 'Anant Chaturdashi',   // Shukla 14
 
       // Ashwina
-      (LunarMonth.ashwina, 1)  => 'Sharad Navratri (Day 1)',
-      (LunarMonth.ashwina, 2)  => 'Sharad Navratri (Day 2)',
-      (LunarMonth.ashwina, 3)  => 'Sharad Navratri (Day 3)',
-      (LunarMonth.ashwina, 4)  => 'Sharad Navratri (Day 4)',
-      (LunarMonth.ashwina, 5)  => 'Sharad Navratri (Day 5)',
-      (LunarMonth.ashwina, 6)  => 'Sharad Navratri (Day 6)',
-      (LunarMonth.ashwina, 7)  => 'Sharad Navratri (Day 7)',
-      (LunarMonth.ashwina, 8)  => 'Sharad Navratri (Day 8)',
-      (LunarMonth.ashwina, 9)  => 'Sharad Navratri (Day 9)',
+      (LunarMonth.ashwina, 1)  => 'Sharad Navratri',
+      (LunarMonth.ashwina, 8)  => 'Maha Ashtami',
+      (LunarMonth.ashwina, 9)  => 'Maha Navami',
       (LunarMonth.ashwina, 10) => 'Vijayadashami',
       (LunarMonth.ashwina, 15) => 'Sharad Purnima',
 

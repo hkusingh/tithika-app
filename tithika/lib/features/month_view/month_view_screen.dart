@@ -10,22 +10,70 @@ import '../../models/paksha.dart';
 import '../../state/providers.dart';
 import '../shared/starfield_background.dart';
 
-class MonthViewScreen extends ConsumerWidget {
+// ── Screen ────────────────────────────────────────────────────────────────────
+
+class MonthViewScreen extends ConsumerStatefulWidget {
   const MonthViewScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MonthViewScreen> createState() => _MonthViewScreenState();
+}
+
+class _MonthViewScreenState extends ConsumerState<MonthViewScreen> {
+  late PageController _pageController;
+
+  static int _toPage(DateTime m) => m.year * 12 + (m.month - 1);
+  static DateTime _fromPage(int p) => DateTime(p ~/ 12, p % 12 + 1);
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(
+      initialPage: _toPage(ref.read(selectedMonthProvider)),
+    );
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _goToPrevMonth() {
+    _pageController.animateToPage(
+      _pageController.page!.round() - 1,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  void _goToNextMonth() {
+    _pageController.animateToPage(
+      _pageController.page!.round() + 1,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final month = ref.watch(selectedMonthProvider);
-    final monthAsync =
-        ref.watch(monthDataProvider((month.year, month.month)));
+    final monthAsync = ref.watch(monthDataProvider((month.year, month.month)));
 
-    final gregorianLabel =
-        '${gregorianMonthName(month.month)} ${month.year}';
+    final gregorianLabel = '${gregorianMonthName(month.month)} ${month.year}';
 
-    // Use day-1's lunarMonth for the header subtitle when data is ready.
-    final hinduMonthLabel = monthAsync.valueOrNull?[1]?.lunarMonth.nameEn
-            .toUpperCase() ??
-        '';
+    // Collect all distinct Hindu months in first-appearance order.
+    // Adhika and Nija of the same month are tracked separately.
+    final hinduMonthNames = <String>[];
+    ({LunarMonth? month, bool isAdhika}) lastSeen = (month: null, isAdhika: false);
+    for (final data in (monthAsync.valueOrNull?.values ?? const <DayData>[])) {
+      if (data.lunarMonth != lastSeen.month || data.isAdhika != lastSeen.isAdhika) {
+        final base = data.lunarMonth.nameEn.toUpperCase();
+        hinduMonthNames.add(data.isAdhika ? 'ADH. $base' : base);
+        lastSeen = (month: data.lunarMonth, isAdhika: data.isAdhika);
+      }
+    }
+    final hinduMonthLabel = hinduMonthNames.join(' – ');
 
     return Scaffold(
       body: Stack(
@@ -34,7 +82,7 @@ class MonthViewScreen extends ConsumerWidget {
           SafeArea(
             child: Column(
               children: [
-                // Month header
+                // ── Month header (fixed) ──────────────────────────────────
                 Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
@@ -44,10 +92,7 @@ class MonthViewScreen extends ConsumerWidget {
                       IconButton(
                         icon: const Icon(Icons.chevron_left_rounded,
                             color: TithikaColors.inkSoft),
-                        onPressed: () {
-                          ref.read(selectedMonthProvider.notifier).state =
-                              DateTime(month.year, month.month - 1);
-                        },
+                        onPressed: _goToPrevMonth,
                       ),
                       Column(
                         children: [
@@ -74,16 +119,13 @@ class MonthViewScreen extends ConsumerWidget {
                       IconButton(
                         icon: const Icon(Icons.chevron_right_rounded,
                             color: TithikaColors.inkSoft),
-                        onPressed: () {
-                          ref.read(selectedMonthProvider.notifier).state =
-                              DateTime(month.year, month.month + 1);
-                        },
+                        onPressed: _goToNextMonth,
                       ),
                     ],
                   ),
                 ),
 
-                // Back to Day View
+                // ── Back to Day View (fixed) ──────────────────────────────
                 Align(
                   alignment: Alignment.centerLeft,
                   child: TextButton.icon(
@@ -97,7 +139,7 @@ class MonthViewScreen extends ConsumerWidget {
                   ),
                 ),
 
-                // Weekday header
+                // ── Weekday header (fixed) ────────────────────────────────
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                   child: Row(
@@ -118,35 +160,83 @@ class MonthViewScreen extends ConsumerWidget {
                 ),
                 const Divider(color: TithikaColors.line, height: 1),
 
-                // Grid
+                // ── Swipable grid ─────────────────────────────────────────
                 Expanded(
-                  child: monthAsync.when(
-                    loading: () => const Center(
-                      child: CircularProgressIndicator(
-                        color: TithikaColors.shukla,
-                        strokeWidth: 1.5,
-                      ),
-                    ),
-                    error: (e, _) => Center(
-                      child: Text(
-                        'Could not load month data.',
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodySmall
-                            ?.copyWith(color: TithikaColors.inkMuted),
-                      ),
-                    ),
-                    data: (monthData) => _MonthGrid(
-                      year: month.year,
-                      month: month.month,
-                      monthData: monthData,
-                    ),
+                  child: PageView.builder(
+                    controller: _pageController,
+                    onPageChanged: (index) {
+                      ref.read(selectedMonthProvider.notifier).state =
+                          _fromPage(index);
+                    },
+                    itemBuilder: (context, index) {
+                      final m = _fromPage(index);
+                      return _MonthPage(year: m.year, month: m.month);
+                    },
                   ),
                 ),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ── Month page (one page of the PageView) ─────────────────────────────────────
+
+class _MonthPage extends ConsumerWidget {
+  final int year;
+  final int month;
+
+  const _MonthPage({required this.year, required this.month});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final monthAsync = ref.watch(monthDataProvider((year, month)));
+
+    return monthAsync.when(
+      loading: () => const Center(
+        child: CircularProgressIndicator(
+            color: TithikaColors.shukla, strokeWidth: 1.5),
+      ),
+      error: (e, _) => Center(
+        child: Text(
+          'Could not load month data.',
+          style: Theme.of(context)
+              .textTheme
+              .bodySmall
+              ?.copyWith(color: TithikaColors.inkMuted),
+        ),
+      ),
+      data: (monthData) => LayoutBuilder(
+        builder: (context, constraints) {
+          // Compute the grid's natural height from row count so it never
+          // shrinks when the festival list is long.
+          final firstWeekday = DateTime(year, month, 1).weekday % 7;
+          final daysInMonth = DateTime(year, month + 1, 0).day;
+          final rows = ((firstWeekday + daysInMonth) / 7).ceil();
+          // Grid has horizontal padding 6 each side; childAspectRatio 0.72.
+          final cellWidth = (constraints.maxWidth - 12) / 7;
+          final gridHeight = rows * cellWidth / 0.72 + 8;
+
+          return SingleChildScrollView(
+            child: Column(
+              children: [
+                SizedBox(
+                  height: gridHeight,
+                  child: _MonthGrid(
+                    year: year,
+                    month: month,
+                    monthData: monthData,
+                  ),
+                ),
+                _NextHinduMonthNote(year: year, month: month),
+                _MonthFestivalList(year: year, month: month, monthData: monthData),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
@@ -170,19 +260,25 @@ class _MonthGrid extends ConsumerWidget {
     final selected = ref.watch(selectedDateProvider);
     final today = DateTime.now();
 
-    // weekday of the 1st: DateTime.weekday is Mon=1…Sun=7; grid is Sun-first.
     final firstWeekday = DateTime(year, month, 1).weekday % 7;
     final daysInMonth = DateTime(year, month + 1, 0).day;
     final totalCells = ((firstWeekday + daysInMonth) / 7).ceil() * 7;
 
     // Precompute which days start a new Hindu month within this grid.
+    // Tracks both lunarMonth and isAdhika so Adhika + Nija of the same month
+    // each get their own label entry.
     final Map<int, String> monthLabels = {};
     LunarMonth? lastLunarMonth;
+    bool lastIsAdhika = false;
     for (var d = 1; d <= daysInMonth; d++) {
       final data = monthData[d];
-      if (data != null && data.lunarMonth != lastLunarMonth) {
-        monthLabels[d] = data.lunarMonth.abbr4;
+      if (data != null &&
+          (data.lunarMonth != lastLunarMonth ||
+              data.isAdhika != lastIsAdhika)) {
+        final abbr = data.lunarMonth.abbr4;
+        monthLabels[d] = data.isAdhika ? 'A.${abbr.substring(0, 3)}' : abbr;
         lastLunarMonth = data.lunarMonth;
+        lastIsAdhika = data.isAdhika;
       }
     }
 
@@ -252,7 +348,8 @@ class _MonthCell extends StatelessWidget {
         ? TithikaColors.inkMuted
         : (isShukla ? TithikaColors.shukla : TithikaColors.krishna);
 
-    // Today and selected can overlap; selected takes visual priority.
+    final isHinduMonthStart = hinduMonthLabel != null;
+
     Color? bgColor;
     if (isSelected) {
       bgColor = TithikaColors.shukla.withValues(alpha: 0.20);
@@ -269,7 +366,11 @@ class _MonthCell extends StatelessWidget {
         border: Border(
           top: isSelected
               ? const BorderSide(color: TithikaColors.shukla, width: 2)
-              : BorderSide.none,
+              : isHinduMonthStart
+                  ? BorderSide(
+                      color: TithikaColors.shukla.withValues(alpha: 0.5),
+                      width: 1.5)
+                  : BorderSide.none,
           bottom: const BorderSide(color: Color(0x0AFFFFFF)),
           right: const BorderSide(color: Color(0x0AFFFFFF)),
         ),
@@ -278,16 +379,16 @@ class _MonthCell extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Hindu month label — only on first day of a new lunar month
-          if (hinduMonthLabel != null)
+          // Hindu month label — bold gold on first day of new lunar month
+          if (isHinduMonthStart)
             Padding(
               padding: const EdgeInsets.only(top: 2),
               child: Text(
                 hinduMonthLabel!,
                 style: const TextStyle(
-                  fontSize: 6.5,
+                  fontSize: 7.5,
                   fontWeight: FontWeight.w700,
-                  color: TithikaColors.inkMuted,
+                  color: TithikaColors.shukla,
                   letterSpacing: 0.3,
                 ),
               ),
@@ -295,7 +396,7 @@ class _MonthCell extends StatelessWidget {
           else
             const SizedBox(height: 4),
 
-          // Date number — gold circle for today, gold text for selected
+          // Date number
           Container(
             width: 20,
             height: 20,
@@ -338,9 +439,7 @@ class _MonthCell extends StatelessWidget {
               style: TextStyle(
                 fontSize: 9,
                 fontWeight: FontWeight.w600,
-                color: isShukla
-                    ? TithikaColors.shukla
-                    : TithikaColors.krishna,
+                color: isShukla ? TithikaColors.shukla : TithikaColors.krishna,
               ),
             ),
 
@@ -361,5 +460,147 @@ class _MonthCell extends StatelessWidget {
   }
 }
 
-// ── Starfield background ──────────────────────────────────────────────────────
+// ── Month festival list ───────────────────────────────────────────────────────
 
+class _MonthFestivalList extends StatelessWidget {
+  final int year;
+  final int month;
+  final Map<int, DayData> monthData;
+
+  const _MonthFestivalList({
+    required this.year,
+    required this.month,
+    required this.monthData,
+  });
+
+  static const _weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  static const _months = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final festivals = <({int day, String name})>[];
+    final daysInMonth = DateTime(year, month + 1, 0).day;
+    for (var d = 1; d <= daysInMonth; d++) {
+      final name = monthData[d]?.festivalName;
+      if (name != null) festivals.add((day: d, name: name));
+    }
+
+    if (festivals.isEmpty) return const SizedBox.shrink();
+
+    return Container(
+      margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+      decoration: BoxDecoration(
+        border: Border.all(color: TithikaColors.line),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+            child: Text(
+              'FESTIVALS',
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: TithikaColors.shukla,
+                    letterSpacing: 0.8,
+                    fontSize: 10,
+                  ),
+            ),
+          ),
+          const Divider(height: 1, color: TithikaColors.line),
+          ...festivals.map((f) {
+            final date = DateTime(year, month, f.day);
+            final wd = _weekdays[date.weekday % 7];
+            final mo = _months[month - 1];
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 54,
+                    child: Text(
+                      '$wd ${f.day} $mo',
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            color: TithikaColors.inkSoft,
+                            fontSize: 10,
+                          ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(width: 3, height: 3,
+                      decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: TithikaColors.festival)),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      f.name,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
+          const SizedBox(height: 4),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Next Hindu month note ─────────────────────────────────────────────────────
+
+class _NextHinduMonthNote extends ConsumerWidget {
+  final int year;
+  final int month;
+
+  const _NextHinduMonthNote({required this.year, required this.month});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final transitionsAsync =
+        ref.watch(hinduMonthTransitionsProvider((year, month)));
+
+    return transitionsAsync.when(
+      loading: () => const SizedBox(height: 28),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (transitions) {
+        if (transitions.isEmpty) return const SizedBox.shrink();
+        const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const months = [
+          'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+        ];
+
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: transitions.map((info) {
+              final wd = weekdays[info.date.weekday % 7];
+              final mo = months[info.date.month - 1];
+              final time = formatLocalTime(info.startUtc, info.tzOffset);
+              return Text(
+                '${info.month.nameEn} begins $wd, $mo ${info.date.day} at $time',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: TithikaColors.inkSoft,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
+              );
+            }).toList(),
+          ),
+        );
+      },
+    );
+  }
+}

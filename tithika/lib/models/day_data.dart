@@ -35,6 +35,10 @@ class DayData {
   /// (kshaya / skipped tithi). Null on most days.
   final TithiInfo? secondaryTithi;
 
+  /// True if this day falls within an Adhika (intercalary) lunar month —
+  /// i.e. no solar Sankranti occurs between two consecutive Purnimas.
+  final bool isAdhika;
+
   const DayData({
     required this.localDate,
     required this.tithi,
@@ -46,20 +50,27 @@ class DayData {
     this.sunZodiacEntryToday = false,
     this.festivalName,
     this.secondaryTithi,
+    this.isAdhika = false,
   });
 
-  DayData copyWith({String? festivalName, TithiInfo? secondaryTithi}) {
+  DayData copyWith({
+    String? festivalName,
+    TithiInfo? secondaryTithi,
+    bool? isAdhika,
+    LunarMonth? lunarMonth,
+  }) {
     return DayData(
       localDate: localDate,
       tithi: tithi,
       nakshatra: nakshatra,
       sunriseUtc: sunriseUtc,
       sunsetUtc: sunsetUtc,
-      lunarMonth: lunarMonth,
+      lunarMonth: lunarMonth ?? this.lunarMonth,
       sunZodiacSign: sunZodiacSign,
       sunZodiacEntryToday: sunZodiacEntryToday,
       festivalName: festivalName ?? this.festivalName,
       secondaryTithi: secondaryTithi ?? this.secondaryTithi,
+      isAdhika: isAdhika ?? this.isAdhika,
     );
   }
 }
