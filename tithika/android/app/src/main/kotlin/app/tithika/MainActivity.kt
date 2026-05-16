@@ -1,4 +1,4 @@
-package com.tithika.tithika
+package app.tithika
 
 import io.flutter.embedding.android.FlutterActivity
 
