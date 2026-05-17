@@ -15,6 +15,15 @@ import '../shared/starfield_background.dart';
 import 'location_banner.dart';
 import 'moon_phase_widget.dart';
 
+DayData _applyMonthSystem(DayData raw, MonthSystem system) {
+  if (system == MonthSystem.amanta) return raw;
+  if (!raw.isAdhika && raw.tithi.paksha == Paksha.krishna) {
+    final next = LunarMonth.values[(raw.lunarMonth.index + 1) % 12];
+    return raw.copyWith(lunarMonth: next);
+  }
+  return raw;
+}
+
 // Fixed epoch for converting dates ↔ PageView page indices.
 // Use UTC to avoid DST-related off-by-one errors in difference().
 final _epoch = DateTime.utc(2000, 1, 1);
@@ -209,6 +218,7 @@ class _DayPageContent extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tithiSvcAsync = ref.watch(svc.tithiServiceProvider);
     final location = ref.watch(effectiveLocationProvider);
+    final monthSystem = ref.watch(appSettingsProvider).monthSystem;
 
     return tithiSvcAsync.when(
       loading: () => const Center(
@@ -233,7 +243,9 @@ class _DayPageContent extends ConsumerWidget {
           lon: location.lon,
           tzOffset: location.tzOffsetAt(date),
         );
-        final data = raw.copyWith(festivalName: FestivalDetector.detect(raw));
+        final adjusted = _applyMonthSystem(raw, monthSystem);
+        final purnimanta = _applyMonthSystem(raw, MonthSystem.purnimanta);
+        final data = adjusted.copyWith(festivalName: FestivalDetector.detect(purnimanta));
         return _DayContent(data: data, date: date);
       },
     );
