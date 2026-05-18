@@ -4,6 +4,7 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../core/theme.dart';
 import '../../models/app_location.dart';
@@ -11,6 +12,10 @@ import '../../models/app_settings.dart';
 import '../../state/providers.dart';
 import '../shared/city_picker_sheet.dart';
 import '../shared/starfield_background.dart';
+
+final _packageInfoProvider = FutureProvider<PackageInfo>(
+  (_) => PackageInfo.fromPlatform(),
+);
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -215,6 +220,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: TithikaColors.inkMuted,
                             ),
+                      ),
+                      const SizedBox(height: 20),
+                      Consumer(
+                        builder: (context, ref, _) {
+                          final info = ref.watch(_packageInfoProvider);
+                          final version = info.whenOrNull(
+                            data: (p) => 'Version ${p.version} (${p.buildNumber})',
+                          ) ?? '';
+                          return Text(
+                            version,
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: TithikaColors.inkMuted,
+                                ),
+                          );
+                        },
                       ),
                       const SizedBox(height: 24),
                     ],

@@ -2,11 +2,14 @@ import '../models/day_data.dart';
 import '../models/lunar_month.dart';
 
 abstract final class FestivalDetector {
-  /// Returns the festival name for [day], or null if it is an ordinary day.
+  /// Returns the English festival name for [day], or null if it is an ordinary day.
   ///
   /// Solar festivals (Sankranti) take priority over tithi-based names.
   /// Tithi numbers use the continuous 1–30 scale: Shukla 1–15 = 1–15,
   /// Krishna 1–14 = 16–29, Amavasya = 30.
+  ///
+  /// The returned string is always English and serves as the canonical key.
+  /// Use FestivalNames.localize() in the display layer to get a localized name.
   static String? detect(DayData day) {
     final t = day.tithi.number;
     final m = day.lunarMonth;

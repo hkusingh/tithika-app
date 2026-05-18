@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/festival_names.dart';
 import '../../core/theme.dart';
+import '../../models/app_settings.dart';
 import '../../models/lunar_month.dart';
 import '../../models/paksha.dart';
 import '../../state/providers.dart';
@@ -155,12 +157,14 @@ class _MonthHeader extends StatelessWidget {
 
 // ── Festival card ─────────────────────────────────────────────────────────────
 
-class _FestivalCard extends StatelessWidget {
+class _FestivalCard extends ConsumerWidget {
   final FestivalEntry entry;
   const _FestivalCard({required this.entry});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final language = ref.watch(appSettingsProvider).language;
+    final isDeva = language == AppLanguage.hindiDevanagari;
     final date = entry.date;
     final data = entry.data;
     final isShukla = data.tithi.paksha == Paksha.shukla;
@@ -171,9 +175,11 @@ class _FestivalCard extends StatelessWidget {
     final mo = _monthNamesShort[date.month - 1];
     final gregDate = '$wd, $mo ${date.day}';
 
-    final pakshaLabel = isShukla ? 'Shukla' : 'Krishna';
-    final hinduDate =
-        '${data.lunarMonth.nameEn} · $pakshaLabel ${data.tithi.pakshaNumber}';
+    final pakshaLabel = isShukla
+        ? (isDeva ? 'शुक्ल' : 'Shukla')
+        : (isDeva ? 'कृष्ण' : 'Krishna');
+    final monthName = isDeva ? data.lunarMonth.nameDeva : data.lunarMonth.nameEn;
+    final hinduDate = '$monthName · $pakshaLabel ${data.tithi.pakshaNumber}';
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -200,7 +206,7 @@ class _FestivalCard extends StatelessWidget {
                 ),
               ),
               child: const Icon(
-                Icons.star_rounded,
+                Icons.flare_rounded,
                 color: TithikaColors.festival,
                 size: 18,
               ),
@@ -214,7 +220,7 @@ class _FestivalCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      entry.data.festivalName!,
+                      FestivalNames.localize(entry.data.festivalName, language)!,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             fontWeight: FontWeight.w600,
                             color: TithikaColors.ink,
@@ -223,10 +229,16 @@ class _FestivalCard extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       hinduDate,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: pakshaColor,
-                            fontSize: 11,
-                          ),
+                      style: isDeva
+                          ? devanagariStyle(
+                              Theme.of(context).textTheme.bodySmall,
+                              color: pakshaColor,
+                              fontSize: 11,
+                            )
+                          : Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: pakshaColor,
+                                fontSize: 11,
+                              ),
                     ),
                   ],
                 ),

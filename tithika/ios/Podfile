@@ -40,4 +40,23 @@ post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
   end
+
+  # flutter_timezone 5.x bundles objective_c.framework with a simulator
+  # platform marker (LC_BUILD_VERSION platform=iphonesimulator), which
+  # App Store Connect rejects with validation error 409. This build phase
+  # runs vtool after frameworks are embedded to rewrite the marker to iOS.
+  require 'xcodeproj'
+  project_path = File.expand_path('../Runner.xcodeproj', __FILE__)
+  project = Xcodeproj::Project.open(project_path)
+  runner_target = project.targets.find { |t| t.name == 'Runner' }
+  phase_name = 'Fix objective_c.framework platform marker'
+  unless runner_target.build_phases.any? { |p| p.respond_to?(:name) && p.name == phase_name }
+    phase = runner_target.new_shell_script_build_phase(phase_name)
+    phase.shell_script = <<~'SCRIPT'
+      F="${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/objective_c.framework/objective_c"
+      [ -f "$F" ] && vtool -set-build-version ios 12.0 17.0 -replace -output "$F" "$F" || true
+    SCRIPT
+    phase.run_only_for_deployment_postprocessing = '1'
+    project.save
+  end
 end

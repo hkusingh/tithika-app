@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/festival_names.dart';
 import '../../core/theme.dart';
 import '../../core/time_format.dart';
 import '../../models/app_settings.dart';
@@ -160,7 +161,7 @@ class _DayViewScreenState extends ConsumerState<DayViewScreen> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               IconButton(
-                                icon: const Icon(Icons.celebration_rounded,
+                                icon: const Icon(Icons.flare_rounded,
                                     color: TithikaColors.inkSoft, size: 22),
                                 onPressed: () => context.go('/festivals'),
                                 tooltip: 'Festivals',
@@ -344,7 +345,7 @@ class _DayContent extends ConsumerWidget {
           Text(tithiFullName, style: tithiNameStyle),
           if (data.festivalName != null) ...[
             const SizedBox(height: 6),
-            _FestivalBadge(name: data.festivalName!),
+            _FestivalBadge(name: FestivalNames.localize(data.festivalName!, language)!),
           ],
           const SizedBox(height: 6),
           Text(
@@ -610,6 +611,7 @@ class _DayStrip extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final stripAsync = ref.watch(stripDaysProvider);
     final selected = ref.watch(selectedDateProvider);
+    final language = ref.watch(appSettingsProvider).language;
 
     return Container(
       decoration: const BoxDecoration(
@@ -635,6 +637,7 @@ class _DayStrip extends ConsumerWidget {
                   dayData: dayData,
                   date: cellDate,
                   isSelected: isSelected,
+                  language: language,
                 ),
               ),
             );
@@ -649,16 +652,20 @@ class _StripCell extends StatelessWidget {
   final DayData dayData;
   final DateTime date;
   final bool isSelected;
+  final AppLanguage language;
 
   const _StripCell({
     required this.dayData,
     required this.date,
     required this.isSelected,
+    required this.language,
   });
 
   // Named festival takes priority; fall back to recurring observances.
   String? get _label {
-    if (dayData.festivalName != null) return dayData.festivalName;
+    if (dayData.festivalName != null) {
+      return FestivalNames.localize(dayData.festivalName, language);
+    }
     return switch (dayData.tithi.number) {
       11 || 26 => 'Ekadashi',
       15       => 'Purnima',

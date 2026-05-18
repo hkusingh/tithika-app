@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/festival_names.dart';
 import '../../core/theme.dart';
 import '../../core/time_format.dart';
+import '../../models/app_settings.dart';
 import '../../models/day_data.dart';
 import '../../models/lunar_month.dart';
 import '../../models/paksha.dart';
@@ -61,6 +63,7 @@ class _MonthViewScreenState extends ConsumerState<MonthViewScreen> {
     final monthAsync = ref.watch(monthDataProvider((month.year, month.month)));
 
     final gregorianLabel = '${gregorianMonthName(month.month)} ${month.year}';
+    final isDeva = ref.watch(appSettingsProvider).language == AppLanguage.hindiDevanagari;
 
     // Collect all distinct Hindu months in first-appearance order.
     // Adhika and Nija of the same month are tracked separately.
@@ -68,8 +71,12 @@ class _MonthViewScreenState extends ConsumerState<MonthViewScreen> {
     ({LunarMonth? month, bool isAdhika}) lastSeen = (month: null, isAdhika: false);
     for (final data in (monthAsync.valueOrNull?.values ?? const <DayData>[])) {
       if (data.lunarMonth != lastSeen.month || data.isAdhika != lastSeen.isAdhika) {
-        final base = data.lunarMonth.nameEn.toUpperCase();
-        hinduMonthNames.add(data.isAdhika ? 'ADH. $base' : base);
+        final base = isDeva
+            ? data.lunarMonth.nameDeva
+            : data.lunarMonth.nameEn.toUpperCase();
+        hinduMonthNames.add(
+          data.isAdhika ? (isDeva ? 'अधिक $base' : 'ADH. $base') : base,
+        );
         lastSeen = (month: data.lunarMonth, isAdhika: data.isAdhika);
       }
     }
@@ -106,13 +113,19 @@ class _MonthViewScreenState extends ConsumerState<MonthViewScreen> {
                           if (hinduMonthLabel.isNotEmpty)
                             Text(
                               hinduMonthLabel,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .labelSmall
-                                  ?.copyWith(
-                                    color: TithikaColors.shukla,
-                                    letterSpacing: 0.06 * 11,
-                                  ),
+                              style: isDeva
+                                  ? devanagariStyle(
+                                      Theme.of(context).textTheme.labelSmall,
+                                      color: TithikaColors.shukla,
+                                      fontSize: 11,
+                                    )
+                                  : Theme.of(context)
+                                      .textTheme
+                                      .labelSmall
+                                      ?.copyWith(
+                                        color: TithikaColors.shukla,
+                                        letterSpacing: 0.06 * 11,
+                                      ),
                             ),
                         ],
                       ),
@@ -462,7 +475,7 @@ class _MonthCell extends StatelessWidget {
 
 // ── Month festival list ───────────────────────────────────────────────────────
 
-class _MonthFestivalList extends StatelessWidget {
+class _MonthFestivalList extends ConsumerWidget {
   final int year;
   final int month;
   final Map<int, DayData> monthData;
@@ -480,12 +493,13 @@ class _MonthFestivalList extends StatelessWidget {
   ];
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final language = ref.watch(appSettingsProvider).language;
     final festivals = <({int day, String name})>[];
     final daysInMonth = DateTime(year, month + 1, 0).day;
     for (var d = 1; d <= daysInMonth; d++) {
-      final name = monthData[d]?.festivalName;
-      if (name != null) festivals.add((day: d, name: name));
+      final key = monthData[d]?.festivalName;
+      if (key != null) festivals.add((day: d, name: FestivalNames.localize(key, language)!));
     }
 
     if (festivals.isEmpty) return const SizedBox.shrink();
@@ -568,10 +582,11 @@ class _NextHinduMonthNote extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final transitionsAsync =
         ref.watch(hinduMonthTransitionsProvider((year, month)));
+    final isDeva = ref.watch(appSettingsProvider).language == AppLanguage.hindiDevanagari;
 
     return transitionsAsync.when(
       loading: () => const SizedBox(height: 28),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (e, s) => const SizedBox.shrink(),
       data: (transitions) {
         if (transitions.isEmpty) return const SizedBox.shrink();
         const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -589,8 +604,9 @@ class _NextHinduMonthNote extends ConsumerWidget {
               final wd = weekdays[info.date.weekday % 7];
               final mo = months[info.date.month - 1];
               final time = formatLocalTime(info.startUtc, info.tzOffset);
+              final monthName = isDeva ? info.month.nameDeva : info.month.nameEn;
               return Text(
-                '${info.month.nameEn} begins $wd, $mo ${info.date.day} at $time',
+                '$monthName begins $wd, $mo ${info.date.day} at $time',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: TithikaColors.inkSoft,
                       fontSize: 11,

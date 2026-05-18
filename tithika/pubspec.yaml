@@ -2,7 +2,7 @@ name: tithika
 description: "Tithika — Hindu lunar calendar with tithi-accurate moon phases."
 publish_to: 'none'
 
-version: 1.1.0+7
+version: 1.1.0+9
 
 environment:
   sdk: ^3.11.5
@@ -36,6 +36,9 @@ dependencies:
   google_fonts: ^6.2.1
   sweph: ^3.2.1+2.10.3
   path_provider: ^2.1.5
+
+  # App version
+  package_info_plus: ^8.0.0
 
 dev_dependencies:
   flutter_test:
