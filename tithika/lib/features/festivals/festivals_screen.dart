@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/app_strings.dart';
 import '../../core/festival_names.dart';
 import '../../core/theme.dart';
 import '../../models/app_settings.dart';
@@ -175,9 +176,7 @@ class _FestivalCard extends ConsumerWidget {
     final mo = _monthNamesShort[date.month - 1];
     final gregDate = '$wd, $mo ${date.day}';
 
-    final pakshaLabel = isShukla
-        ? (isDeva ? 'शुक्ल' : 'Shukla')
-        : (isDeva ? 'कृष्ण' : 'Krishna');
+    final pakshaLabel = AppStrings.paksha(data.tithi.paksha, language);
     final monthName = isDeva ? data.lunarMonth.nameDeva : data.lunarMonth.nameEn;
     final hinduDate = '$monthName · $pakshaLabel ${data.tithi.pakshaNumber}';
 
