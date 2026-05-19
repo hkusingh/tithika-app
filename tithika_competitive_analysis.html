@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tithika — Competitive Analysis · May 2026</title>
+<style>
+:root {
+  --navy:      #1A2744;
+  --indigo:    #4A5FC1;
+  --gold:      #D9A441;
+  --text:      #1C1C1C;
+  --muted:     #666;
+  --light:     #F5F7FA;
+  --border:    #E0E3EA;
+  --green:     #1E7E34;
+  --green-bg:  #E8F5E9;
+  --red:       #B71C1C;
+  --red-bg:    #FFEBEE;
+  --amber:     #B45309;
+  --amber-bg:  #FFF3E0;
+  --blue-bg:   #E3F2FD;
+  --purple-bg: #F3E5F5;
+  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+
+  /* for the embedded chart */
+  --color-text-primary:      #1C1C1C;
+  --color-text-secondary:    #666666;
+  --color-text-tertiary:     #999999;
+  --color-border-tertiary:   rgba(0,0,0,0.10);
+  --color-border-secondary:  rgba(0,0,0,0.18);
+  --color-background-primary:   #ffffff;
+  --color-background-secondary: #F5F7FA;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --navy:      #243560;
+    --indigo:    #7B8FD8;
+    --text:      #E8E8E8;
+    --muted:     #AAAAAA;
+    --light:     #1E1E2A;
+    --border:    #383848;
+    --green:     #4CAF60;
+    --green-bg:  #0D2B10;
+    --red:       #EF6060;
+    --red-bg:    #2B0D0D;
+    --amber:     #E2A040;
+    --amber-bg:  #2B1A00;
+    --blue-bg:   #0A1A30;
+    --purple-bg: #1E0A2B;
+
+    --color-text-primary:      #E8E8E8;
+    --color-text-secondary:    #AAAAAA;
+    --color-text-tertiary:     #777777;
+    --color-border-tertiary:   rgba(255,255,255,0.10);
+    --color-border-secondary:  rgba(255,255,255,0.18);
+    --color-background-primary:   #1E1E2A;
+    --color-background-secondary: #252535;
+  }
+  body { background: #141420; }
+}
+
+*  { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font); color: var(--text); line-height: 1.65; font-size: 15px; }
+
+/* ── Page shell ─────────────────────────────────────── */
+.doc-header { background: var(--navy); color: #fff; padding: 52px 64px 44px; }
+.doc-header-emoji { font-size: 52px; display: block; margin-bottom: 14px; line-height: 1; }
+.doc-header h1 { font-size: 34px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 6px; }
+.doc-header .subtitle { font-size: 17px; color: rgba(255,255,255,0.68); margin-bottom: 14px; }
+.doc-header .meta { font-size: 12px; color: rgba(255,255,255,0.42); }
+.gold-bar { height: 3px; background: var(--gold); }
+.doc-nav { background: var(--light); border-bottom: 1px solid var(--border); padding: 0 64px; display: flex; gap: 0; overflow-x: auto; }
+.doc-nav a { display: inline-block; padding: 13px 18px 11px; font-size: 13px; color: var(--indigo); text-decoration: none; font-weight: 500; border-bottom: 2px solid transparent; white-space: nowrap; transition: border-color .15s; }
+.doc-nav a:hover { border-bottom-color: var(--gold); }
+.doc-content { max-width: 980px; margin: 0 auto; padding: 44px 64px 60px; }
+.doc-footer { background: var(--light); border-top: 3px solid var(--gold); padding: 22px 64px; text-align: center; font-size: 12px; color: var(--muted); }
+
+/* ── Sections ───────────────────────────────────────── */
+section { margin-bottom: 56px; scroll-margin-top: 20px; }
+section h2 { font-size: 21px; font-weight: 700; color: var(--navy); padding-bottom: 10px; border-bottom: 2px solid var(--gold); margin-bottom: 20px; }
+section h3 { font-size: 15px; font-weight: 600; color: var(--indigo); margin: 24px 0 10px; }
+p { margin-bottom: 12px; }
+strong { font-weight: 600; }
+
+/* ── Tables ─────────────────────────────────────────── */
+.table-wrap { overflow-x: auto; margin: 14px 0 22px; border-radius: 8px; border: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+th { background: var(--navy); color: #fff; padding: 9px 13px; text-align: left; font-weight: 600; font-size: 12.5px; }
+th:first-child { border-radius: 7px 0 0 0; }
+th:last-child  { border-radius: 0 7px 0 0; }
+td { padding: 8px 13px; border-bottom: 1px solid var(--border); vertical-align: top; color: var(--text); }
+tr:last-child td { border-bottom: none; }
+tr:nth-child(even) td { background: var(--light); }
+tr:hover td { background: rgba(74,95,193,0.04); }
+td.bold { font-weight: 600; }
+
+/* ── Feature matrix ─────────────────────────────────── */
+.feat-yes  { background: var(--green-bg)  !important; color: var(--green);  font-weight: 700; text-align: center; font-size: 14px; }
+.feat-no   { background: var(--red-bg)    !important; color: var(--red);    font-weight: 700; text-align: center; font-size: 14px; }
+.feat-part { background: var(--amber-bg)  !important; color: var(--amber);  font-weight: 500; text-align: center; font-size: 11px; }
+.tithika-col { background: rgba(74,95,193,0.06) !important; }
+th.tithika-th { background: #3A4FA8; }
+
+/* ── Summary table Tithika row ──────────────────────── */
+tr.tithika-row td { background: var(--blue-bg) !important; font-weight: 600; color: var(--indigo); }
+
+/* ── Competitor cards ───────────────────────────────── */
+.competitor-card { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 32px; }
+.card-header { background: var(--navy); color: #fff; padding: 14px 22px; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.card-header-name { font-size: 16px; font-weight: 700; }
+.card-header-meta { font-size: 12px; color: rgba(255,255,255,0.6); }
+.card-sub { background: #EEF1F8; padding: 8px 22px; display: flex; gap: 28px; font-size: 12px; color: #555; flex-wrap: wrap; }
+@media (prefers-color-scheme: dark) { .card-sub { background: #252535; color: #AAA; } }
+.card-body { padding: 18px 22px; }
+.card-body > p { font-size: 14px; line-height: 1.65; margin-bottom: 16px; color: var(--text); }
+.pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.pros, .cons { background: var(--light); border-radius: 8px; padding: 14px 16px; }
+.pros h4 { color: var(--green); font-size: 12.5px; font-weight: 700; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+.cons h4 { color: var(--red);   font-size: 12.5px; font-weight: 700; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+.pros ul, .cons ul { list-style: none; padding: 0; }
+.pros li, .cons li { font-size: 13px; padding: 3px 0 3px 18px; position: relative; line-height: 1.5; }
+.pros li::before { content: '✓'; color: var(--green); position: absolute; left: 0; font-weight: 700; }
+.cons li::before { content: '−'; color: var(--red);   position: absolute; left: 1px; font-size: 16px; top: -1px; }
+
+/* ── Bullet lists ───────────────────────────────────── */
+.bullets { list-style: none; padding: 0; margin: 10px 0 16px; }
+.bullets li { padding: 4px 0 4px 20px; position: relative; font-size: 14px; }
+.bullets li::before { content: '•'; position: absolute; left: 0; color: var(--gold); font-size: 18px; top: 1px; }
+
+/* ── Positioning chart container ────────────────────── */
+.chart-wrap { background: var(--light); border: 1px solid var(--border); border-radius: 10px; padding: 24px 20px 16px; }
+.chart-meta { font-size: 13px; color: var(--muted); margin-bottom: 10px; line-height: 1.6; }
+
+/* chart legend cards (reuse the widget structure) */
+.chart-legend { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px 14px; margin-top: 10px; font-size: 12px; }
+.legend-card { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-tertiary); }
+.legend-card-ti { border: 2px solid #534AB7; }
+.legend-name { font-weight: 600; color: var(--color-text-primary); }
+.legend-sub  { color: var(--color-text-secondary); font-size: 11px; }
+
+/* ── Takeaways ──────────────────────────────────────── */
+.takeaway { padding: 13px 18px 13px 20px; border-left: 3px solid var(--gold); background: rgba(217,164,65,0.07); margin-bottom: 10px; border-radius: 0 8px 8px 0; font-size: 14px; line-height: 1.6; }
+
+/* ── Positioning table ──────────────────────────────── */
+tr.pos-tithika td { background: var(--blue-bg) !important; font-weight: 600; color: var(--indigo); }
+
+@media (max-width: 680px) {
+  .doc-header, .doc-nav, .doc-content, .doc-footer { padding-left: 18px; padding-right: 18px; }
+  .doc-header h1 { font-size: 26px; }
+  .pros-cons { grid-template-columns: 1fr; }
+  .chart-legend { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══════════════════════════════════════════════════════════ -->
+<header class="doc-header">
+  <span class="doc-header-emoji">🌙</span>
+  <h1>Tithika (तिथिका)</h1>
+  <p class="subtitle">Competitive Analysis — Hindu Calendar &amp; Panchang Apps</p>
+  <p class="meta">Version 1.0 &nbsp;·&nbsp; May 2026 &nbsp;·&nbsp; Prepared by the Tithika Product Team &nbsp;·&nbsp; Confidential</p>
+</header>
+<div class="gold-bar"></div>
+
+<!-- ═══ NAV ══════════════════════════════════════════════════════════════ -->
+<nav class="doc-nav">
+  <a href="#summary">Executive Summary</a>
+  <a href="#chart">Positioning Chart</a>
+  <a href="#profiles">Competitor Profiles</a>
+  <a href="#matrix">Feature Matrix</a>
+  <a href="#strategy">Strategic Implications</a>
+  <a href="#takeaways">Key Takeaways</a>
+</nav>
+
+<!-- ═══ CONTENT ══════════════════════════════════════════════════════════ -->
+<main class="doc-content">
+
+<!-- ── 1. Executive Summary ──────────────────────────────────────────── -->
+<section id="summary">
+  <h2>Executive Summary</h2>
+  <p>The Hindu calendar app market is served by several well-established players, most of which have been built over many years and accumulated large user bases — particularly Drik Panchang, which is the category leader. The common pattern across all competitors is a heavy feature load: full Panchanga, Kundali, horoscopes, muhurta calculators, regional calendars, and often prayers and aarti content. This breadth comes at a cost — cluttered interfaces, aggressive advertising, and a steep learning curve for new users.</p>
+  <p><strong>Tithika's opportunity</strong> is to occupy a clearly differentiated position: the most beautiful, most accurate, and most approachable tithi-first app. No ads. No astrology. No feature bloat. Tithika bets that a large segment of users — especially the diaspora and younger urban Indians — wants a calm, well-designed, trustworthy lunar calendar without wading through Kundali charts or Vastu compasses.</p>
+
+  <h3>Market at a Glance</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th>App</th><th>Rating</th><th>Scale</th><th>Current positioning</th>
+      </tr></thead>
+      <tbody>
+        <tr><td class="bold">Drik Panchang</td><td>4.6–4.8 ★</td><td>1M+ Android, 5.5K iOS reviews</td><td>Feature-complete but cluttered; intrusive ads on free tier</td></tr>
+        <tr><td class="bold">Shubh Panchang</td><td>~4.5 ★</td><td>1 lakh+ daily users</td><td>Clean UI, muhurta focus; thinner festival coverage</td></tr>
+        <tr><td class="bold">Hindu Calendar – Panchang</td><td>~4.5 ★</td><td>#1 in 50+ countries (iOS)</td><td>Simple and popular; limited advanced features</td></tr>
+        <tr><td class="bold">Tithi – Hindu Calendar</td><td>~4.3 ★</td><td>Niche, Android-only</td><td>Ad-free, basic tithi view; Gujarati/Marathi/Hindi only</td></tr>
+        <tr><td class="bold">Hindu Calendar (Android)</td><td>~4.2 ★</td><td>Moderate, Android-only</td><td>Balanced; offline; horoscopes; accuracy varies</td></tr>
+        <tr class="tithika-row"><td class="bold">Tithika (planned v1)</td><td>—</td><td>—</td><td>Tithi-first · no ads · programmatic moon · Drik accuracy · open source</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ── 2. Competitive Positioning Chart ──────────────────────────────── -->
+<section id="chart">
+  <h2>Competitive Positioning Map</h2>
+
+  <div class="chart-wrap">
+    <p class="chart-meta">
+      <strong>X-axis</strong> — Ease of use &amp; design quality &nbsp;·&nbsp;
+      <strong>Y-axis</strong> — User value (ad-free, privacy, cost) &nbsp;·&nbsp;
+      <strong>Bubble size</strong> — Feature breadth &nbsp;·&nbsp;
+      <strong>Ring thickness</strong> — Accuracy
+    </p>
+
+    <svg id="pm" viewBox="0 0 680 488" width="100%" style="display:block;overflow:visible">
+      <!-- quadrant fills -->
+      <rect id="q-tr" x="349" y="34" width="292" height="199"/>
+      <rect id="q-tl" x="57"  y="34" width="292" height="199"/>
+      <rect id="q-bl" x="57"  y="233" width="292" height="199"/>
+      <rect id="q-br" x="349" y="233" width="292" height="199"/>
+      <!-- grid -->
+      <g id="grid" stroke-width="0.5" stroke-dasharray="3,5">
+        <line x1="57" x2="641" y1="74"  y2="74"/>
+        <line x1="57" x2="641" y1="114" y2="114"/>
+        <line x1="57" x2="641" y1="154" y2="154"/>
+        <line x1="57" x2="641" y1="194" y2="194"/>
+        <line x1="57" x2="641" y1="272" y2="272"/>
+        <line x1="57" x2="641" y1="312" y2="312"/>
+        <line x1="57" x2="641" y1="352" y2="352"/>
+        <line x1="57" x2="641" y1="392" y2="392"/>
+        <line x1="173" y1="34" x2="173" y2="432"/>
+        <line x1="289" y1="34" x2="289" y2="432"/>
+        <line x1="407" y1="34" x2="407" y2="432"/>
+        <line x1="523" y1="34" x2="523" y2="432"/>
+      </g>
+      <!-- center dividers -->
+      <line id="vcl" x1="349" y1="34" x2="349" y2="432" stroke-width="1.5" stroke-dasharray="7,5"/>
+      <line id="hcl" x1="57"  y1="233" x2="641" y2="233" stroke-width="1.5" stroke-dasharray="7,5"/>
+      <!-- axes -->
+      <line id="xax" x1="57" y1="432" x2="641" y2="432" stroke-width="1.5"/>
+      <line id="yax" x1="57" y1="34"  x2="57"  y2="432" stroke-width="1.5"/>
+      <!-- y ticks -->
+      <g id="yticks" font-size="10" text-anchor="end">
+        <text x="50" y="436">0</text><text x="50" y="396">1</text><text x="50" y="356">2</text>
+        <text x="50" y="316">3</text><text x="50" y="276">4</text><text x="50" y="236">5</text>
+        <text x="50" y="196">6</text><text x="50" y="156">7</text><text x="50" y="116">8</text>
+        <text x="50" y="76">9</text><text x="50" y="38">10</text>
+      </g>
+      <!-- x ticks -->
+      <g id="xticks" font-size="10" text-anchor="middle">
+        <text x="57"  y="447">0</text><text x="115" y="447">1</text><text x="173" y="447">2</text>
+        <text x="231" y="447">3</text><text x="289" y="447">4</text><text x="349" y="447">5</text>
+        <text x="407" y="447">6</text><text x="465" y="447">7</text><text x="523" y="447">8</text>
+        <text x="581" y="447">9</text><text x="641" y="447">10</text>
+      </g>
+      <!-- axis titles -->
+      <text id="xtitle" x="349" y="467" font-size="12" font-weight="600" text-anchor="middle">Ease of use &amp; design quality →</text>
+      <text id="ytitle" x="14" y="233" font-size="12" font-weight="600" text-anchor="middle" transform="rotate(-90,14,233)">User value (ad-free, privacy) →</text>
+      <!-- quadrant labels -->
+      <text id="ql-tr" x="360" y="52"  font-size="11" font-weight="600">Beautiful &amp; honest</text>
+      <text id="ql-tl" x="68"  y="52"  font-size="11" font-weight="600">Functional but demanding</text>
+      <text id="ql-bl" x="68"  y="425" font-size="11" font-weight="600">Complex &amp; costly</text>
+      <text id="ql-br" x="360" y="425" font-size="11" font-weight="600">Smooth but ad-supported</text>
+
+      <!-- ── Bubbles ── -->
+      <!-- 1. Drik Panchang: ease=2.2, value=2.0 → (184,353), features=10→r=32, accuracy=9→sw=4 -->
+      <circle cx="184" cy="353" r="32" fill="rgba(226,75,74,0.14)" stroke="#E24B4A" stroke-width="4"/>
+      <text x="184" y="350" font-size="11" font-weight="600" text-anchor="middle" fill="#E24B4A">Drik</text>
+      <text x="184" y="363" font-size="9.5" text-anchor="middle" fill="#E24B4A">Panchang</text>
+
+      <!-- 2. Shubh Panchang: ease=6.5, value=4.0 → (434,273), features=7→r=24, accuracy=7→sw=2.5 -->
+      <circle cx="434" cy="273" r="24" fill="rgba(186,117,23,0.14)" stroke="#BA7517" stroke-width="2.5"/>
+      <text x="434" y="270" font-size="11" font-weight="600" text-anchor="middle" fill="#8a5512">Shubh</text>
+      <text x="434" y="282" font-size="9.5" text-anchor="middle" fill="#8a5512">Panchang</text>
+
+      <!-- 3. Hindu Cal–Panchang: ease=7.2, value=5.4 → (475,217), features=5→r=20, accuracy=5→sw=1.5 -->
+      <circle cx="475" cy="217" r="20" fill="rgba(55,138,221,0.14)" stroke="#378ADD" stroke-width="1.5"/>
+      <text x="475" y="214" font-size="9.5" font-weight="600" text-anchor="middle" fill="#185FA5">Hindu Cal</text>
+      <text x="475" y="225" font-size="9" text-anchor="middle" fill="#185FA5">Panchang</text>
+
+      <!-- 4. Tithi App: ease=5.2, value=7.8 → (358,121), features=3→r=14, accuracy=5→sw=1.5 -->
+      <circle cx="358" cy="121" r="14" fill="rgba(29,158,117,0.14)" stroke="#1D9E75" stroke-width="1.5"/>
+      <text x="358" y="118" font-size="9.5" font-weight="600" text-anchor="middle" fill="#0F6E56">Tithi</text>
+      <text x="358" y="129" font-size="9" text-anchor="middle" fill="#0F6E56">App</text>
+
+      <!-- 5. Hindu Cal Android: ease=4.6, value=6.1 → (324,188), features=5→r=20, accuracy=5→sw=1.5 -->
+      <circle cx="324" cy="188" r="20" fill="rgba(99,153,34,0.14)" stroke="#639922" stroke-width="1.5"/>
+      <text x="324" y="185" font-size="9.5" font-weight="600" text-anchor="middle" fill="#3B6D11">Hindu Cal</text>
+      <text x="324" y="196" font-size="9" text-anchor="middle" fill="#3B6D11">Android</text>
+
+      <!-- 6. Tithika v1: ease=8.8, value=9.1 → (567,69), features=4→r=20, accuracy=9→sw=4 -->
+      <circle cx="567" cy="69" r="20" fill="rgba(83,74,183,0.20)" stroke="#534AB7" stroke-width="4"/>
+      <text x="567" y="65" font-size="11" font-weight="700" text-anchor="middle" fill="#534AB7">Tithika</text>
+      <text x="567" y="77" font-size="9.5" text-anchor="middle" fill="#534AB7">v1 plan</text>
+
+      <!-- sweet-spot star -->
+      <text id="star" x="628" y="58" font-size="18" text-anchor="middle">★</text>
+    </svg>
+
+    <!-- legend -->
+    <div class="chart-legend">
+      <div class="legend-card">
+        <svg width="26" height="26" style="flex-shrink:0"><circle cx="13" cy="13" r="11" fill="rgba(226,75,74,0.14)" stroke="#E24B4A" stroke-width="4"/></svg>
+        <div><div class="legend-name">Drik Panchang</div><div class="legend-sub">Features 10/10 · Accuracy 9/10</div></div>
+      </div>
+      <div class="legend-card">
+        <svg width="26" height="26" style="flex-shrink:0"><circle cx="13" cy="13" r="9" fill="rgba(186,117,23,0.14)" stroke="#BA7517" stroke-width="2.5"/></svg>
+        <div><div class="legend-name">Shubh Panchang</div><div class="legend-sub">Features 7/10 · Accuracy 7/10</div></div>
+      </div>
+      <div class="legend-card">
+        <svg width="26" height="26" style="flex-shrink:0"><circle cx="13" cy="13" r="7" fill="rgba(55,138,221,0.14)" stroke="#378ADD" stroke-width="1.5"/></svg>
+        <div><div class="legend-name">Hindu Cal – Panchang</div><div class="legend-sub">Features 5/10 · Accuracy 5/10</div></div>
+      </div>
+      <div class="legend-card">
+        <svg width="26" height="26" style="flex-shrink:0"><circle cx="13" cy="13" r="5" fill="rgba(29,158,117,0.14)" stroke="#1D9E75" stroke-width="1.5"/></svg>
+        <div><div class="legend-name">Tithi App</div><div class="legend-sub">Features 3/10 · Accuracy 5/10</div></div>
+      </div>
+      <div class="legend-card">
+        <svg width="26" height="26" style="flex-shrink:0"><circle cx="13" cy="13" r="7" fill="rgba(99,153,34,0.14)" stroke="#639922" stroke-width="1.5"/></svg>
+        <div><div class="legend-name">Hindu Cal (Android)</div><div class="legend-sub">Features 5/10 · Accuracy 5/10</div></div>
+      </div>
+      <div class="legend-card legend-card-ti">
+        <svg width="26" height="26" style="flex-shrink:0"><circle cx="13" cy="13" r="7" fill="rgba(83,74,183,0.20)" stroke="#534AB7" stroke-width="4"/></svg>
+        <div><div class="legend-name" style="color:#534AB7">Tithika v1 (planned)</div><div class="legend-sub">Features 4/10 · Accuracy 9/10</div></div>
+      </div>
+    </div>
+    <p style="font-size:11px;color:var(--muted);margin-top:10px">Ring thickness = accuracy (thick = high) &nbsp;·&nbsp; Bubble size = feature breadth &nbsp;·&nbsp; Scores are editorial estimates based on public reviews &amp; app store data, May 2026</p>
+  </div>
+</section>
+
+<!-- ── 3. Competitor Profiles ─────────────────────────────────────────── -->
+<section id="profiles">
+  <h2>Competitor Profiles</h2>
+
+  <!-- Drik Panchang -->
+  <div class="competitor-card">
+    <div class="card-header">
+      <span class="card-header-name">1. Drik Panchang — Hindu Calendar</span>
+      <span class="card-header-meta">4.8 ★ iOS (5.5K reviews) · 4.6 ★ Android (198K reviews) · 1M+ downloads</span>
+    </div>
+    <div class="card-sub">
+      <span><strong>Platform:</strong> iOS &amp; Android</span>
+      <span><strong>Price:</strong> Free + ads; ad-free ₹19/mo or ₹199/yr</span>
+      <span><strong>Developer:</strong> Adarsh Mobile Applications LLP</span>
+      <span><strong>Last updated:</strong> February 2026</span>
+    </div>
+    <div class="card-body">
+      <p>Drik Panchang is the de-facto reference standard in the category, backed by a reputed website (drikpanchang.com) with decades of trust. Its Android app alone has over a million downloads and nearly 200,000 ratings. The feature set is encyclopedic: from basic Panchanga through Kundali generation, horoscope matching, and a Vastu compass. For a devout user who wants everything in one place, it is the default choice. However, that same completeness is its biggest usability liability. Reviews consistently praise accuracy while criticising the ad experience and interface complexity. It has no visual representation of the moon and its onboarding assumes prior knowledge of Vedic concepts.</p>
+      <div class="pros-cons">
+        <div class="pros">
+          <h4>Strengths</h4>
+          <ul>
+            <li>Undisputed accuracy benchmark — Drik calculation method, trusted by astrologers</li>
+            <li>Full Panchanga: all 5 elements plus extended Dainika data</li>
+            <li>Kundali generator (D1–D60 charts), horoscope matching, Vimshottari Dasha</li>
+            <li>10+ Indian languages: Bengali, Gujarati, Hindi, Kannada, Malayalam, Marathi, Odia, Tamil, Telugu</li>
+            <li>Offline-first; location-aware globally; DST support built in</li>
+            <li>Cloud sync; festival reminders; ICS calendar export</li>
+            <li>Vastu compass, Prashnavali, Choghadiya, Hora, Rahu Kalam with countdown timers</li>
+            <li>Active development — updated February 2026</li>
+          </ul>
+        </div>
+        <div class="cons">
+          <h4>Weaknesses / Gaps</h4>
+          <ul>
+            <li>UI is dense and dated — information overload for casual or new users</li>
+            <li>Aggressive ads on free tier (full-screen interstitials between tabs)</li>
+            <li>No moon-phase visualisation — tithi is a number, not a visual experience</li>
+            <li>No home-screen widget on iOS</li>
+            <li>Privacy: collects identifiers and usage data for cross-app tracking</li>
+            <li>iOS app's last major feature update was 2019</li>
+            <li>Onboarding assumes familiarity with Panchanga concepts</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shubh Panchang -->
+  <div class="competitor-card">
+    <div class="card-header">
+      <span class="card-header-name">2. Shubh Panchang — Hindu Calendar</span>
+      <span class="card-header-meta">~4.5 ★ · 1 lakh+ daily users · iOS &amp; Android</span>
+    </div>
+    <div class="card-sub">
+      <span><strong>Platform:</strong> iOS &amp; Android + web (shubhpanchang.com)</span>
+      <span><strong>Price:</strong> Free (ad-supported)</span>
+      <span><strong>Developer:</strong> AppStoneLab Technologies LLP</span>
+    </div>
+    <div class="card-body">
+      <p>Shubh Panchang positions itself as the friendlier, more modern alternative to Drik Panchang. Its clean interface and emphasis on muhurta timings resonate with users planning important life events. The app operates as both a mobile app and web property. The muhurta module is regarded as one of the best in the category. Its weakness is depth of festival coverage and the lack of brand trust that Drik Panchang has built over many years. Some users report festival dates missing or incorrect — a serious issue for a devotional app.</p>
+      <div class="pros-cons">
+        <div class="pros">
+          <h4>Strengths</h4>
+          <ul>
+            <li>Cleaner, more modern UI — praised as beginner-friendly</li>
+            <li>Strong muhurta: Gruh Pravesh, marriage, vehicle, property timings</li>
+            <li>Full Panchanga plus Choghadiya, Hora, Gowri Panchang</li>
+            <li>Rahu Kaal, Yamaganda, Abhijit Muhurta with location-aware timings</li>
+            <li>Both Purnimanta and Amanta month systems</li>
+            <li>Festival &amp; vrat notifications; personalized horoscopes</li>
+            <li>Web version extends reach beyond mobile</li>
+          </ul>
+        </div>
+        <div class="cons">
+          <h4>Weaknesses / Gaps</h4>
+          <ul>
+            <li>Festival coverage gaps — Dussehra missing in some versions</li>
+            <li>Ad-supported free model; not ad-free by default</li>
+            <li>No moon-phase visualisation</li>
+            <li>No home-screen widgets</li>
+            <li>Location defaulted to Mumbai in some versions</li>
+            <li>English/Hindi/Gujarati only — narrower than Drik Panchang</li>
+            <li>Less established accuracy trust than Drik</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hindu Calendar – Panchang -->
+  <div class="competitor-card">
+    <div class="card-header">
+      <span class="card-header-name">3. Hindu Calendar — Panchang</span>
+      <span class="card-header-meta">~4.5 ★ · #1 in 50+ countries on iOS · 2 lakh+ users</span>
+    </div>
+    <div class="card-sub">
+      <span><strong>Platform:</strong> iOS (primary)</span>
+      <span><strong>Price:</strong> Free</span>
+    </div>
+    <div class="card-body">
+      <p>This app's top chart ranking across 50+ countries is remarkable and speaks to the power of simplicity — it gives users exactly what they need without overwhelming them. The diaspora audience (UK, USA, Canada, Australia) responds strongly to it. However, the app has not evolved significantly and sits between the power-user apps and a truly modern consumer experience. It is a digital reference book rather than an engaging daily companion. No visual moon language, no notifications, no widget for lock screen or home screen.</p>
+      <div class="pros-cons">
+        <div class="pros">
+          <h4>Strengths</h4>
+          <ul>
+            <li>#1 in 50+ countries — enormous distribution advantage</li>
+            <li>All 5 Panchanga elements; auspicious timings and major festivals</li>
+            <li>Offline-first; clean city/location selection</li>
+            <li>Approachable for users new to Panchanga</li>
+            <li>Strong word-of-mouth from diaspora communities</li>
+          </ul>
+        </div>
+        <div class="cons">
+          <h4>Weaknesses / Gaps</h4>
+          <ul>
+            <li>No Kundali, no advanced muhurta, no regional calendars</li>
+            <li>No moon-phase visualisation</li>
+            <li>No home-screen widgets or notifications</li>
+            <li>Limited language support (primarily English + Hindi)</li>
+            <li>Accuracy harder to verify — calculation method not disclosed</li>
+            <li>Weaker Android presence than iOS</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tithi App -->
+  <div class="competitor-card">
+    <div class="card-header">
+      <span class="card-header-name">4. Tithi — Hindu Calendar</span>
+      <span class="card-header-meta">~4.3 ★ · Niche · Android only</span>
+    </div>
+    <div class="card-sub">
+      <span><strong>Platform:</strong> Android only</span>
+      <span><strong>Price:</strong> Free, no ads</span>
+    </div>
+    <div class="card-body">
+      <p>This app is the closest conceptual cousin to Tithika in the market — ad-free, offline, and puts the tithi at the centre of the experience. However, it is limited to Android, has a small user base, and has not invested in design or visual storytelling. Its existence validates the market appetite for a focused, ad-free tithi app, but it has not executed on the visual and UX quality that would make it mainstream. Tithika can learn from its positioning while dramatically outclassing it on design, platform coverage, and content depth.</p>
+      <div class="pros-cons">
+        <div class="pros">
+          <h4>Strengths</h4>
+          <ul>
+            <li>Ad-free by design — rare in this category</li>
+            <li>Fully offline</li>
+            <li>Tithi-first design philosophy — closest to Tithika's concept</li>
+            <li>Supports Hindi, Gujarati, and Marathi</li>
+            <li>Lightweight and fast</li>
+          </ul>
+        </div>
+        <div class="cons">
+          <h4>Weaknesses / Gaps</h4>
+          <ul>
+            <li>Android only — excludes a large part of the target market</li>
+            <li>No programmatic moon visualisation</li>
+            <li>No notifications, muhurta, or festival detail pages</li>
+            <li>Limited languages (3 Indian languages, no English)</li>
+            <li>No home-screen widget; small community</li>
+            <li>Unknown developer — trust and maintenance uncertain</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hindu Calendar Android -->
+  <div class="competitor-card">
+    <div class="card-header">
+      <span class="card-header-name">5. Hindu Calendar (Android)</span>
+      <span class="card-header-meta">~4.2 ★ · Moderate downloads · Android only</span>
+    </div>
+    <div class="card-sub">
+      <span><strong>Platform:</strong> Android only</span>
+      <span><strong>Price:</strong> Free</span>
+    </div>
+    <div class="card-body">
+      <p>A solid, workmanlike app that serves the Android market well for users who want a balanced Panchanga reference without the complexity of Drik Panchang. It is not particularly distinguished in any one dimension but avoids major failure modes. Its horoscope section is a useful retention hook. It would not be a primary competitor to Tithika given its Android-only nature and lack of differentiating design investment, but it occupies the same casual-user space that Tithika aims to serve on both platforms.</p>
+      <div class="pros-cons">
+        <div class="pros">
+          <h4>Strengths</h4>
+          <ul>
+            <li>Good balance of Panchanga detail and user-friendliness</li>
+            <li>Offline functionality — critical for areas with poor connectivity</li>
+            <li>Includes personalized horoscopes</li>
+            <li>Festival calendar with key dates</li>
+            <li>Generally reliable for daily use</li>
+          </ul>
+        </div>
+        <div class="cons">
+          <h4>Weaknesses / Gaps</h4>
+          <ul>
+            <li>Android only</li>
+            <li>Accuracy should be cross-verified — not authoritative</li>
+            <li>No moon visualisation</li>
+            <li>No notifications or reminders</li>
+            <li>UI is functional but not modern or engaging</li>
+            <li>No home-screen widget; limited language support</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── 4. Feature Comparison Matrix ──────────────────────────────────── -->
+<section id="matrix">
+  <h2>Feature Comparison Matrix</h2>
+  <p>The matrix below compares the five competitors against Tithika v1's planned feature set. ✓ = fully present, − = absent, <em>part</em> = partially implemented or limited.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th style="min-width:170px">Feature</th>
+        <th style="text-align:center">Drik<br>Panchang</th>
+        <th style="text-align:center">Shubh<br>Panchang</th>
+        <th style="text-align:center">Hindu Cal<br>Panchang</th>
+        <th style="text-align:center">Tithi<br>App</th>
+        <th style="text-align:center">Hindu Cal<br>Android</th>
+        <th class="tithika-th" style="text-align:center">Tithika<br>v1 plan</th>
+      </tr></thead>
+      <tbody>
+        <tr><td class="bold">Tithi (all 30)</td>          <td class="feat-yes">✓</td><td class="feat-yes">✓</td><td class="feat-yes">✓</td><td class="feat-yes">✓</td><td class="feat-yes">✓</td><td class="feat-yes tithika-col">✓</td></tr>
+        <tr><td class="bold">Nakshatra</td>               <td class="feat-yes">✓</td><td class="feat-yes">✓</td><td class="feat-yes">✓</td><td class="feat-no">−</td><td class="feat-yes">✓</td><td class="feat-yes tithika-col">✓</td></tr>
+        <tr><td class="bold">Yoga + Karana</td>           <td class="feat-yes">✓</td><td class="feat-yes">✓</td><td class="feat-yes">✓</td><td class="feat-no">−</td><td class="feat-part">part</td><td class="feat-no tithika-col">−</td></tr>
+        <tr><td class="bold">Sunrise / Sunset</td>        <td class="feat-yes">✓</td><td class="feat-yes">✓</td><td class="feat-yes">✓</td><td class="feat-no">−</td><td class="feat-yes">✓</td><td class="feat-yes tithika-col">✓</td></tr>
+        <tr><td class="bold">Moonrise / Moonset</td>      <td class="feat-yes">✓</td><td class="feat-yes">✓</td><td class="feat-no">−</td><td class="feat-no">−</td><td class="feat-no">−</td><td class="feat-no tithika-col">−</td></tr>
+        <tr><td class="bold">Moon-phase visualisation</td><td class="feat-no">−</td><td class="feat-no">−</td><td class="feat-no">−</td><td class="feat-no">−</td><td class="feat-no">−</td><td class="feat-yes tithika-col">✓</td></tr>
+        <tr><td class="bold">Festival calendar</td>       <td class="feat-yes">✓</td><td class="feat-yes">✓</td><td class="feat-part">part</td><td class="feat-no">−</td><td class="feat-part">part</td><td class="feat-yes tithika-col">✓</td></tr>
+        <tr><td class="bold">Special tithi indicators</td><td class="feat-yes">✓</td><td class="feat-yes">✓</td><td class="feat-part">part</td><td class="feat-no">−</td><td class="feat-no">−</td><td class="feat-yes tithika-col">✓</td></tr>
+        <tr><td class="bold">Muhurta / Choghadiya</td>    <td class="feat-yes">✓</td><td class="feat-yes">✓</td><td class="feat-part">part</td><td class="feat-no">−</td><td class="feat-no">−</td><td class="feat-no tithika-col">−</td></tr>
+        <tr><td class="bold">Rahu Kaal / Yamaganda</td>   <td class="feat-yes">✓</td><td class="feat-yes">✓</td><td class="feat-no">−</td><td class="feat-no">−</td><td class="feat-no">−</td><td class="feat-no tithika-col">−</td></tr>
+        <tr><td class="bold">Notifications / Reminders</td><td class="feat-yes">✓</td><td class="feat-yes">✓</td><td class="feat-no">−</td><td class="feat-no">−</td><td class="feat-no">−</td><td class="feat-no tithika-col">−</td></tr>
+        <tr><td class="bold">Home-screen widget</td>      <td class="feat-part">part</td><td class="feat-no">−</td><td class="feat-no">−</td><td class="feat-no">−</td><td class="feat-no">−</td><td class="feat-no tithika-col">−</td></tr>
+        <tr><td class="bold">Offline-first</td>           <td class="feat-yes">✓</td><td class="feat-part">part</td><td class="feat-yes">✓</td><td class="feat-yes">✓</td><td class="feat-yes">✓</td><td class="feat-yes tithika-col">✓</td></tr>
+        <tr><td class="bold">Location-aware (GPS + city)</td><td class="feat-yes">✓</td><td class="feat-part">part</td><td class="feat-yes">✓</td><td class="feat-no">−</td><td class="feat-part">part</td><td class="feat-yes tithika-col">✓</td></tr>
+        <tr><td class="bold">Purnimanta / Amanta toggle</td><td class="feat-yes">✓</td><td class="feat-yes">✓</td><td class="feat-no">−</td><td class="feat-no">−</td><td class="feat-no">−</td><td class="feat-yes tithika-col">✓</td></tr>
+        <tr><td class="bold">Kundali / Horoscope</td>     <td class="feat-yes">✓</td><td class="feat-yes">✓</td><td class="feat-no">−</td><td class="feat-no">−</td><td class="feat-yes">✓</td><td class="feat-no tithika-col">−</td></tr>
+        <tr><td class="bold">iOS + Android</td>           <td class="feat-yes">✓</td><td class="feat-yes">✓</td><td class="feat-part">part</td><td class="feat-no">−</td><td class="feat-no">−</td><td class="feat-yes tithika-col">✓</td></tr>
+        <tr><td class="bold">10+ Indian languages</td>    <td class="feat-yes">✓</td><td class="feat-no">−</td><td class="feat-part">part</td><td class="feat-part">part</td><td class="feat-no">−</td><td class="feat-part tithika-col">part</td></tr>
+        <tr><td class="bold">Ad-free (free tier)</td>     <td class="feat-no">−</td><td class="feat-no">−</td><td class="feat-no">−</td><td class="feat-yes">✓</td><td class="feat-yes">✓</td><td class="feat-yes tithika-col">✓</td></tr>
+        <tr><td class="bold">Privacy (no tracking)</td>   <td class="feat-no">−</td><td class="feat-no">−</td><td class="feat-no">−</td><td class="feat-yes">✓</td><td class="feat-part">part</td><td class="feat-yes tithika-col">✓</td></tr>
+        <tr><td class="bold">Open source</td>             <td class="feat-no">−</td><td class="feat-no">−</td><td class="feat-no">−</td><td class="feat-no">−</td><td class="feat-no">−</td><td class="feat-yes tithika-col">✓</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:12px;color:var(--muted)">✓ = present fully &nbsp;·&nbsp; − = absent &nbsp;·&nbsp; part = partial or limited</p>
+</section>
+
+<!-- ── 5. Strategic Implications ─────────────────────────────────────── -->
+<section id="strategy">
+  <h2>Strategic Implications for Tithika</h2>
+
+  <h3>Where Tithika Wins by Design</h3>
+  <p>The competitive landscape reveals a clear white space that Tithika is positioned to own. No existing app combines: (1) tithi-first focus, (2) beautiful moon visualisation, (3) ad-free free tier, (4) open source credibility, and (5) modern consumer-grade design.</p>
+  <ul class="bullets">
+    <li><strong>No moon visualisation anywhere.</strong> Not one competitor renders the moon phase visually. This is Tithika's most immediate visual differentiator — it makes the tithi tangible.</li>
+    <li><strong>Ads are a universal pain point.</strong> The most-reviewed complaint across Drik Panchang is intrusive advertising. An ad-free v1 is a genuine competitive advantage.</li>
+    <li><strong>Complexity is a weakness, not a feature.</strong> Users routinely complain that full-featured apps are overwhelming. Tithika's scoped feature set is a deliberate design bet — and the market evidence supports it.</li>
+    <li><strong>Open source creates trust.</strong> For a devotional app where accuracy is paramount, open source means the community can verify the calculations. No competitor offers this.</li>
+    <li><strong>The diaspora is underserved.</strong> Hindu Calendar–Panchang is #1 in 50+ countries without doing anything special for that segment. A beautiful, English-first, location-aware app with moon rendering would resonate powerfully.</li>
+  </ul>
+
+  <h3>Where Tithika Needs to Earn Trust</h3>
+  <ul class="bullets">
+    <li><strong>Accuracy:</strong> Drik Panchang is the accuracy standard. Tithika must match it and make that verifiable — the open-source Swiss Ephemeris foundation is a strong start, but it must be communicated clearly.</li>
+    <li><strong>Festival depth:</strong> Competitors have years of festival content. Tithika's v1 list (36 festivals) is solid, but edge cases should be reviewed by practicing users before launch.</li>
+    <li><strong>Language:</strong> Starting with English/Hindi is appropriate, but Devanagari rendering must be flawless on day one — any script errors will undermine trust with devout users.</li>
+    <li><strong>Brand credibility:</strong> New apps lack the trust of Drik Panchang (backed by a 10+ year website). Tithika should lean into its open-source nature and accuracy claims from launch.</li>
+  </ul>
+
+  <h3>Recommended Competitive Positioning</h3>
+  <p>Tithika should position itself as <strong>"the beautiful, honest lunar calendar"</strong> — a contrast to cluttered, ad-heavy incumbents.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Segment</th><th>Best current option</th><th>Differentiator</th></tr></thead>
+      <tbody>
+        <tr><td>Mass-market / power users</td><td>Drik Panchang</td><td>Full Panchanga, Kundali, 10+ languages</td></tr>
+        <tr><td>Modern / muhurta planning</td><td>Shubh Panchang</td><td>Clean UI, muhurta emphasis, web + app</td></tr>
+        <tr><td>Simple daily reference</td><td>Hindu Cal–Panchang</td><td>Minimal, popular, iOS-first</td></tr>
+        <tr class="pos-tithika"><td>Beautiful lunar focus</td><td>Tithika</td><td>Moon visualisation · ad-free · open source · Drik accuracy</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ── 6. Key Takeaways ───────────────────────────────────────────────── -->
+<section id="takeaways">
+  <h2>Key Takeaways</h2>
+  <div class="takeaway"><strong>Drik Panchang</strong> is the authority to benchmark accuracy against — it is both the bar to meet and the warning of what to avoid (ads, complexity, visual blandness).</div>
+  <div class="takeaway"><strong>No competitor visualises the moon.</strong> This is Tithika's most defensible and immediate differentiator at launch.</div>
+  <div class="takeaway"><strong>Ad-free is rare and valued.</strong> Only niche, low-scale apps avoid ads today. Tithika's commitment to no ads at the free tier is a genuine market gap.</div>
+  <div class="takeaway"><strong>The diaspora market is proven and underserved</strong> by beautiful apps. Hindu Calendar–Panchang is #1 in 50+ countries doing very little — Tithika can do far more.</div>
+  <div class="takeaway"><strong>Open source + Swiss Ephemeris</strong> is the fastest path to accuracy credibility with the power-user segment that bloggers, priests, and community leaders belong to.</div>
+  <div class="takeaway"><strong>Scope is a moat.</strong> Resist the temptation to add Kundali, horoscopes, or muhurta to v1. The clear, focused product is the differentiator — bloat is the incumbent's weakness.</div>
+</section>
+
+</main>
+
+<footer class="doc-footer">
+  <p>Tithika Product Team &nbsp;·&nbsp; Internal &amp; Confidential &nbsp;·&nbsp; May 2026 &nbsp;·&nbsp; v1.0</p>
+  <p style="margin-top:4px">Scores are editorial estimates based on public App Store / Google Play data and user reviews as of May 2026.</p>
+</footer>
+
+<script>
+(function(){
+  const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+  const set  = (id, attr, val) => { const el = document.getElementById(id); if(el) el.setAttribute(attr, val); };
+  set('q-tr','fill', dark ? 'rgba(99,153,34,0.13)'  : 'rgba(99,153,34,0.07)');
+  set('q-tl','fill', dark ? 'rgba(150,150,150,0.05)': 'rgba(150,150,150,0.03)');
+  set('q-bl','fill', dark ? 'rgba(226,75,74,0.10)'  : 'rgba(226,75,74,0.05)');
+  set('q-br','fill', dark ? 'rgba(150,150,150,0.05)': 'rgba(150,150,150,0.03)');
+  const sc = dark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)';
+  const ac = dark ? 'rgba(255,255,255,0.30)' : 'rgba(0,0,0,0.28)';
+  const ts = dark ? 'rgba(255,255,255,0.40)' : 'rgba(0,0,0,0.38)';
+  const tp = dark ? 'rgba(255,255,255,0.72)' : 'rgba(0,0,0,0.62)';
+  document.getElementById('grid').setAttribute('stroke', sc);
+  set('vcl','stroke', dark ? 'rgba(255,255,255,0.20)':'rgba(0,0,0,0.13)');
+  set('hcl','stroke', dark ? 'rgba(255,255,255,0.20)':'rgba(0,0,0,0.13)');
+  set('xax','stroke', ac); set('yax','stroke', ac);
+  ['xticks','yticks'].forEach(id => { const g = document.getElementById(id); if(g) g.setAttribute('fill', ts); });
+  set('xtitle','fill', tp); set('ytitle','fill', tp);
+  const qlc = dark ? 'rgba(255,255,255,0.32)':'rgba(0,0,0,0.28)';
+  ['ql-tl','ql-bl','ql-br'].forEach(id => set(id,'fill', qlc));
+  set('ql-tr','fill', dark ? 'rgba(120,200,80,0.75)':'rgba(50,110,10,0.50)');
+  set('star','fill', dark ? 'rgba(99,153,34,0.55)':'rgba(80,130,20,0.35)');
+})();
+</script>
+</body>
+</html>
