@@ -8,7 +8,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:tithika/core/router.dart' show buildRouter;
 import 'package:tithika/core/theme.dart';
+import 'package:tithika/services/notification_service.dart';
 import 'package:tithika/services/providers.dart';
+import 'package:tithika/state/providers.dart' show appSettingsProvider;
 
 Future<void> _precacheMoonImage() async {
   final completer = Completer<void>();
@@ -28,6 +30,7 @@ void main() async {
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   tz.initializeTimeZones();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  await NotificationService.initialize();
 
   final prefs = await SharedPreferences.getInstance();
 
@@ -43,6 +46,22 @@ void main() async {
     container.read(citySearchServiceProvider.future),
     _precacheMoonImage(),
   ]).timeout(const Duration(seconds: 15), onTimeout: () => []);
+
+  // Reschedule notifications after ephemeris is warmed up.
+  unawaited(() async {
+    try {
+      final settings = container.read(appSettingsProvider);
+      if (settings.notificationSettings.enabled) {
+        final tithiSvc =
+            await container.read(tithiServiceProvider.future);
+        await NotificationService.scheduleAll(
+          settings: settings.notificationSettings,
+          appSettings: settings,
+          tithiService: tithiSvc,
+        );
+      }
+    } catch (_) {}
+  }());
   await Future.delayed(const Duration(seconds: 1));
 
   runApp(

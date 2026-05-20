@@ -8,12 +8,14 @@ import '../../core/theme.dart';
 import '../../core/time_format.dart';
 import '../../models/app_settings.dart';
 import '../../models/day_data.dart';
+import '../../models/hora_data.dart';
 import '../../models/lunar_month.dart';
 import '../../models/paksha.dart';
 import '../../services/festival_detector.dart';
 import '../../services/providers.dart' as svc;
 import '../../state/providers.dart';
 import '../shared/starfield_background.dart';
+import '../shared/tithika_nav_bar.dart';
 import 'location_banner.dart';
 import 'moon_phase_widget.dart';
 
@@ -104,88 +106,38 @@ class _DayViewScreenState extends ConsumerState<DayViewScreen> {
             child: Column(
               children: [
                 const LocationBanner(),
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: SizedBox(
-                    height: 40,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        // Absolutely centered Today button
-                        if (!isToday)
-                          GestureDetector(
-                            onTap: () {
-                              ref
-                                  .read(selectedDateProvider.notifier)
-                                  .state = today;
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 4),
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                    color: TithikaColors.shukla
-                                        .withValues(alpha: 0.6)),
-                                borderRadius: BorderRadius.circular(20),
-                                color: TithikaColors.shukla
-                                    .withValues(alpha: 0.08),
-                              ),
-                              child: Text(
-                                'Today',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall
-                                    ?.copyWith(
-                                      color: TithikaColors.shukla,
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 12,
-                                    ),
-                              ),
+                TithikaNavBar(
+                  centerOverride: !isToday
+                      ? GestureDetector(
+                          onTap: () {
+                            ref.read(selectedDateProvider.notifier).state =
+                                today;
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                  color: TithikaColors.shukla
+                                      .withValues(alpha: 0.6)),
+                              borderRadius: BorderRadius.circular(20),
+                              color:
+                                  TithikaColors.shukla.withValues(alpha: 0.08),
+                            ),
+                            child: Text(
+                              'Today',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(
+                                    color: TithikaColors.shukla,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 12,
+                                  ),
                             ),
                           ),
-                        // Left: app name
-                        const Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            'Tithika',
-                            style: TextStyle(
-                              color: TithikaColors.ink,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ),
-                        // Right: action icons
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.flare_rounded,
-                                    color: TithikaColors.inkSoft, size: 22),
-                                onPressed: () => context.go('/festivals'),
-                                tooltip: 'Festivals',
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.calendar_month_rounded,
-                                    color: TithikaColors.inkSoft, size: 22),
-                                onPressed: () => context.go('/month'),
-                                tooltip: 'Month view',
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.tune_rounded,
-                                    color: TithikaColors.inkSoft, size: 22),
-                                onPressed: () => context.go('/settings'),
-                                tooltip: 'Settings',
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                        )
+                      : null,
                 ),
                 Expanded(
                   flex: 85,
@@ -267,7 +219,6 @@ class _DayContent extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final location = ref.watch(effectiveLocationProvider);
     final language = ref.watch(appSettingsProvider).language;
-    final isDeva = language == AppLanguage.hindiDevanagari;
 
     final tz = location.tzOffsetAt(date);
     final isShukla = data.tithi.paksha == Paksha.shukla;
@@ -285,16 +236,29 @@ class _DayContent extends ConsumerWidget {
     final sunsetStr  = data.sunsetUtc  != null ? formatLocalTime(data.sunsetUtc!,  tz) : '—';
 
     final baseStyle = Theme.of(context).textTheme.titleLarge;
-    final tithiNameStyle = isDeva
-        ? devanagariStyle(baseStyle, fontSize: 22)
-        : baseStyle?.copyWith(fontSize: 22);
-    final tithiFullName = isDeva ? data.tithi.fullNameDeva : data.tithi.fullNameEn;
+    final tithiNameStyle = scriptStyle(language, baseStyle, fontSize: 22);
+    final tithiFullName = switch (language) {
+      AppLanguage.hindiDevanagari => data.tithi.fullNameDeva,
+      AppLanguage.tamil           => data.tithi.fullNameTamil,
+      AppLanguage.bengali         => data.tithi.fullNameBengali,
+      _                           => data.tithi.fullNameEn,
+    };
     final adhikaPrefix  = data.isAdhika ? AppStrings.adhikaPrefix(language) : '';
-    final monthName     = isDeva ? data.lunarMonth.nameDeva : data.lunarMonth.nameEn.toUpperCase();
+    final monthName     = switch (language) {
+      AppLanguage.hindiDevanagari => data.lunarMonth.nameDeva,
+      AppLanguage.tamil           => data.lunarMonth.nameTamil,
+      AppLanguage.bengali         => data.lunarMonth.nameBengali,
+      _                           => data.lunarMonth.nameEn.toUpperCase(),
+    };
     final lunarMonthLabel =
         '$adhikaPrefix$monthName  ·  ${AppStrings.pakshaUpper(data.tithi.paksha, language)} ${AppStrings.pakshaWord(language)}';
     final nakshatraLabel = AppStrings.nakshatra(language);
-    final nakshatraName  = isDeva ? data.nakshatra.nameDeva : data.nakshatra.nameEn;
+    final nakshatraName  = switch (language) {
+      AppLanguage.hindiDevanagari => data.nakshatra.nameDeva,
+      AppLanguage.tamil           => data.nakshatra.nameTamil,
+      AppLanguage.bengali         => data.nakshatra.nameBengali,
+      _                           => data.nakshatra.nameEn,
+    };
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 18),
@@ -302,40 +266,28 @@ class _DayContent extends ConsumerWidget {
         children: [
           Text(
             weekday,
-            style: isDeva
-                ? devanagariStyle(
-                    Theme.of(context).textTheme.bodySmall,
-                    color: TithikaColors.inkSoft,
-                    fontSize: 15,
-                  )
-                : Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: TithikaColors.inkSoft,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 15,
-                      letterSpacing: 0.05 * 13,
-                    ),
+            style: scriptStyle(
+              language,
+              Theme.of(context).textTheme.bodySmall,
+              color: TithikaColors.inkSoft,
+              fontWeight: FontWeight.w500,
+              fontSize: 15,
+            ),
           ),
           const SizedBox(height: 2),
           Text(
             '${AppStrings.gregMonth(date.month, language)} ${date.day}, ${date.year}',
-            style: isDeva
-                ? devanagariStyle(Theme.of(context).textTheme.displayLarge, fontSize: 28)
-                : Theme.of(context).textTheme.displayLarge?.copyWith(fontSize: 28),
+            style: scriptStyle(language, Theme.of(context).textTheme.displayLarge, fontSize: 24),
           ),
           const SizedBox(height: 4),
           Text(
             lunarMonthLabel,
-            style: isDeva
-                ? devanagariStyle(
-                    Theme.of(context).textTheme.labelSmall,
-                    color: pakshaColor,
-                    fontSize: 14,
-                  )
-                : Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: pakshaColor,
-                      fontSize: 14,
-                      letterSpacing: 0.08 * 12,
-                    ),
+            style: scriptStyle(
+              language,
+              Theme.of(context).textTheme.labelSmall,
+              color: pakshaColor,
+              fontSize: 15,
+            ),
           ),
           const SizedBox(height: 14),
           MoonPhaseWidget(
@@ -360,24 +312,23 @@ class _DayContent extends ConsumerWidget {
             const SizedBox(height: 3),
             Text(
               AppStrings.secondaryTithiBegins(
-                isDeva ? data.secondaryTithi!.fullNameDeva : data.secondaryTithi!.fullNameEn,
+                switch (language) {
+                  AppLanguage.hindiDevanagari => data.secondaryTithi!.fullNameDeva,
+                  AppLanguage.tamil           => data.secondaryTithi!.fullNameTamil,
+                  AppLanguage.bengali         => data.secondaryTithi!.fullNameBengali,
+                  _                           => data.secondaryTithi!.fullNameEn,
+                },
                 formatLocalTime(data.secondaryTithi!.start, tz),
                 language,
               ),
-              style: isDeva
-                  ? devanagariStyle(
-                      Theme.of(context).textTheme.bodySmall,
-                      color: data.secondaryTithi!.paksha == Paksha.shukla
-                          ? TithikaColors.shukla
-                          : TithikaColors.krishna,
-                      fontSize: 13,
-                    )
-                  : Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: data.secondaryTithi!.paksha == Paksha.shukla
-                            ? TithikaColors.shukla
-                            : TithikaColors.krishna,
-                        fontSize: 13,
-                      ),
+              style: scriptStyle(
+                language,
+                Theme.of(context).textTheme.bodySmall,
+                color: data.secondaryTithi!.paksha == Paksha.shukla
+                    ? TithikaColors.shukla
+                    : TithikaColors.krishna,
+                fontSize: 13,
+              ),
             ),
           ],
           const SizedBox(height: 10),
@@ -385,15 +336,24 @@ class _DayContent extends ConsumerWidget {
             label: nakshatraLabel,
             value: nakshatraName,
             sub: nakshatraUntil,
-            valueStyle: isDeva
-                ? devanagariStyle(null,
-                    color: TithikaColors.ink,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 15)
-                : null,
+            valueStyle: scriptStyle(
+              language,
+              null,
+              color: TithikaColors.ink,
+              fontWeight: FontWeight.w600,
+              fontSize: 15,
+            ),
           ),
           const SizedBox(height: 4),
-          _SunCard(sunrise: sunriseStr, sunset: sunsetStr, language: language),
+          _SunCard(
+            sunrise: sunriseStr,
+            sunset: sunsetStr,
+            moonrise: data.moonriseUtc != null ? formatLocalTime(data.moonriseUtc!, tz) : '—',
+            moonset:  data.moonsetUtc  != null ? formatLocalTime(data.moonsetUtc!,  tz) : '—',
+            language: language,
+          ),
+          const SizedBox(height: 4),
+          _HoraCard(date: date, tz: tz),
           const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -409,7 +369,7 @@ class _DayContent extends ConsumerWidget {
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: TithikaColors.inkSoft,
-                        fontSize: 16,
+                        fontSize: 15,
                       ),
                 ),
               ),
@@ -519,13 +479,20 @@ class _DetailCard extends StatelessWidget {
 class _SunCard extends StatelessWidget {
   final String sunrise;
   final String sunset;
+  final String moonrise;
+  final String moonset;
   final AppLanguage language;
 
-  const _SunCard({required this.sunrise, required this.sunset, required this.language});
+  const _SunCard({
+    required this.sunrise,
+    required this.sunset,
+    required this.moonrise,
+    required this.moonset,
+    required this.language,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final isDeva = language == AppLanguage.hindiDevanagari;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -534,24 +501,53 @@ class _SunCard extends StatelessWidget {
         border: Border.all(color: TithikaColors.line),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Row(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Expanded(
-              child: _SunSegment(
-                  icon: Icons.wb_sunny_rounded,
-                  iconColor: const Color(0xFFFFB347),
-                  label: AppStrings.sunrise(language),
-                  time: sunrise,
-                  isDeva: isDeva)),
-          Container(width: 1, height: 28, color: TithikaColors.line),
-          Expanded(
-              child: _SunSegment(
-                  icon: Icons.nights_stay_rounded,
-                  iconColor: TithikaColors.ink,
-                  label: AppStrings.sunset(language),
-                  time: sunset,
-                  alignment: CrossAxisAlignment.end,
-                  isDeva: isDeva)),
+          // Sun row
+          Row(
+            children: [
+              Expanded(
+                  child: _SunSegment(
+                      icon: Icons.wb_sunny_rounded,
+                      iconColor: const Color(0xFFFFB347),
+                      label: AppStrings.sunrise(language),
+                      time: sunrise,
+                      language: language)),
+              Container(width: 1, height: 28, color: TithikaColors.line),
+              Expanded(
+                  child: _SunSegment(
+                      icon: Icons.nights_stay_rounded,
+                      iconColor: TithikaColors.ink,
+                      label: AppStrings.sunset(language),
+                      time: sunset,
+                      alignment: CrossAxisAlignment.end,
+                      language: language)),
+            ],
+          ),
+          Divider(height: 1, color: TithikaColors.line),
+          const SizedBox(height: 4),
+          // Moon row
+          Row(
+            children: [
+              Expanded(
+                  child: _SunSegment(
+                      icon: Icons.brightness_2_rounded,
+                      iconColor: TithikaColors.moonLight,
+                      label: AppStrings.moonrise(language),
+                      time: moonrise,
+                      language: language)),
+              Container(width: 1, height: 28, color: TithikaColors.line),
+              Expanded(
+                  child: _SunSegment(
+                      icon: Icons.brightness_2_outlined,
+                      iconColor: TithikaColors.moonLight.withValues(alpha: 0.5),
+                      label: AppStrings.moonset(language),
+                      time: moonset,
+                      alignment: CrossAxisAlignment.end,
+                      language: language)),
+            ],
+          ),
         ],
       ),
     );
@@ -564,15 +560,15 @@ class _SunSegment extends StatelessWidget {
   final String label;
   final String time;
   final CrossAxisAlignment alignment;
-  final bool isDeva;
+  final AppLanguage language;
 
   const _SunSegment({
     required this.icon,
     required this.iconColor,
     required this.label,
     required this.time,
+    required this.language,
     this.alignment = CrossAxisAlignment.start,
-    this.isDeva = false,
   });
 
   @override
@@ -590,9 +586,11 @@ class _SunSegment extends StatelessWidget {
               Icon(icon, size: 14, color: iconColor),
               const SizedBox(width: 4),
               Text(label,
-                  style: isDeva
-                      ? devanagariStyle(Theme.of(context).textTheme.labelSmall, fontSize: 13)
-                      : Theme.of(context).textTheme.labelSmall?.copyWith(fontSize: 13)),
+                  style: scriptStyle(
+                    language,
+                    Theme.of(context).textTheme.labelSmall,
+                    fontSize: 13,
+                  )),
             ],
           ),
           const SizedBox(height: 1),
@@ -606,6 +604,142 @@ class _SunSegment extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+// ── Hora card ─────────────────────────────────────────────────────────────────
+
+class _HoraCard extends ConsumerWidget {
+  final DateTime date;
+  final Duration tz;
+
+  const _HoraCard({required this.date, required this.tz});
+
+  String _horaEndTime(DateTime endUtc, DateTime sunriseUtc) {
+    final local = endUtc.add(tz);
+    final srLocal = sunriseUtc.add(tz);
+    final base = formatLocalTime(endUtc, tz);
+    final isNextDay =
+        local.day != srLocal.day || local.month != srLocal.month;
+    return isNextDay ? '$base +1' : base;
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Only show for the currently selected page to avoid stale data.
+    final selectedDate = ref.watch(selectedDateProvider);
+    if (date.year != selectedDate.year ||
+        date.month != selectedDate.month ||
+        date.day != selectedDate.day) {
+      return const SizedBox.shrink();
+    }
+
+    final horaAsync = ref.watch(horaProvider);
+    final language = ref.watch(appSettingsProvider).language;
+
+    return horaAsync.when(
+      loading: () => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
+      data: (slots) {
+        if (slots == null || slots.isEmpty) return const SizedBox.shrink();
+
+        final now = DateTime.now().toUtc();
+        int activeIdx = 0;
+        for (var i = 0; i < slots.length; i++) {
+          if (!now.isBefore(slots[i].start) && now.isBefore(slots[i].end)) {
+            activeIdx = i;
+            break;
+          }
+        }
+        final active = slots[activeIdx];
+        final horaNum = (activeIdx % 12) + 1;
+        final color = active.planet.accentColor;
+        final endStr = _horaEndTime(active.end, slots.first.start);
+
+        return GestureDetector(
+          onTap: () => context.go('/hora'),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: TithikaColors.card,
+              border: Border.all(color: TithikaColors.line),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  AppStrings.hora(language),
+                  style: Theme.of(context)
+                      .textTheme
+                      .labelSmall
+                      ?.copyWith(fontSize: 10),
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Container(
+                      width: 20,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: color.withValues(alpha: 0.15),
+                        border: Border.all(
+                            color: color.withValues(alpha: 0.5), width: 0.5),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        active.planet.glyph,
+                        style: TextStyle(fontSize: 10, color: color),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            active.planet.name(language),
+                            style: scriptStyle(
+                              language,
+                              null,
+                              color: TithikaColors.ink,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                            ),
+                          ),
+                          Text(
+                            AppStrings.horaSubLabel(
+                                horaNum, active.isDay, language),
+                            style: scriptStyle(
+                              language,
+                              null,
+                              color: TithikaColors.inkMuted,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Text(
+                      AppStrings.nakshatraUntil(endStr, language),
+                      style: const TextStyle(
+                        color: TithikaColors.inkSoft,
+                        fontSize: 11,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    const Icon(Icons.chevron_right_rounded,
+                        size: 16, color: TithikaColors.inkMuted),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
@@ -697,7 +831,6 @@ class _StripCell extends StatelessWidget {
     final dotColor =
         isShukla ? TithikaColors.shukla : TithikaColors.krishna;
 
-    final isDeva = language == AppLanguage.hindiDevanagari;
     final weekday = AppStrings.weekdayShort(date.weekday, language);
 
     return Container(
@@ -717,22 +850,18 @@ class _StripCell extends StatelessWidget {
         children: [
           Text(
             weekday,
-            style: isDeva
-                ? devanagariStyle(
-                    Theme.of(context).textTheme.labelSmall,
-                    color: TithikaColors.inkMuted,
-                    fontSize: 10,
-                  )
-                : Theme.of(context).textTheme.labelSmall?.copyWith(
-                    fontSize: 10,
-                    color: TithikaColors.inkMuted,
-                  ),
+            style: scriptStyle(
+              language,
+              Theme.of(context).textTheme.labelSmall,
+              color: TithikaColors.inkMuted,
+              fontSize: 10,
+            ),
           ),
           const SizedBox(height: 2),
           Text(
             '${date.day}',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 15,
               fontWeight: FontWeight.w700,
               color: isSelected ? TithikaColors.shukla : TithikaColors.ink,
             ),

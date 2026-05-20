@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../core/app_strings.dart';
 import '../../core/festival_names.dart';
@@ -10,6 +9,7 @@ import '../../models/lunar_month.dart';
 import '../../models/paksha.dart';
 import '../../state/providers.dart';
 import '../shared/starfield_background.dart';
+import '../shared/tithika_nav_bar.dart';
 
 const _weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const _monthNames = [
@@ -35,31 +35,9 @@ class FestivalsScreen extends ConsumerWidget {
           const StarfieldBackground(),
           SafeArea(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // ── Header ────────────────────────────────────────────────
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 12),
-                  child: Row(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.arrow_back_rounded,
-                            color: TithikaColors.inkSoft, size: 22),
-                        onPressed: () => context.go('/'),
-                        tooltip: 'Back',
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Festivals $year',
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleLarge
-                            ?.copyWith(fontSize: 18),
-                      ),
-                    ],
-                  ),
-                ),
+                TithikaNavBar(title: 'Festivals $year'),
                 const Divider(color: TithikaColors.line, height: 1),
 
                 // ── Body ──────────────────────────────────────────────────
@@ -165,7 +143,6 @@ class _FestivalCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final language = ref.watch(appSettingsProvider).language;
-    final isDeva = language == AppLanguage.hindiDevanagari;
     final date = entry.date;
     final data = entry.data;
     final isShukla = data.tithi.paksha == Paksha.shukla;
@@ -177,7 +154,12 @@ class _FestivalCard extends ConsumerWidget {
     final gregDate = '$wd, $mo ${date.day}';
 
     final pakshaLabel = AppStrings.paksha(data.tithi.paksha, language);
-    final monthName = isDeva ? data.lunarMonth.nameDeva : data.lunarMonth.nameEn;
+    final monthName = switch (language) {
+      AppLanguage.hindiDevanagari => data.lunarMonth.nameDeva,
+      AppLanguage.tamil           => data.lunarMonth.nameTamil,
+      AppLanguage.bengali         => data.lunarMonth.nameBengali,
+      _                           => data.lunarMonth.nameEn,
+    };
     final hinduDate = '$monthName · $pakshaLabel ${data.tithi.pakshaNumber}';
 
     return Padding(
@@ -228,16 +210,12 @@ class _FestivalCard extends ConsumerWidget {
                     const SizedBox(height: 2),
                     Text(
                       hinduDate,
-                      style: isDeva
-                          ? devanagariStyle(
-                              Theme.of(context).textTheme.bodySmall,
-                              color: pakshaColor,
-                              fontSize: 11,
-                            )
-                          : Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: pakshaColor,
-                                fontSize: 11,
-                              ),
+                      style: scriptStyle(
+                        language,
+                        Theme.of(context).textTheme.bodySmall,
+                        color: pakshaColor,
+                        fontSize: 11,
+                      ),
                     ),
                   ],
                 ),

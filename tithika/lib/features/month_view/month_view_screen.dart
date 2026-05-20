@@ -11,7 +11,9 @@ import '../../models/day_data.dart';
 import '../../models/lunar_month.dart';
 import '../../models/paksha.dart';
 import '../../state/providers.dart';
+import '../day_view/moon_phase_widget.dart';
 import '../shared/starfield_background.dart';
+import '../shared/tithika_nav_bar.dart';
 
 // ── Screen ────────────────────────────────────────────────────────────────────
 
@@ -65,15 +67,18 @@ class _MonthViewScreenState extends ConsumerState<MonthViewScreen> {
 
     final gregorianLabel = '${gregorianMonthName(month.month)} ${month.year}';
     final language = ref.watch(appSettingsProvider).language;
-    final isDeva = language == AppLanguage.hindiDevanagari;
-
     // Collect all distinct Hindu months in first-appearance order.
     // Adhika and Nija of the same month are tracked separately.
     final hinduMonthNames = <String>[];
     ({LunarMonth? month, bool isAdhika}) lastSeen = (month: null, isAdhika: false);
     for (final data in (monthAsync.valueOrNull?.values ?? const <DayData>[])) {
       if (data.lunarMonth != lastSeen.month || data.isAdhika != lastSeen.isAdhika) {
-        final base = isDeva ? data.lunarMonth.nameDeva : data.lunarMonth.nameEn.toUpperCase();
+        final base = switch (language) {
+          AppLanguage.hindiDevanagari => data.lunarMonth.nameDeva,
+          AppLanguage.tamil           => data.lunarMonth.nameTamil,
+          AppLanguage.bengali         => data.lunarMonth.nameBengali,
+          _                           => data.lunarMonth.nameEn.toUpperCase(),
+        };
         hinduMonthNames.add(
           data.isAdhika ? '${AppStrings.adhikaPrefixShort(language)}$base' : base,
         );
@@ -89,45 +94,35 @@ class _MonthViewScreenState extends ConsumerState<MonthViewScreen> {
           SafeArea(
             child: Column(
               children: [
-                // ── Month header (fixed) ──────────────────────────────────
+                // ── Shared nav bar ────────────────────────────────────────
+                TithikaNavBar(title: gregorianLabel),
+                const Divider(color: TithikaColors.line, height: 1),
+
+                // ── Month navigation (arrows + Hindu month name) ──────────
                 Padding(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+                      const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       IconButton(
                         icon: const Icon(Icons.chevron_left_rounded,
                             color: TithikaColors.inkSoft),
                         onPressed: _goToPrevMonth,
                       ),
-                      Column(
-                        children: [
-                          Text(
-                            gregorianLabel,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleLarge
-                                ?.copyWith(fontSize: 16),
-                          ),
-                          if (hinduMonthLabel.isNotEmpty)
-                            Text(
-                              hinduMonthLabel,
-                              style: isDeva
-                                  ? devanagariStyle(
-                                      Theme.of(context).textTheme.labelSmall,
-                                      color: TithikaColors.shukla,
-                                      fontSize: 11,
-                                    )
-                                  : Theme.of(context)
-                                      .textTheme
-                                      .labelSmall
-                                      ?.copyWith(
-                                        color: TithikaColors.shukla,
-                                        letterSpacing: 0.06 * 11,
-                                      ),
-                            ),
-                        ],
+                      Expanded(
+                        child: hinduMonthLabel.isNotEmpty
+                            ? Center(
+                                child: Text(
+                                  hinduMonthLabel,
+                                  style: scriptStyle(
+                                    language,
+                                    Theme.of(context).textTheme.labelSmall,
+                                    color: TithikaColors.shukla,
+                                    fontSize: 11,
+                                  ),
+                                ),
+                              )
+                            : const SizedBox.shrink(),
                       ),
                       IconButton(
                         icon: const Icon(Icons.chevron_right_rounded,
@@ -135,20 +130,6 @@ class _MonthViewScreenState extends ConsumerState<MonthViewScreen> {
                         onPressed: _goToNextMonth,
                       ),
                     ],
-                  ),
-                ),
-
-                // ── Back to Day View (fixed) ──────────────────────────────
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: TextButton.icon(
-                    onPressed: () => context.go('/'),
-                    icon: const Icon(Icons.arrow_back_rounded,
-                        size: 16, color: TithikaColors.inkSoft),
-                    label: Text(
-                      'Day View',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
                   ),
                 ),
 
@@ -162,9 +143,11 @@ class _MonthViewScreenState extends ConsumerState<MonthViewScreen> {
                             child: Center(
                               child: Text(
                                 d,
-                                style: isDeva
-                                    ? devanagariStyle(Theme.of(context).textTheme.labelSmall, fontSize: 10)
-                                    : Theme.of(context).textTheme.labelSmall,
+                                style: scriptStyle(
+                                  language,
+                                  Theme.of(context).textTheme.labelSmall,
+                                  fontSize: 10,
+                                ),
                               ),
                             ),
                           ),
@@ -358,9 +341,6 @@ class _MonthCell extends StatelessWidget {
   Widget build(BuildContext context) {
     final isFestival = data?.festivalName != null;
     final isShukla = data?.tithi.paksha == Paksha.shukla;
-    final dotColor = data == null
-        ? TithikaColors.inkMuted
-        : (isShukla ? TithikaColors.shukla : TithikaColors.krishna);
 
     final isHinduMonthStart = hinduMonthLabel != null;
 
@@ -435,16 +415,18 @@ class _MonthCell extends StatelessWidget {
             ),
           ),
 
-          // Paksha dot
-          Container(
-            width: 5,
-            height: 5,
-            margin: const EdgeInsets.symmetric(vertical: 1),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: dotColor,
-            ),
-          ),
+          // Moon phase icon
+          if (data != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 1),
+              child: MoonPhaseWidget(
+                tithiNumber: data!.tithi.number,
+                glowColor: Colors.transparent,
+                size: 14,
+              ),
+            )
+          else
+            const SizedBox(height: 16),
 
           // Tithi number
           if (data != null)
@@ -490,7 +472,6 @@ class _MonthFestivalList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final language = ref.watch(appSettingsProvider).language;
-    final isDeva = language == AppLanguage.hindiDevanagari;
     final festivals = <({int day, String name})>[];
     final daysInMonth = DateTime(year, month + 1, 0).day;
     for (var d = 1; d <= daysInMonth; d++) {
@@ -514,14 +495,12 @@ class _MonthFestivalList extends ConsumerWidget {
             padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
             child: Text(
               AppStrings.festivals(language),
-              style: isDeva
-                  ? devanagariStyle(Theme.of(context).textTheme.labelSmall,
-                      color: TithikaColors.shukla, fontSize: 10)
-                  : Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: TithikaColors.shukla,
-                        letterSpacing: 0.8,
-                        fontSize: 10,
-                      ),
+              style: scriptStyle(
+                language,
+                Theme.of(context).textTheme.labelSmall,
+                color: TithikaColors.shukla,
+                fontSize: 10,
+              ),
             ),
           ),
           const Divider(height: 1, color: TithikaColors.line),
@@ -582,7 +561,6 @@ class _NextHinduMonthNote extends ConsumerWidget {
     final transitionsAsync =
         ref.watch(hinduMonthTransitionsProvider((year, month)));
     final language = ref.watch(appSettingsProvider).language;
-    final isDeva = language == AppLanguage.hindiDevanagari;
 
     return transitionsAsync.when(
       loading: () => const SizedBox(height: 28),
@@ -599,17 +577,21 @@ class _NextHinduMonthNote extends ConsumerWidget {
               final wd   = AppStrings.weekdayShort(info.date.weekday, language);
               final mo   = AppStrings.gregMonthShort(info.date.month, language);
               final time = formatLocalTime(info.startUtc, info.tzOffset);
-              final monthName = isDeva ? info.month.nameDeva : info.month.nameEn;
+              final monthName = switch (language) {
+                AppLanguage.hindiDevanagari => info.month.nameDeva,
+                AppLanguage.tamil           => info.month.nameTamil,
+                AppLanguage.bengali         => info.month.nameBengali,
+                _                           => info.month.nameEn,
+              };
               return Text(
                 AppStrings.hinduMonthBegins(monthName, wd, mo, info.date.day, time, language),
-                style: isDeva
-                    ? devanagariStyle(Theme.of(context).textTheme.bodySmall,
-                        color: TithikaColors.inkSoft, fontSize: 11)
-                    : Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: TithikaColors.inkSoft,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                        ),
+                style: scriptStyle(
+                  language,
+                  Theme.of(context).textTheme.bodySmall,
+                  color: TithikaColors.inkSoft,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                ),
               );
             }).toList(),
           ),

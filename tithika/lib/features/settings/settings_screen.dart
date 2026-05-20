@@ -3,15 +3,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../core/theme.dart';
 import '../../models/app_location.dart';
 import '../../models/app_settings.dart';
+import '../../services/notification_service.dart';
 import '../../state/providers.dart';
 import '../shared/city_picker_sheet.dart';
 import '../shared/starfield_background.dart';
+import '../shared/tithika_nav_bar.dart';
 
 final _packageInfoProvider = FutureProvider<PackageInfo>(
   (_) => PackageInfo.fromPlatform(),
@@ -26,6 +27,7 @@ class SettingsScreen extends ConsumerStatefulWidget {
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   bool _gpsLoading = false;
+  bool _notifLoading = false;
 
   Future<void> _pickCity() async {
     final selected = await showModalBottomSheet<AppLocation>(
@@ -109,12 +111,51 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     }
   }
 
+  Future<void> _toggleNotifications(bool enable) async {
+    if (enable) {
+      setState(() => _notifLoading = true);
+      final granted = await NotificationService.requestPermission();
+      if (mounted) setState(() => _notifLoading = false);
+      if (!granted && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Notification permission denied.'),
+            backgroundColor: TithikaColors.card,
+          ),
+        );
+        return;
+      }
+    }
+    final current = ref.read(appSettingsProvider).notificationSettings;
+    await ref
+        .read(appSettingsProvider.notifier)
+        .setNotificationSettings(current.copyWith(enabled: enable));
+  }
+
+  Future<void> _pickReminderTime() async {
+    final current = ref.read(appSettingsProvider).notificationSettings;
+    final picked = await showTimePicker(
+      context: context,
+      initialTime:
+          TimeOfDay(hour: current.dailyReminderHour, minute: current.dailyReminderMinute),
+    );
+    if (picked != null && mounted) {
+      await ref.read(appSettingsProvider.notifier).setNotificationSettings(
+            current.copyWith(
+              dailyReminderHour: picked.hour,
+              dailyReminderMinute: picked.minute,
+            ),
+          );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final settings = ref.watch(appSettingsProvider);
     final cityName = settings.location?.cityName ?? 'Not set';
     final language = settings.language;
     final monthSystem = settings.monthSystem;
+    final notif = settings.notificationSettings;
 
     return Scaffold(
       body: Stack(
@@ -124,25 +165,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Row(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.arrow_back_rounded,
-                            color: TithikaColors.inkSoft),
-                        onPressed: () => context.go('/'),
-                      ),
-                      Text(
-                        'Settings',
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleLarge
-                            ?.copyWith(fontSize: 16),
-                      ),
-                    ],
-                  ),
-                ),
+                const TithikaNavBar(title: 'Settings'),
+                const Divider(color: TithikaColors.line, height: 1),
                 Expanded(
                   child: ListView(
                     padding: const EdgeInsets.symmetric(
@@ -178,7 +202,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
                       _SectionLabel('LANGUAGE'),
                       _RadioGroup(
-                        options: const ['English', 'Hindi (Latin)', 'हिन्दी'],
+                        options: const ['English', 'Hindi (Latin)', 'हिन्दी', 'தமிழ்', 'বাংলা'],
                         selected: language.index,
                         onChanged: (i) => ref
                             .read(appSettingsProvider.notifier)
@@ -187,6 +211,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           null,
                           null,
                           devanagariStyle(
+                            Theme.of(context).textTheme.bodyMedium,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          tamilStyle(
+                            Theme.of(context).textTheme.bodyMedium,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          bengaliStyle(
                             Theme.of(context).textTheme.bodyMedium,
                             fontWeight: FontWeight.w500,
                           ),
@@ -203,6 +235,55 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             .read(appSettingsProvider.notifier)
                             .setMonthSystem(MonthSystem.values[i]),
                       ),
+
+                      const SizedBox(height: 20),
+
+                      _SectionLabel('NOTIFICATIONS'),
+                      _SettingsRow(
+                        label: 'Enable notifications',
+                        value: '',
+                        trailing: _notifLoading
+                            ? const SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 1.5,
+                                  color: TithikaColors.shukla,
+                                ),
+                              )
+                            : Switch(
+                                value: notif.enabled,
+                                onChanged: _notifLoading
+                                    ? null
+                                    : _toggleNotifications,
+                                activeThumbColor: Colors.white,
+                                activeTrackColor: TithikaColors.shukla.withValues(alpha: 0.35),
+                                inactiveThumbColor: TithikaColors.shukla.withValues(alpha: 0.5),
+                                inactiveTrackColor: Colors.black,
+                                trackOutlineColor: WidgetStatePropertyAll(TithikaColors.shukla.withValues(alpha: 0.5)),
+                                materialTapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap,
+                              ),
+                      ),
+                      if (notif.enabled) ...[
+                        const SizedBox(height: 8),
+                        _NotifSubGroup(
+                          notif: notif,
+                          onDailyChanged: (v) => ref
+                              .read(appSettingsProvider.notifier)
+                              .setNotificationSettings(
+                                  notif.copyWith(dailyReminderEnabled: v)),
+                          onTimeTap: _pickReminderTime,
+                          onFestivalChanged: (v) => ref
+                              .read(appSettingsProvider.notifier)
+                              .setNotificationSettings(
+                                  notif.copyWith(festivalAlertsEnabled: v)),
+                          onEkadashiChanged: (v) => ref
+                              .read(appSettingsProvider.notifier)
+                              .setNotificationSettings(
+                                  notif.copyWith(ekadashiAlertsEnabled: v)),
+                        ),
+                      ],
 
                       const SizedBox(height: 32),
                       _SectionLabel('CREDITS'),
@@ -379,3 +460,136 @@ class _RadioGroup extends StatelessWidget {
   }
 }
 
+// ── Notification sub-options card ─────────────────────────────────────────────
+
+class _NotifSubGroup extends StatelessWidget {
+  final NotificationSettings notif;
+  final ValueChanged<bool> onDailyChanged;
+  final VoidCallback onTimeTap;
+  final ValueChanged<bool> onFestivalChanged;
+  final ValueChanged<bool> onEkadashiChanged;
+
+  const _NotifSubGroup({
+    required this.notif,
+    required this.onDailyChanged,
+    required this.onTimeTap,
+    required this.onFestivalChanged,
+    required this.onEkadashiChanged,
+  });
+
+  String _fmtTime() {
+    final h = notif.dailyReminderHour;
+    final m = notif.dailyReminderMinute;
+    final suffix = h < 12 ? 'AM' : 'PM';
+    final h12 = h % 12 == 0 ? 12 : h % 12;
+    return '$h12:${m.toString().padLeft(2, '0')} $suffix';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: TithikaColors.card,
+        border: Border.all(color: TithikaColors.line),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        children: [
+          _SubRow(
+            label: 'Daily panchanga reminder',
+            trailing: Switch(
+              value: notif.dailyReminderEnabled,
+              onChanged: onDailyChanged,
+              activeThumbColor: Colors.white,
+                                activeTrackColor: TithikaColors.shukla.withValues(alpha: 0.35),
+                                inactiveThumbColor: TithikaColors.shukla.withValues(alpha: 0.5),
+                                inactiveTrackColor: Colors.black,
+                                trackOutlineColor: WidgetStatePropertyAll(TithikaColors.shukla.withValues(alpha: 0.5)),
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            divider: true,
+          ),
+          if (notif.dailyReminderEnabled)
+            _SubRow(
+              label: 'Reminder time',
+              trailing: GestureDetector(
+                onTap: onTimeTap,
+                child: Text(
+                  _fmtTime(),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: TithikaColors.shukla,
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
+              ),
+              divider: true,
+            ),
+          _SubRow(
+            label: 'Festival alerts',
+            trailing: Switch(
+              value: notif.festivalAlertsEnabled,
+              onChanged: onFestivalChanged,
+              activeThumbColor: Colors.white,
+                                activeTrackColor: TithikaColors.shukla.withValues(alpha: 0.35),
+                                inactiveThumbColor: TithikaColors.shukla.withValues(alpha: 0.5),
+                                inactiveTrackColor: Colors.black,
+                                trackOutlineColor: WidgetStatePropertyAll(TithikaColors.shukla.withValues(alpha: 0.5)),
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            divider: true,
+          ),
+          _SubRow(
+            label: 'Ekadashi alerts',
+            trailing: Switch(
+              value: notif.ekadashiAlertsEnabled,
+              onChanged: onEkadashiChanged,
+              activeThumbColor: Colors.white,
+              activeTrackColor: TithikaColors.shukla.withValues(alpha: 0.35),
+              inactiveThumbColor: TithikaColors.shukla.withValues(alpha: 0.5),
+              inactiveTrackColor: Colors.black,
+              trackOutlineColor: WidgetStatePropertyAll(TithikaColors.shukla.withValues(alpha: 0.5)),
+            ),
+            divider: false,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SubRow extends StatelessWidget {
+  final String label;
+  final Widget trailing;
+  final bool divider;
+
+  const _SubRow({
+    required this.label,
+    required this.trailing,
+    required this.divider,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        border: divider
+            ? const Border(bottom: BorderSide(color: TithikaColors.line))
+            : null,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium
+                ?.copyWith(fontWeight: FontWeight.w500),
+          ),
+          trailing,
+        ],
+      ),
+    );
+  }
+}

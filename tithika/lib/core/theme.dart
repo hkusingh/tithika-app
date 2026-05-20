@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../models/app_settings.dart';
+
 // ── Design tokens ─────────────────────────────────────────────────────────────
 class TithikaColors {
   TithikaColors._();
@@ -37,6 +39,37 @@ TextStyle devanagariStyle(TextStyle? base, {Color? color, double? fontSize, Font
     letterSpacing: 0,
   );
 }
+
+TextStyle tamilStyle(TextStyle? base, {Color? color, double? fontSize, FontWeight? fontWeight}) {
+  return (base ?? const TextStyle()).copyWith(
+    fontFamily: 'NotoSansTamil',
+    fontFamilyFallback: const ['Tamil MN', 'Tamil Sangam MN'],
+    color: color,
+    fontSize: fontSize,
+    fontWeight: fontWeight,
+    letterSpacing: 0,
+  );
+}
+
+TextStyle bengaliStyle(TextStyle? base, {Color? color, double? fontSize, FontWeight? fontWeight}) {
+  return (base ?? const TextStyle()).copyWith(
+    fontFamily: 'NotoSansBengali',
+    fontFamilyFallback: const ['Bangla MN', 'Bangla Sangam MN'],
+    color: color,
+    fontSize: fontSize,
+    fontWeight: fontWeight,
+    letterSpacing: 0,
+  );
+}
+
+TextStyle scriptStyle(AppLanguage lang, TextStyle? base,
+    {Color? color, double? fontSize, FontWeight? fontWeight}) =>
+    switch (lang) {
+      AppLanguage.hindiDevanagari => devanagariStyle(base, color: color, fontSize: fontSize, fontWeight: fontWeight),
+      AppLanguage.tamil           => tamilStyle(base, color: color, fontSize: fontSize, fontWeight: fontWeight),
+      AppLanguage.bengali         => bengaliStyle(base, color: color, fontSize: fontSize, fontWeight: fontWeight),
+      _                           => (base ?? const TextStyle()).copyWith(color: color, fontSize: fontSize, fontWeight: fontWeight),
+    };
 
 // ── Theme ─────────────────────────────────────────────────────────────────────
 ThemeData buildTithikaTheme() {
