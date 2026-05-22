@@ -39,8 +39,10 @@ class TithiService {
       localDate.day,
     ).subtract(tzOffset);
 
-    final sunriseUtc = _ephe.sunrise(utcMidnight, lat, lon);
-    final sunsetUtc = _ephe.sunset(utcMidnight, lat, lon);
+    final sunriseUtc  = _ephe.sunrise(utcMidnight, lat, lon);
+    final sunsetUtc   = _ephe.sunset(utcMidnight, lat, lon);
+    final moonriseUtc = _ephe.moonrise(utcMidnight, lat, lon);
+    final moonsetUtc  = _ephe.moonset(utcMidnight, lat, lon);
 
     // All calculations use sunrise as the reference time, per the Drik
     // day-boundary rule.  If GPS fails or the sun never rises (polar edge
@@ -74,6 +76,8 @@ class TithiService {
       nakshatra: nakshatra,
       sunriseUtc: sunriseUtc,
       sunsetUtc: sunsetUtc,
+      moonriseUtc: moonriseUtc,
+      moonsetUtc: moonsetUtc,
       lunarMonth: lunarMonth,
       sunZodiacSign: sunZodiacSign,
       sunZodiacEntryToday: sunZodiacEntryToday,

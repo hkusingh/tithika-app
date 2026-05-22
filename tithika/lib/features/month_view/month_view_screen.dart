@@ -94,24 +94,42 @@ class _MonthViewScreenState extends ConsumerState<MonthViewScreen> {
           SafeArea(
             child: Column(
               children: [
-                // ── Shared nav bar ────────────────────────────────────────
-                TithikaNavBar(title: gregorianLabel),
+                // ── Shared nav bar (no title — month shown in strip below) ──
+                const TithikaNavBar(),
                 const Divider(color: TithikaColors.line, height: 1),
 
-                // ── Month navigation (arrows + Hindu month name) ──────────
+                // ── Month navigation strip ────────────────────────────────
                 Padding(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                      const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
                   child: Row(
                     children: [
                       IconButton(
                         icon: const Icon(Icons.chevron_left_rounded,
                             color: TithikaColors.inkSoft),
                         onPressed: _goToPrevMonth,
+                        padding: EdgeInsets.zero,
+                        constraints:
+                            const BoxConstraints(minWidth: 36, minHeight: 36),
                       ),
                       Expanded(
-                        child: hinduMonthLabel.isNotEmpty
-                            ? Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              gregorianLabel,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    color: TithikaColors.ink,
+                                    fontSize: 14,
+                                  ),
+                            ),
+                            if (hinduMonthLabel.isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 2),
                                 child: Text(
                                   hinduMonthLabel,
                                   style: scriptStyle(
@@ -121,13 +139,17 @@ class _MonthViewScreenState extends ConsumerState<MonthViewScreen> {
                                     fontSize: 11,
                                   ),
                                 ),
-                              )
-                            : const SizedBox.shrink(),
+                              ),
+                          ],
+                        ),
                       ),
                       IconButton(
                         icon: const Icon(Icons.chevron_right_rounded,
                             color: TithikaColors.inkSoft),
                         onPressed: _goToNextMonth,
+                        padding: EdgeInsets.zero,
+                        constraints:
+                            const BoxConstraints(minWidth: 36, minHeight: 36),
                       ),
                     ],
                   ),

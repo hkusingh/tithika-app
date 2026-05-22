@@ -104,6 +104,38 @@ class SwephEphemerisService implements EphemerisService {
     );
     return resultJd == null ? null : utcFromJulianDay(resultJd);
   }
+
+  @override
+  DateTime? moonrise(DateTime utcMidnight, double lat, double lon) {
+    assert(utcMidnight.isUtc);
+    final jd = julianDayFromUtc(utcMidnight);
+    final resultJd = Sweph.swe_rise_trans(
+      jd,
+      HeavenlyBody.SE_MOON,
+      SwephFlag.SEFLG_SWIEPH,
+      RiseSetTransitFlag.SE_CALC_RISE,
+      GeoPosition(lon, lat),
+      _atPress,
+      _atTemp,
+    );
+    return resultJd == null ? null : utcFromJulianDay(resultJd);
+  }
+
+  @override
+  DateTime? moonset(DateTime utcMidnight, double lat, double lon) {
+    assert(utcMidnight.isUtc);
+    final jd = julianDayFromUtc(utcMidnight);
+    final resultJd = Sweph.swe_rise_trans(
+      jd,
+      HeavenlyBody.SE_MOON,
+      SwephFlag.SEFLG_SWIEPH,
+      RiseSetTransitFlag.SE_CALC_SET,
+      GeoPosition(lon, lat),
+      _atPress,
+      _atTemp,
+    );
+    return resultJd == null ? null : utcFromJulianDay(resultJd);
+  }
 }
 
 /// Loads Flutter asset bytes using [rootBundle].

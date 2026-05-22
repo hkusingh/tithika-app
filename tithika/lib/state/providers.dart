@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/app_location.dart';
 import '../models/app_settings.dart';
 import '../models/day_data.dart';
+import '../models/hora_data.dart';
 import '../models/lunar_month.dart';
 import '../models/paksha.dart';
 import '../services/festival_detector.dart';
+import '../services/hora_service.dart';
 import '../services/providers.dart' as svc;
 import 'app_settings_notifier.dart';
 
@@ -171,6 +173,37 @@ final hinduMonthTransitionsProvider =
     prev = data.lunarMonth;
   }
   return transitions;
+});
+
+// ── Hora ──────────────────────────────────────────────────────────────────────
+
+/// 24 unequal planetary hours for the selected date at the effective location.
+/// Returns null while the ephemeris is loading or sunrise/sunset is unavailable.
+final horaProvider = FutureProvider<List<HoraSlot>?>((ref) async {
+  final dayData = await ref.watch(dayDataProvider.future);
+  if (dayData == null) return null;
+  if (dayData.sunriseUtc == null || dayData.sunsetUtc == null) return null;
+
+  final tithiSvc = await ref.watch(svc.tithiServiceProvider.future);
+  final location = ref.watch(effectiveLocationProvider);
+  final date = ref.watch(selectedDateProvider);
+
+  final tomorrow = DateTime(date.year, date.month, date.day + 1);
+  final nextDayRaw = tithiSvc.calculateForDate(
+    localDate: tomorrow,
+    lat: location.lat,
+    lon: location.lon,
+    tzOffset: location.tzOffsetAt(tomorrow),
+  );
+  final nextSunrise = nextDayRaw.sunriseUtc;
+  if (nextSunrise == null) return null;
+
+  return HoraService.calculate(
+    sunriseUtc: dayData.sunriseUtc!,
+    sunsetUtc: dayData.sunsetUtc!,
+    nextSunriseUtc: nextSunrise,
+    weekday: date.weekday,
+  );
 });
 
 // ── Year festival list ────────────────────────────────────────────────────────

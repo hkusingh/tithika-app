@@ -110,6 +110,12 @@ class _StubEphemeris implements EphemerisService {
     final a = _anchorFor(jd);
     return utcFromJulianDay(a.sunsetJd + (jd - a.refJd).roundToDouble());
   }
+
+  @override
+  DateTime? moonrise(DateTime utcMidnight, double lat, double lon) => null;
+
+  @override
+  DateTime? moonset(DateTime utcMidnight, double lat, double lon) => null;
 }
 
 // ── Reference anchors ─────────────────────────────────────────────────────────

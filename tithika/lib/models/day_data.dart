@@ -18,6 +18,8 @@ class DayData {
 
   final DateTime? sunriseUtc;
   final DateTime? sunsetUtc;
+  final DateTime? moonriseUtc;
+  final DateTime? moonsetUtc;
 
   final LunarMonth lunarMonth;
 
@@ -45,6 +47,8 @@ class DayData {
     required this.nakshatra,
     this.sunriseUtc,
     this.sunsetUtc,
+    this.moonriseUtc,
+    this.moonsetUtc,
     required this.lunarMonth,
     required this.sunZodiacSign,
     this.sunZodiacEntryToday = false,
@@ -65,6 +69,8 @@ class DayData {
       nakshatra: nakshatra,
       sunriseUtc: sunriseUtc,
       sunsetUtc: sunsetUtc,
+      moonriseUtc: moonriseUtc,
+      moonsetUtc: moonsetUtc,
       lunarMonth: lunarMonth ?? this.lunarMonth,
       sunZodiacSign: sunZodiacSign,
       sunZodiacEntryToday: sunZodiacEntryToday,

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tithika/features/day_view/day_view_screen.dart';
 import 'package:tithika/features/festivals/festivals_screen.dart';
+import 'package:tithika/features/hora/hora_screen.dart';
 import 'package:tithika/features/month_view/month_view_screen.dart';
 import 'package:tithika/features/onboarding/onboarding_screen.dart';
 import 'package:tithika/features/settings/settings_screen.dart';
@@ -15,6 +16,7 @@ class Routes {
   static const monthView = '/month';
   static const settings = '/settings';
   static const festivals = '/festivals';
+  static const hora = '/hora';
 }
 
 /// Builds the router with access to Riverpod so the redirect can read
@@ -50,6 +52,10 @@ GoRouter buildRouter(WidgetRef ref) {
           GoRoute(
             path: 'festivals',
             builder: (context, state) => const FestivalsScreen(),
+          ),
+          GoRoute(
+            path: 'hora',
+            builder: (context, state) => const HoraScreen(),
           ),
         ],
       ),

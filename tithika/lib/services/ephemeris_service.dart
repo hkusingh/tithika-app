@@ -30,4 +30,12 @@ abstract class EphemerisService {
   /// UTC time of sunset for the same date/location. Returns null if sun
   /// never sets.
   DateTime? sunset(DateTime utcMidnight, double lat, double lon);
+
+  /// UTC time of moonrise for the calendar date containing [utcMidnight],
+  /// at [lat]/[lon]. Returns null if the moon never rises (polar edge case).
+  DateTime? moonrise(DateTime utcMidnight, double lat, double lon);
+
+  /// UTC time of moonset for the same date/location. Returns null if the
+  /// moon never sets.
+  DateTime? moonset(DateTime utcMidnight, double lat, double lon);
 }

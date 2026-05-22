@@ -36,6 +36,18 @@ extension LunarMonthName on LunarMonth {
         'पौष', 'माघ', 'फाल्गुन', 'चैत्र',
       ][index];
 
+  String get nameTamil => const [
+        'வைகாசி', 'ஆனி', 'ஆடி', 'ஆவணி',
+        'புரட்டாசி', 'ஐப்பசி', 'கார்த்திகை', 'மார்கழி',
+        'தை', 'மாசி', 'பங்குனி', 'சித்திரை',
+      ][index];
+
+  String get nameBengali => const [
+        'বৈশাখ', 'জ্যৈষ্ঠ', 'আষাঢ়', 'শ্রাবণ',
+        'ভাদ্র', 'আশ্বিন', 'কার্তিক', 'অগ্রহায়ণ',
+        'পৌষ', 'মাঘ', 'ফাল্গুন', 'চৈত্র',
+      ][index];
+
   // 4-char abbreviation for the month-grid cell label.
   // ASHA=Ashadha, ASHW=Ashwina (unique pair).
   String get abbr4 => const [

@@ -30,10 +30,14 @@ class TithiInfo {
 
   String get nameEn => _tithiNamesEn[number - 1];
   String get nameDeva => _tithiNamesDeva[number - 1];
+  String get nameTamil => _tithiNamesTamil[number - 1];
+  String get nameBengali => _tithiNamesBengali[number - 1];
 
   /// Human-readable paksha + tithi, e.g. "Shukla Pratipada".
   String get fullNameEn => '${paksha == Paksha.shukla ? "Shukla" : "Krishna"} $nameEn';
   String get fullNameDeva => '${paksha == Paksha.shukla ? "शुक्ल" : "कृष्ण"} $nameDeva';
+  String get fullNameTamil => '${paksha == Paksha.shukla ? "வளர்பிறை" : "தேய்பிறை"} $nameTamil';
+  String get fullNameBengali => '${paksha == Paksha.shukla ? "শুক্ল" : "কৃষ্ণ"} $nameBengali';
 }
 
 // ── String tables ─────────────────────────────────────────────────────────────
@@ -54,5 +58,23 @@ const _tithiNamesDeva = [
   'प्रतिपदा', 'द्वितीया', 'तृतीया', 'चतुर्थी', 'पञ्चमी',
   'षष्ठी', 'सप्तमी', 'अष्टमी', 'नवमी', 'दशमी',
   'एकादशी', 'द्वादशी', 'त्रयोदशी', 'चतुर्दशी', 'अमावस्या',
+];
+
+const _tithiNamesTamil = [
+  'பிரதமை', 'துவிதியை', 'திரிதியை', 'சதுர்த்தி', 'பஞ்சமி',
+  'ஷஷ்டி', 'சப்தமி', 'அஷ்டமி', 'நவமி', 'தசமி',
+  'ஏகாதசி', 'துவாதசி', 'திரயோதசி', 'சதுர்தசி', 'பவுர்ணமி',
+  'பிரதமை', 'துவிதியை', 'திரிதியை', 'சதுர்த்தி', 'பஞ்சமி',
+  'ஷஷ்டி', 'சப்தமி', 'அஷ்டமி', 'நவமி', 'தசமி',
+  'ஏகாதசி', 'துவாதசி', 'திரயோதசி', 'சதுர்தசி', 'அமாவாசை',
+];
+
+const _tithiNamesBengali = [
+  'প্রতিপদ', 'দ্বিতীয়া', 'তৃতীয়া', 'চতুর্থী', 'পঞ্চমী',
+  'ষষ্ঠী', 'সপ্তমী', 'অষ্টমী', 'নবমী', 'দশমী',
+  'একাদশী', 'দ্বাদশী', 'ত্রয়োদশী', 'চতুর্দশী', 'পূর্ণিমা',
+  'প্রতিপদ', 'দ্বিতীয়া', 'তৃতীয়া', 'চতুর্থী', 'পঞ্চমী',
+  'ষষ্ঠী', 'সপ্তমী', 'অষ্টমী', 'নবমী', 'দশমী',
+  'একাদশী', 'দ্বাদশী', 'ত্রয়োদশী', 'চতুর্দশী', 'অমাবস্যা',
 ];
 
