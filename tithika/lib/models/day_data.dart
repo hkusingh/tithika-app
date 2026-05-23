@@ -33,9 +33,15 @@ class DayData {
   /// Festival name for this day, or null.
   final String? festivalName;
 
-  /// A second tithi that begins after sunrise but before the next sunrise
-  /// (kshaya / skipped tithi). Null on most days.
+  /// A second tithi that begins after sunrise but before the next sunrise.
+  /// Null on most days.
   final TithiInfo? secondaryTithi;
+
+  /// True when [secondaryTithi] is a true kshaya (skipped) tithi — i.e. it
+  /// also ends before the next sunrise, so it never appears as a primary tithi
+  /// on any calendar day.  False when the secondary tithi continues past the
+  /// next sunrise and will be the primary tithi tomorrow.
+  final bool secondaryIsKshaya;
 
   /// True if this day falls within an Adhika (intercalary) lunar month —
   /// i.e. no solar Sankranti occurs between two consecutive Purnimas.
@@ -54,12 +60,14 @@ class DayData {
     this.sunZodiacEntryToday = false,
     this.festivalName,
     this.secondaryTithi,
+    this.secondaryIsKshaya = false,
     this.isAdhika = false,
   });
 
   DayData copyWith({
     String? festivalName,
     TithiInfo? secondaryTithi,
+    bool? secondaryIsKshaya,
     bool? isAdhika,
     LunarMonth? lunarMonth,
   }) {
@@ -76,6 +84,7 @@ class DayData {
       sunZodiacEntryToday: sunZodiacEntryToday,
       festivalName: festivalName ?? this.festivalName,
       secondaryTithi: secondaryTithi ?? this.secondaryTithi,
+      secondaryIsKshaya: secondaryIsKshaya ?? this.secondaryIsKshaya,
       isAdhika: isAdhika ?? this.isAdhika,
     );
   }

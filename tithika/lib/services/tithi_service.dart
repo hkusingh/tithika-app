@@ -63,11 +63,15 @@ class TithiService {
     final nextSunriseUtc = _ephe.sunrise(nextDayUtcMidnight, lat, lon)
         ?? nextDayUtcMidnight.add(const Duration(hours: 6));
     TithiInfo? secondaryTithi;
+    var secondaryIsKshaya = false;
     if (tithi.end.isBefore(nextSunriseUtc)) {
       final secondaryJd = _ephe.julianDayFromUtc(
         tithi.end.add(const Duration(minutes: 1)),
       );
       secondaryTithi = _tithiAt(secondaryJd);
+      // Kshaya: the secondary tithi also ends before the next sunrise, so it
+      // never becomes a primary tithi on any calendar day.
+      secondaryIsKshaya = secondaryTithi.end.isBefore(nextSunriseUtc);
     }
 
     return DayData(
@@ -82,6 +86,7 @@ class TithiService {
       sunZodiacSign: sunZodiacSign,
       sunZodiacEntryToday: sunZodiacEntryToday,
       secondaryTithi: secondaryTithi,
+      secondaryIsKshaya: secondaryIsKshaya,
       isAdhika: isAdhika,
     );
   }
