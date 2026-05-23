@@ -1,5 +1,6 @@
 String formatLocalTime(DateTime utc, Duration tzOffset) {
-  final local = utc.add(tzOffset);
+  // Round to nearest minute before truncating seconds.
+  final local = utc.add(tzOffset).add(const Duration(seconds: 30));
   final h = local.hour % 12 == 0 ? 12 : local.hour % 12;
   final m = local.minute.toString().padLeft(2, '0');
   final period = local.hour < 12 ? 'AM' : 'PM';
@@ -21,7 +22,7 @@ String gregorianMonthName(int month) => _monthNames[month - 1];
 /// Returns e.g. "May 12 6:42 AM" — used for tithi start/end times where
 /// the date context is needed because the window can span midnight.
 String formatLocalDatetime(DateTime utc, Duration tzOffset) {
-  final local = utc.add(tzOffset);
+  final local = utc.add(tzOffset).add(const Duration(seconds: 30));
   final h = local.hour % 12 == 0 ? 12 : local.hour % 12;
   final m = local.minute.toString().padLeft(2, '0');
   final period = local.hour < 12 ? 'AM' : 'PM';

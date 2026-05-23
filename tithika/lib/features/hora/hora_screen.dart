@@ -308,7 +308,7 @@ class _HoraRow extends StatelessWidget {
                   style: scriptStyle(
                     language,
                     null,
-                    color: TithikaColors.inkMuted,
+                    color: TithikaColors.inkSoft,
                     fontSize: 11,
                   ),
                 ),
