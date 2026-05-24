@@ -81,14 +81,7 @@ class TithikaApp extends ConsumerStatefulWidget {
 }
 
 class _TithikaAppState extends ConsumerState<TithikaApp> {
-  late final GoRouter _router;
-
-  @override
-  void initState() {
-    super.initState();
-    // Router created once — prevents navigation reset when theme changes.
-    _router = buildRouter(ref);
-  }
+  GoRouter? _router;
 
   @override
   Widget build(BuildContext context) {
@@ -97,6 +90,9 @@ class _TithikaAppState extends ConsumerState<TithikaApp> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       FlutterNativeSplash.remove();
     });
+    // Router is created once on first build (ref.listen is only valid in build).
+    // Subsequent rebuilds reuse the cached instance, preventing nav reset.
+    _router ??= buildRouter(ref);
     final themeMode = ref.watch(appSettingsProvider).theme.themeMode;
     return MaterialApp.router(
       title: 'Tithika',
@@ -104,7 +100,7 @@ class _TithikaAppState extends ConsumerState<TithikaApp> {
       theme:      buildTithikaTheme(Brightness.light),
       darkTheme:  buildTithikaTheme(Brightness.dark),
       themeMode:  themeMode,
-      routerConfig: _router,
+      routerConfig: _router!,
     );
   }
 }

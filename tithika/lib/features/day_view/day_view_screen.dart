@@ -519,7 +519,7 @@ class _SunCard extends StatelessWidget {
               Container(width: 1, height: 28, color: colors.line),
               Expanded(
                   child: _SunSegment(
-                      icon: Icons.nights_stay_rounded,
+                      icon: Icons.wb_twilight,
                       iconColor: colors.ink,
                       label: AppStrings.sunset(language),
                       time: sunset,
@@ -535,7 +535,7 @@ class _SunCard extends StatelessWidget {
               Expanded(
                   child: _SunSegment(
                       icon: Icons.brightness_2_rounded,
-                      iconColor: colors.moonLight,
+                      iconColor: colors.inkSoft,
                       label: AppStrings.moonrise(language),
                       time: moonrise,
                       language: language)),
@@ -543,7 +543,7 @@ class _SunCard extends StatelessWidget {
               Expanded(
                   child: _SunSegment(
                       icon: Icons.brightness_2_outlined,
-                      iconColor: colors.moonLight.withValues(alpha: 0.5),
+                      iconColor: colors.inkMuted,
                       label: AppStrings.moonset(language),
                       time: moonset,
                       alignment: CrossAxisAlignment.end,
