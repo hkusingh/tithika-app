@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:tithika/core/router.dart' show buildRouter;
@@ -72,11 +73,25 @@ void main() async {
   );
 }
 
-class TithikaApp extends ConsumerWidget {
+class TithikaApp extends ConsumerStatefulWidget {
   const TithikaApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TithikaApp> createState() => _TithikaAppState();
+}
+
+class _TithikaAppState extends ConsumerState<TithikaApp> {
+  late final GoRouter _router;
+
+  @override
+  void initState() {
+    super.initState();
+    // Router created once — prevents navigation reset when theme changes.
+    _router = buildRouter(ref);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     // Dismiss the native splash after the first Flutter frame is painted,
     // so there is no blank-screen gap between splash and app content.
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -89,7 +104,7 @@ class TithikaApp extends ConsumerWidget {
       theme:      buildTithikaTheme(Brightness.light),
       darkTheme:  buildTithikaTheme(Brightness.dark),
       themeMode:  themeMode,
-      routerConfig: buildRouter(ref),
+      routerConfig: _router,
     );
   }
 }
