@@ -6,6 +6,7 @@ import '../models/app_settings.dart';
 const _keyLocation = 'location';
 const _keyLanguage = 'language';
 const _keyMonthSystem = 'monthSystem';
+const _keyTheme = 'theme';
 const _keyNotifEnabled = 'notif_enabled';
 const _keyNotifDailyEnabled = 'notif_daily_enabled';
 const _keyNotifDailyHour = 'notif_daily_hour';
@@ -23,6 +24,7 @@ class SettingsRepository {
       location: AppLocation.tryDecode(_prefs.getString(_keyLocation)),
       language: AppLanguage.values[_prefs.getInt(_keyLanguage) ?? 0],
       monthSystem: MonthSystem.values[_prefs.getInt(_keyMonthSystem) ?? 0],
+      theme: AppTheme.values[_prefs.getInt(_keyTheme) ?? 0],
       notificationSettings: NotificationSettings(
         enabled: _prefs.getBool(_keyNotifEnabled) ?? false,
         dailyReminderEnabled:
@@ -49,6 +51,10 @@ class SettingsRepository {
 
   Future<void> saveMonthSystem(MonthSystem monthSystem) async {
     await _prefs.setInt(_keyMonthSystem, monthSystem.index);
+  }
+
+  Future<void> saveTheme(AppTheme theme) async {
+    await _prefs.setInt(_keyTheme, theme.index);
   }
 
   Future<void> saveNotificationSettings(NotificationSettings s) async {

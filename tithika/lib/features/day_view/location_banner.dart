@@ -17,6 +17,8 @@ class LocationBanner extends ConsumerWidget {
     final locationSet = ref.watch(locationIsSetProvider);
     if (locationSet) return const SizedBox.shrink();
 
+    final festival = TithikaColors.of(context).festival;
+
     return GestureDetector(
       onTap: () async {
         final selected = await showModalBottomSheet<AppLocation>(
@@ -32,24 +34,21 @@ class LocationBanner extends ConsumerWidget {
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        color: TithikaColors.festival.withAlpha(26),
+        color: festival.withAlpha(26),
         child: Row(
           children: [
-            const Icon(Icons.location_off_rounded, size: 16, color: TithikaColors.festival),
+            Icon(Icons.location_off_rounded, size: 16, color: festival),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
                 'Tap to set your location — currently showing Ujjain',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: TithikaColors.festival,
-                    ),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(color: festival),
               ),
             ),
-            const Icon(Icons.chevron_right_rounded, size: 16, color: TithikaColors.festival),
+            Icon(Icons.chevron_right_rounded, size: 16, color: festival),
           ],
         ),
       ),
     );
   }
 }
-

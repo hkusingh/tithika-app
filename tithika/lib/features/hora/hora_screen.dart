@@ -46,6 +46,7 @@ class _HoraScreenState extends ConsumerState<HoraScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = TithikaColors.of(context);
     final horaAsync = ref.watch(horaProvider);
     final date = ref.watch(selectedDateProvider);
     final location = ref.watch(effectiveLocationProvider);
@@ -57,102 +58,99 @@ class _HoraScreenState extends ConsumerState<HoraScreen> {
         child: Column(
           children: [
             TithikaNavBar(title: AppStrings.hora(language)),
-            const Divider(color: TithikaColors.line, height: 1),
-          // Date navigation row
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.chevron_left_rounded,
-                      color: TithikaColors.inkSoft),
-                  onPressed: () {
-                    ref.read(selectedDateProvider.notifier).state =
-                        date.subtract(const Duration(days: 1));
-                    setState(() => _scrolledToActive = false);
-                  },
-                ),
-                Text(
-                  '${AppStrings.weekdayFull(date.weekday, language)},  '
-                  '${AppStrings.gregMonth(date.month, language)} ${date.day}',
-                  style: scriptStyle(
-                    language,
-                    Theme.of(context).textTheme.bodyMedium,
-                    color: TithikaColors.ink,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
+            Divider(color: colors.line, height: 1),
+            // Date navigation row
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.chevron_left_rounded, color: colors.inkSoft),
+                    onPressed: () {
+                      ref.read(selectedDateProvider.notifier).state =
+                          date.subtract(const Duration(days: 1));
+                      setState(() => _scrolledToActive = false);
+                    },
+                  ),
+                  Text(
+                    '${AppStrings.weekdayFull(date.weekday, language)},  '
+                    '${AppStrings.gregMonth(date.month, language)} ${date.day}',
+                    style: scriptStyle(
+                      language,
+                      Theme.of(context).textTheme.bodyMedium,
+                      color: colors.ink,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.chevron_right_rounded, color: colors.inkSoft),
+                    onPressed: () {
+                      ref.read(selectedDateProvider.notifier).state =
+                          date.add(const Duration(days: 1));
+                      setState(() => _scrolledToActive = false);
+                    },
+                  ),
+                ],
+              ),
+            ),
+            Divider(height: 1, color: colors.line),
+            Expanded(
+              child: horaAsync.when(
+                loading: () => Center(
+                  child: CircularProgressIndicator(
+                    color: colors.shukla,
+                    strokeWidth: 1.5,
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.chevron_right_rounded,
-                      color: TithikaColors.inkSoft),
-                  onPressed: () {
-                    ref.read(selectedDateProvider.notifier).state =
-                        date.add(const Duration(days: 1));
-                    setState(() => _scrolledToActive = false);
-                  },
+                error: (_, _) => Center(
+                  child: Text(
+                    AppStrings.horaUnavailable(language),
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.copyWith(color: colors.inkMuted),
+                  ),
                 ),
-              ],
-            ),
-          ),
-          const Divider(height: 1, color: TithikaColors.line),
-          Expanded(
-            child: horaAsync.when(
-              loading: () => const Center(
-                child: CircularProgressIndicator(
-                  color: TithikaColors.shukla,
-                  strokeWidth: 1.5,
-                ),
-              ),
-              error: (_, _) => Center(
-                child: Text(
-                  AppStrings.horaUnavailable(language),
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodySmall
-                      ?.copyWith(color: TithikaColors.inkMuted),
-                ),
-              ),
-              data: (slots) {
-                if (slots == null || slots.isEmpty) {
-                  return Center(
-                    child: Text(
-                      AppStrings.horaSunriseMissing(language),
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodySmall
-                          ?.copyWith(color: TithikaColors.inkMuted),
-                    ),
-                  );
-                }
-
-                final now = DateTime.now().toUtc();
-                int activeIdx = -1;
-                for (var i = 0; i < slots.length; i++) {
-                  if (!now.isBefore(slots[i].start) &&
-                      now.isBefore(slots[i].end)) {
-                    activeIdx = i;
-                    break;
+                data: (slots) {
+                  if (slots == null || slots.isEmpty) {
+                    return Center(
+                      child: Text(
+                        AppStrings.horaSunriseMissing(language),
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodySmall
+                            ?.copyWith(color: colors.inkMuted),
+                      ),
+                    );
                   }
-                }
 
-                final items = _buildItems(
-                    slots, activeIdx, tz, language, context);
-                _scrollToCurrent();
+                  final now = DateTime.now().toUtc();
+                  int activeIdx = -1;
+                  for (var i = 0; i < slots.length; i++) {
+                    if (!now.isBefore(slots[i].start) &&
+                        now.isBefore(slots[i].end)) {
+                      activeIdx = i;
+                      break;
+                    }
+                  }
 
-                return ListView.builder(
-                  controller: _scrollController,
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  itemCount: items.length,
-                  itemBuilder: (_, i) => items[i],
-                );
-              },
+                  final items = _buildItems(slots, activeIdx, tz, language, context);
+                  _scrollToCurrent();
+
+                  return ListView.builder(
+                    controller: _scrollController,
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    itemCount: items.length,
+                    itemBuilder: (_, i) => items[i],
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
     );
   }
 
@@ -256,6 +254,7 @@ class _HoraRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = TithikaColors.of(context);
     final color = slot.planet.accentColor;
     final timeRange = '${_fmt(slot.start)} – ${_fmt(slot.end)}';
 
@@ -268,7 +267,7 @@ class _HoraRow extends StatelessWidget {
         border: Border.all(
           color: isActive
               ? color.withValues(alpha: 0.35)
-              : TithikaColors.line.withValues(alpha: 0.5),
+              : colors.line.withValues(alpha: 0.5),
         ),
       ),
       child: Row(
@@ -298,7 +297,7 @@ class _HoraRow extends StatelessWidget {
                   style: scriptStyle(
                     language,
                     null,
-                    color: isActive ? color : TithikaColors.ink,
+                    color: isActive ? color : colors.ink,
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
                   ),
@@ -308,7 +307,7 @@ class _HoraRow extends StatelessWidget {
                   style: scriptStyle(
                     language,
                     null,
-                    color: TithikaColors.inkSoft,
+                    color: colors.inkSoft,
                     fontSize: 11,
                   ),
                 ),
@@ -342,8 +341,7 @@ class _HoraRow extends StatelessWidget {
               Text(
                 timeRange,
                 style: TextStyle(
-                  color:
-                      isActive ? TithikaColors.inkSoft : TithikaColors.inkMuted,
+                  color: isActive ? colors.inkSoft : colors.inkMuted,
                   fontSize: 11,
                 ),
               ),

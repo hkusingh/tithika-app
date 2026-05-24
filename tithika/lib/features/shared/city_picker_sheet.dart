@@ -43,12 +43,13 @@ class _CityPickerSheetState extends ConsumerState<CityPickerSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = TithikaColors.of(context);
     final bottom = MediaQuery.viewInsetsOf(context).bottom;
     return Container(
       margin: const EdgeInsets.fromLTRB(12, 0, 12, 0),
-      decoration: const BoxDecoration(
-        color: TithikaColors.panel,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      decoration: BoxDecoration(
+        color: colors.panel,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       height: MediaQuery.sizeOf(context).height * 0.85,
       child: Column(
@@ -58,7 +59,7 @@ class _CityPickerSheetState extends ConsumerState<CityPickerSheet> {
             width: 36,
             height: 4,
             decoration: BoxDecoration(
-              color: TithikaColors.lineStrong,
+              color: colors.lineStrong,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -68,20 +69,20 @@ class _CityPickerSheetState extends ConsumerState<CityPickerSheet> {
             child: TextField(
               controller: _controller,
               autofocus: true,
-              style: const TextStyle(color: TithikaColors.ink),
-              cursorColor: TithikaColors.shukla,
+              style: TextStyle(color: colors.ink),
+              cursorColor: colors.shukla,
               decoration: InputDecoration(
                 hintText: 'Search city…',
-                hintStyle: const TextStyle(color: TithikaColors.inkMuted),
-                prefixIcon: const Icon(Icons.search, color: TithikaColors.inkSoft),
+                hintStyle: TextStyle(color: colors.inkMuted),
+                prefixIcon: Icon(Icons.search, color: colors.inkSoft),
                 suffixIcon: _controller.text.isNotEmpty
                     ? IconButton(
-                        icon: const Icon(Icons.clear, color: TithikaColors.inkMuted),
+                        icon: Icon(Icons.clear, color: colors.inkMuted),
                         onPressed: _controller.clear,
                       )
                     : null,
                 filled: true,
-                fillColor: TithikaColors.card,
+                fillColor: colors.card,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide.none,
@@ -92,10 +93,10 @@ class _CityPickerSheetState extends ConsumerState<CityPickerSheet> {
           const SizedBox(height: 8),
           Expanded(
             child: _results.isEmpty
-                ? const Center(
+                ? Center(
                     child: Text(
                       'No cities found',
-                      style: TextStyle(color: TithikaColors.inkMuted),
+                      style: TextStyle(color: colors.inkMuted),
                     ),
                   )
                 : ListView.builder(
@@ -104,16 +105,10 @@ class _CityPickerSheetState extends ConsumerState<CityPickerSheet> {
                     itemBuilder: (_, i) {
                       final city = _results[i];
                       return ListTile(
-                        title: Text(
-                          city.cityName,
-                          style: const TextStyle(color: TithikaColors.ink),
-                        ),
+                        title: Text(city.cityName, style: TextStyle(color: colors.ink)),
                         trailing: Text(
                           city.country,
-                          style: const TextStyle(
-                            color: TithikaColors.inkMuted,
-                            fontSize: 12,
-                          ),
+                          style: TextStyle(color: colors.inkMuted, fontSize: 12),
                         ),
                         onTap: () => Navigator.of(context).pop(city),
                       );

@@ -18,19 +18,20 @@ class MoonPhaseWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = TithikaColors.of(context);
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: TithikaColors.moonDark,
+        color: colors.moonDark,
         boxShadow: [
           BoxShadow(color: glowColor, blurRadius: 18, spreadRadius: 2),
         ],
       ),
       child: ClipOval(
         child: CustomPaint(
-          painter: _MoonPhasePainter(tithiNumber),
+          painter: _MoonPhasePainter(tithiNumber, colors.moonLight),
         ),
       ),
     );
@@ -39,8 +40,9 @@ class MoonPhaseWidget extends StatelessWidget {
 
 class _MoonPhasePainter extends CustomPainter {
   final int tithiNumber;
+  final Color litColor;
 
-  const _MoonPhasePainter(this.tithiNumber);
+  const _MoonPhasePainter(this.tithiNumber, this.litColor);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -57,7 +59,7 @@ class _MoonPhasePainter extends CustomPainter {
     final factor = cos(elongRad);
 
     final litPaint = Paint()
-      ..color = TithikaColors.moonLight
+      ..color = litColor
       ..style = PaintingStyle.fill;
 
     final isWaxing = tithiNumber <= 15;
@@ -91,7 +93,6 @@ class _MoonPhasePainter extends CustomPainter {
       path.lineTo(cx, cy - r);
     } else if (factor > 0) {
       // Crescent: right side of terminator ellipse, counter-clockwise.
-      // This creates the concave inner surface of the crescent.
       path.arcTo(
         Rect.fromCenter(
             center: Offset(cx, cy), width: 2 * r * factor, height: 2 * r),
@@ -101,7 +102,6 @@ class _MoonPhasePainter extends CustomPainter {
       );
     } else {
       // Gibbous: left side of terminator ellipse, clockwise.
-      // This sweeps through the dark half and adds the extra lit area.
       path.arcTo(
         Rect.fromCenter(
             center: Offset(cx, cy), width: -2 * r * factor, height: 2 * r),
@@ -116,5 +116,6 @@ class _MoonPhasePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_MoonPhasePainter old) => old.tithiNumber != tithiNumber;
+  bool shouldRepaint(_MoonPhasePainter old) =>
+      old.tithiNumber != tithiNumber || old.litColor != litColor;
 }

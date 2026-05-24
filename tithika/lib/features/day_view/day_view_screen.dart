@@ -69,6 +69,7 @@ class _DayViewScreenState extends ConsumerState<DayViewScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = TithikaColors.of(context);
     final location = ref.watch(effectiveLocationProvider);
     final date = ref.watch(selectedDateProvider);
 
@@ -118,11 +119,10 @@ class _DayViewScreenState extends ConsumerState<DayViewScreen> {
                                 horizontal: 10, vertical: 4),
                             decoration: BoxDecoration(
                               border: Border.all(
-                                  color: TithikaColors.shukla
+                                  color: colors.shukla
                                       .withValues(alpha: 0.6)),
                               borderRadius: BorderRadius.circular(20),
-                              color:
-                                  TithikaColors.shukla.withValues(alpha: 0.08),
+                              color: colors.shukla.withValues(alpha: 0.08),
                             ),
                             child: Text(
                               'Today',
@@ -130,7 +130,7 @@ class _DayViewScreenState extends ConsumerState<DayViewScreen> {
                                   .textTheme
                                   .bodySmall
                                   ?.copyWith(
-                                    color: TithikaColors.shukla,
+                                    color: colors.shukla,
                                     fontWeight: FontWeight.w600,
                                     fontSize: 12,
                                   ),
@@ -171,14 +171,15 @@ class _DayPageContent extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = TithikaColors.of(context);
     final tithiSvcAsync = ref.watch(svc.tithiServiceProvider);
     final location = ref.watch(effectiveLocationProvider);
     final monthSystem = ref.watch(appSettingsProvider).monthSystem;
 
     return tithiSvcAsync.when(
-      loading: () => const Center(
+      loading: () => Center(
         child: CircularProgressIndicator(
-          color: TithikaColors.shukla,
+          color: colors.shukla,
           strokeWidth: 1.5,
         ),
       ),
@@ -188,7 +189,7 @@ class _DayPageContent extends ConsumerWidget {
           style: Theme.of(context)
               .textTheme
               .bodySmall
-              ?.copyWith(color: TithikaColors.inkMuted),
+              ?.copyWith(color: colors.inkMuted),
         ),
       ),
       data: (tithiSvc) {
@@ -217,15 +218,14 @@ class _DayContent extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = TithikaColors.of(context);
     final location = ref.watch(effectiveLocationProvider);
     final language = ref.watch(appSettingsProvider).language;
 
     final tz = location.tzOffsetAt(date);
     final isShukla = data.tithi.paksha == Paksha.shukla;
-    final pakshaColor =
-        isShukla ? TithikaColors.shukla : TithikaColors.krishna;
-    final glowColor =
-        isShukla ? TithikaColors.shuklaGlow : TithikaColors.krishnaGlow;
+    final pakshaColor = isShukla ? colors.shukla : colors.krishna;
+    final glowColor = isShukla ? colors.shuklaGlow : colors.krishnaGlow;
 
     final weekday = AppStrings.weekdayFull(date.weekday, language);
 
@@ -269,7 +269,7 @@ class _DayContent extends ConsumerWidget {
             style: scriptStyle(
               language,
               Theme.of(context).textTheme.bodySmall,
-              color: TithikaColors.inkSoft,
+              color: colors.inkSoft,
               fontWeight: FontWeight.w500,
               fontSize: 15,
             ),
@@ -306,7 +306,7 @@ class _DayContent extends ConsumerWidget {
             style: Theme.of(context)
                 .textTheme
                 .bodySmall
-                ?.copyWith(color: TithikaColors.inkSoft, fontSize: 15),
+                ?.copyWith(color: colors.inkSoft, fontSize: 15),
           ),
           if (data.secondaryTithi != null) ...[
             const SizedBox(height: 3),
@@ -325,8 +325,8 @@ class _DayContent extends ConsumerWidget {
                 language,
                 Theme.of(context).textTheme.bodySmall,
                 color: data.secondaryTithi!.paksha == Paksha.shukla
-                    ? TithikaColors.shukla
-                    : TithikaColors.krishna,
+                    ? colors.shukla
+                    : colors.krishna,
                 fontSize: 13,
               ),
             ),
@@ -339,7 +339,7 @@ class _DayContent extends ConsumerWidget {
             valueStyle: scriptStyle(
               language,
               null,
-              color: TithikaColors.ink,
+              color: colors.ink,
               fontWeight: FontWeight.w600,
               fontSize: 15,
             ),
@@ -359,8 +359,8 @@ class _DayContent extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.location_on_rounded,
-                  size: 16, color: TithikaColors.inkSoft),
+              Icon(Icons.location_on_rounded,
+                  size: 16, color: colors.inkSoft),
               const SizedBox(width: 4),
               Flexible(
                 child: Text(
@@ -368,7 +368,7 @@ class _DayContent extends ConsumerWidget {
                       .join(', '),
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: TithikaColors.inkSoft,
+                        color: colors.inkSoft,
                         fontSize: 15,
                       ),
                 ),
@@ -388,18 +388,18 @@ class _FestivalBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = TithikaColors.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
       decoration: BoxDecoration(
-        color: TithikaColors.festival.withValues(alpha: 0.15),
+        color: colors.festival.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(12),
-        border:
-            Border.all(color: TithikaColors.festival.withValues(alpha: 0.4)),
+        border: Border.all(color: colors.festival.withValues(alpha: 0.4)),
       ),
       child: Text(
         name,
         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: TithikaColors.festival,
+              color: colors.festival,
               fontSize: 13,
             ),
       ),
@@ -424,9 +424,10 @@ class _DetailCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = TithikaColors.of(context);
     final effectiveValueStyle = valueStyle ??
-        const TextStyle(
-          color: TithikaColors.ink,
+        TextStyle(
+          color: colors.ink,
           fontWeight: FontWeight.w600,
           fontSize: 15,
         );
@@ -434,8 +435,8 @@ class _DetailCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: TithikaColors.card,
-        border: Border.all(color: TithikaColors.line),
+        color: colors.card,
+        border: Border.all(color: colors.line),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
@@ -462,8 +463,8 @@ class _DetailCard extends StatelessWidget {
               ),
               Text(
                 sub,
-                style: const TextStyle(
-                  color: TithikaColors.inkSoft,
+                style: TextStyle(
+                  color: colors.inkSoft,
                   fontWeight: FontWeight.w500,
                   fontSize: 13,
                 ),
@@ -493,12 +494,13 @@ class _SunCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = TithikaColors.of(context);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: TithikaColors.card,
-        border: Border.all(color: TithikaColors.line),
+        color: colors.card,
+        border: Border.all(color: colors.line),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
@@ -514,18 +516,18 @@ class _SunCard extends StatelessWidget {
                       label: AppStrings.sunrise(language),
                       time: sunrise,
                       language: language)),
-              Container(width: 1, height: 28, color: TithikaColors.line),
+              Container(width: 1, height: 28, color: colors.line),
               Expanded(
                   child: _SunSegment(
                       icon: Icons.nights_stay_rounded,
-                      iconColor: TithikaColors.ink,
+                      iconColor: colors.ink,
                       label: AppStrings.sunset(language),
                       time: sunset,
                       alignment: CrossAxisAlignment.end,
                       language: language)),
             ],
           ),
-          Divider(height: 1, color: TithikaColors.line),
+          Divider(height: 1, color: colors.line),
           const SizedBox(height: 4),
           // Moon row
           Row(
@@ -533,15 +535,15 @@ class _SunCard extends StatelessWidget {
               Expanded(
                   child: _SunSegment(
                       icon: Icons.brightness_2_rounded,
-                      iconColor: TithikaColors.moonLight,
+                      iconColor: colors.moonLight,
                       label: AppStrings.moonrise(language),
                       time: moonrise,
                       language: language)),
-              Container(width: 1, height: 28, color: TithikaColors.line),
+              Container(width: 1, height: 28, color: colors.line),
               Expanded(
                   child: _SunSegment(
                       icon: Icons.brightness_2_outlined,
-                      iconColor: TithikaColors.moonLight.withValues(alpha: 0.5),
+                      iconColor: colors.moonLight.withValues(alpha: 0.5),
                       label: AppStrings.moonset(language),
                       time: moonset,
                       alignment: CrossAxisAlignment.end,
@@ -573,6 +575,7 @@ class _SunSegment extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = TithikaColors.of(context);
     final isEnd = alignment == CrossAxisAlignment.end;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -596,8 +599,8 @@ class _SunSegment extends StatelessWidget {
           const SizedBox(height: 1),
           Text(
             time,
-            style: const TextStyle(
-              color: TithikaColors.ink,
+            style: TextStyle(
+              color: colors.ink,
               fontWeight: FontWeight.w600,
               fontSize: 15,
             ),
@@ -635,6 +638,7 @@ class _HoraCard extends ConsumerWidget {
       return const SizedBox.shrink();
     }
 
+    final colors = TithikaColors.of(context);
     final horaAsync = ref.watch(horaProvider);
     final language = ref.watch(appSettingsProvider).language;
 
@@ -663,8 +667,8 @@ class _HoraCard extends ConsumerWidget {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: TithikaColors.card,
-              border: Border.all(color: TithikaColors.line),
+              color: colors.card,
+              border: Border.all(color: colors.line),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Column(
@@ -705,7 +709,7 @@ class _HoraCard extends ConsumerWidget {
                             style: scriptStyle(
                               language,
                               null,
-                              color: TithikaColors.ink,
+                              color: colors.ink,
                               fontWeight: FontWeight.w600,
                               fontSize: 13,
                             ),
@@ -716,7 +720,7 @@ class _HoraCard extends ConsumerWidget {
                             style: scriptStyle(
                               language,
                               null,
-                              color: TithikaColors.inkMuted,
+                              color: colors.inkMuted,
                               fontSize: 11,
                             ),
                           ),
@@ -725,14 +729,14 @@ class _HoraCard extends ConsumerWidget {
                     ),
                     Text(
                       AppStrings.nakshatraUntil(endStr, language),
-                      style: const TextStyle(
-                        color: TithikaColors.inkSoft,
+                      style: TextStyle(
+                        color: colors.inkSoft,
                         fontSize: 11,
                       ),
                     ),
                     const SizedBox(width: 4),
-                    const Icon(Icons.chevron_right_rounded,
-                        size: 16, color: TithikaColors.inkMuted),
+                    Icon(Icons.chevron_right_rounded,
+                        size: 16, color: colors.inkMuted),
                   ],
                 ),
               ],
@@ -751,14 +755,15 @@ class _DayStrip extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = TithikaColors.of(context);
     final stripAsync = ref.watch(stripDaysProvider);
     final selected = ref.watch(selectedDateProvider);
     final language = ref.watch(appSettingsProvider).language;
 
     return Container(
-      decoration: const BoxDecoration(
-        border: Border(top: BorderSide(color: TithikaColors.line)),
-        color: Color(0x07FFFFFF),
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: colors.line)),
+        color: colors.card,
       ),
       child: stripAsync.when(
         loading: () => const SizedBox.shrink(),
@@ -816,33 +821,33 @@ class _StripCell extends StatelessWidget {
     };
   }
 
-  Color _labelColor(bool isShukla) {
-    if (dayData.festivalName != null) return TithikaColors.festival;
+  Color _labelColor(TithikaColors colors) {
+    if (dayData.festivalName != null) return colors.festival;
     return switch (dayData.tithi.number) {
-      15 => TithikaColors.shukla,
-      30 => TithikaColors.krishna,
-      _  => TithikaColors.festival,
+      15 => colors.shukla,
+      30 => colors.krishna,
+      _  => colors.festival,
     };
   }
 
   @override
   Widget build(BuildContext context) {
+    final colors = TithikaColors.of(context);
     final isShukla = dayData.tithi.paksha == Paksha.shukla;
-    final dotColor =
-        isShukla ? TithikaColors.shukla : TithikaColors.krishna;
+    final dotColor = isShukla ? colors.shukla : colors.krishna;
 
     final weekday = AppStrings.weekdayShort(date.weekday, language);
 
     return Container(
       decoration: BoxDecoration(
         border: Border(
-          right: const BorderSide(color: TithikaColors.line),
+          right: BorderSide(color: colors.line),
           top: isSelected
-              ? const BorderSide(color: TithikaColors.shukla, width: 3)
+              ? BorderSide(color: colors.shukla, width: 3)
               : BorderSide.none,
         ),
         color: isSelected
-            ? TithikaColors.shuklaGlow.withValues(alpha: 0.08)
+            ? colors.shuklaGlow.withValues(alpha: 0.08)
             : null,
       ),
       child: Column(
@@ -853,7 +858,7 @@ class _StripCell extends StatelessWidget {
             style: scriptStyle(
               language,
               Theme.of(context).textTheme.labelSmall,
-              color: TithikaColors.inkMuted,
+              color: colors.inkMuted,
               fontSize: 10,
             ),
           ),
@@ -863,7 +868,7 @@ class _StripCell extends StatelessWidget {
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w700,
-              color: isSelected ? TithikaColors.shukla : TithikaColors.ink,
+              color: isSelected ? colors.shukla : colors.ink,
             ),
           ),
           const SizedBox(height: 2),
@@ -882,7 +887,7 @@ class _StripCell extends StatelessWidget {
               Text(
                 '${dayData.tithi.pakshaNumber}',
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: TithikaColors.inkSoft,
+                      color: colors.inkSoft,
                       fontSize: 10,
                     ),
               ),
@@ -899,7 +904,7 @@ class _StripCell extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
                       fontSize: 9,
-                      color: _labelColor(isShukla),
+                      color: _labelColor(colors),
                       fontWeight: FontWeight.w600,
                     ),
               ),
@@ -912,4 +917,3 @@ class _StripCell extends StatelessWidget {
 }
 
 // ── Starfield background ──────────────────────────────────────────────────────
-

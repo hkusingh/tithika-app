@@ -11,6 +11,7 @@ class TithikaNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = TithikaColors.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: SizedBox(
@@ -26,7 +27,7 @@ class TithikaNavBar extends StatelessWidget {
                 title!,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w600,
-                      color: TithikaColors.ink,
+                      color: colors.ink,
                       fontSize: 14,
                     ),
               ),
@@ -37,23 +38,19 @@ class TithikaNavBar extends StatelessWidget {
               child: GestureDetector(
                 onTap: () => context.go('/'),
                 behavior: HitTestBehavior.opaque,
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       'Tithika',
                       style: TextStyle(
-                        color: TithikaColors.ink,
+                        color: colors.ink,
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
                       ),
                     ),
-                    SizedBox(width: 10),
-                    Icon(
-                      Icons.home_rounded,
-                      color: TithikaColors.inkSoft,
-                      size: 22,
-                    ),
+                    const SizedBox(width: 10),
+                    Icon(Icons.home_rounded, color: colors.inkSoft, size: 22),
                   ],
                 ),
               ),
@@ -66,24 +63,21 @@ class TithikaNavBar extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.flare_rounded,
-                        color: TithikaColors.inkSoft, size: 22),
+                    icon: Icon(Icons.flare_rounded, color: colors.inkSoft, size: 22),
                     onPressed: () => context.go('/festivals'),
                     tooltip: 'Festivals',
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.calendar_month_rounded,
-                        color: TithikaColors.inkSoft, size: 22),
+                    icon: Icon(Icons.calendar_month_rounded, color: colors.inkSoft, size: 22),
                     onPressed: () => context.go('/month'),
                     tooltip: 'Month view',
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.tune_rounded,
-                        color: TithikaColors.inkSoft, size: 22),
+                    icon: Icon(Icons.tune_rounded, color: colors.inkSoft, size: 22),
                     onPressed: () => context.go('/settings'),
                     tooltip: 'Settings',
                     padding: EdgeInsets.zero,

@@ -62,6 +62,7 @@ class _MonthViewScreenState extends ConsumerState<MonthViewScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = TithikaColors.of(context);
     final month = ref.watch(selectedMonthProvider);
     final monthAsync = ref.watch(monthDataProvider((month.year, month.month)));
 
@@ -96,7 +97,7 @@ class _MonthViewScreenState extends ConsumerState<MonthViewScreen> {
               children: [
                 // ── Shared nav bar (no title — month shown in strip below) ──
                 const TithikaNavBar(),
-                const Divider(color: TithikaColors.line, height: 1),
+                Divider(color: colors.line, height: 1),
 
                 // ── Month navigation strip ────────────────────────────────
                 Padding(
@@ -105,8 +106,8 @@ class _MonthViewScreenState extends ConsumerState<MonthViewScreen> {
                   child: Row(
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.chevron_left_rounded,
-                            color: TithikaColors.inkSoft),
+                        icon: Icon(Icons.chevron_left_rounded,
+                            color: colors.inkSoft),
                         onPressed: _goToPrevMonth,
                         padding: EdgeInsets.zero,
                         constraints:
@@ -123,7 +124,7 @@ class _MonthViewScreenState extends ConsumerState<MonthViewScreen> {
                                   .bodyMedium
                                   ?.copyWith(
                                     fontWeight: FontWeight.w600,
-                                    color: TithikaColors.ink,
+                                    color: colors.ink,
                                     fontSize: 14,
                                   ),
                             ),
@@ -135,7 +136,7 @@ class _MonthViewScreenState extends ConsumerState<MonthViewScreen> {
                                   style: scriptStyle(
                                     language,
                                     Theme.of(context).textTheme.labelSmall,
-                                    color: TithikaColors.shukla,
+                                    color: colors.shukla,
                                     fontSize: 11,
                                   ),
                                 ),
@@ -144,8 +145,8 @@ class _MonthViewScreenState extends ConsumerState<MonthViewScreen> {
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.chevron_right_rounded,
-                            color: TithikaColors.inkSoft),
+                        icon: Icon(Icons.chevron_right_rounded,
+                            color: colors.inkSoft),
                         onPressed: _goToNextMonth,
                         padding: EdgeInsets.zero,
                         constraints:
@@ -177,7 +178,7 @@ class _MonthViewScreenState extends ConsumerState<MonthViewScreen> {
                         .toList(),
                   ),
                 ),
-                const Divider(color: TithikaColors.line, height: 1),
+                Divider(color: colors.line, height: 1),
 
                 // ── Swipable grid ─────────────────────────────────────────
                 Expanded(
@@ -212,12 +213,13 @@ class _MonthPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = TithikaColors.of(context);
     final monthAsync = ref.watch(monthDataProvider((year, month)));
 
     return monthAsync.when(
-      loading: () => const Center(
+      loading: () => Center(
         child: CircularProgressIndicator(
-            color: TithikaColors.shukla, strokeWidth: 1.5),
+            color: colors.shukla, strokeWidth: 1.5),
       ),
       error: (e, _) => Center(
         child: Text(
@@ -225,7 +227,7 @@ class _MonthPage extends ConsumerWidget {
           style: Theme.of(context)
               .textTheme
               .bodySmall
-              ?.copyWith(color: TithikaColors.inkMuted),
+              ?.copyWith(color: colors.inkMuted),
         ),
       ),
       data: (monthData) => LayoutBuilder(
@@ -361,18 +363,18 @@ class _MonthCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = TithikaColors.of(context);
     final isFestival = data?.festivalName != null;
     final isShukla = data?.tithi.paksha == Paksha.shukla;
-
     final isHinduMonthStart = hinduMonthLabel != null;
 
     Color? bgColor;
     if (isSelected) {
-      bgColor = TithikaColors.shukla.withValues(alpha: 0.20);
+      bgColor = colors.shukla.withValues(alpha: 0.20);
     } else if (isToday) {
-      bgColor = TithikaColors.shukla.withValues(alpha: 0.14);
+      bgColor = colors.shukla.withValues(alpha: 0.14);
     } else if (isFestival) {
-      bgColor = TithikaColors.festival.withValues(alpha: 0.08);
+      bgColor = colors.festival.withValues(alpha: 0.08);
     }
 
     return Container(
@@ -381,14 +383,14 @@ class _MonthCell extends StatelessWidget {
         color: bgColor,
         border: Border(
           top: isSelected
-              ? const BorderSide(color: TithikaColors.shukla, width: 2)
+              ? BorderSide(color: colors.shukla, width: 2)
               : isHinduMonthStart
                   ? BorderSide(
-                      color: TithikaColors.shukla.withValues(alpha: 0.5),
+                      color: colors.shukla.withValues(alpha: 0.5),
                       width: 1.5)
                   : BorderSide.none,
-          bottom: const BorderSide(color: Color(0x0AFFFFFF)),
-          right: const BorderSide(color: Color(0x0AFFFFFF)),
+          bottom: BorderSide(color: colors.line),
+          right: BorderSide(color: colors.line),
         ),
       ),
       child: Column(
@@ -401,10 +403,10 @@ class _MonthCell extends StatelessWidget {
               padding: const EdgeInsets.only(top: 2),
               child: Text(
                 hinduMonthLabel!,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 7.5,
                   fontWeight: FontWeight.w700,
-                  color: TithikaColors.shukla,
+                  color: colors.shukla,
                   letterSpacing: 0.3,
                 ),
               ),
@@ -417,9 +419,9 @@ class _MonthCell extends StatelessWidget {
             width: 20,
             height: 20,
             decoration: (isToday && !isSelected)
-                ? const BoxDecoration(
+                ? BoxDecoration(
                     shape: BoxShape.circle,
-                    color: TithikaColors.shukla,
+                    color: colors.shukla,
                   )
                 : null,
             alignment: Alignment.center,
@@ -429,10 +431,10 @@ class _MonthCell extends StatelessWidget {
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
                 color: isSelected
-                    ? TithikaColors.shukla
+                    ? colors.shukla
                     : isToday
-                        ? TithikaColors.moonDark
-                        : TithikaColors.ink,
+                        ? colors.moonDark
+                        : colors.ink,
               ),
             ),
           ),
@@ -457,7 +459,7 @@ class _MonthCell extends StatelessWidget {
               style: TextStyle(
                 fontSize: 9,
                 fontWeight: FontWeight.w600,
-                color: isShukla ? TithikaColors.shukla : TithikaColors.krishna,
+                color: isShukla ? colors.shukla : colors.krishna,
               ),
             ),
 
@@ -467,9 +469,9 @@ class _MonthCell extends StatelessWidget {
               width: 4,
               height: 4,
               margin: const EdgeInsets.only(top: 2),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: TithikaColors.festival,
+                color: colors.festival,
               ),
             ),
         ],
@@ -493,6 +495,7 @@ class _MonthFestivalList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = TithikaColors.of(context);
     final language = ref.watch(appSettingsProvider).language;
     final festivals = <({int day, String name})>[];
     final daysInMonth = DateTime(year, month + 1, 0).day;
@@ -506,7 +509,7 @@ class _MonthFestivalList extends ConsumerWidget {
     return Container(
       margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
       decoration: BoxDecoration(
-        border: Border.all(color: TithikaColors.line),
+        border: Border.all(color: colors.line),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
@@ -520,12 +523,12 @@ class _MonthFestivalList extends ConsumerWidget {
               style: scriptStyle(
                 language,
                 Theme.of(context).textTheme.labelSmall,
-                color: TithikaColors.shukla,
+                color: colors.shukla,
                 fontSize: 10,
               ),
             ),
           ),
-          const Divider(height: 1, color: TithikaColors.line),
+          Divider(height: 1, color: colors.line),
           ...festivals.map((f) {
             final date = DateTime(year, month, f.day);
             final wd = AppStrings.weekdayShort(date.weekday, language);
@@ -539,16 +542,20 @@ class _MonthFestivalList extends ConsumerWidget {
                     child: Text(
                       '$wd ${f.day} $mo',
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: TithikaColors.inkSoft,
+                            color: colors.inkSoft,
                             fontSize: 10,
                           ),
                     ),
                   ),
                   const SizedBox(width: 8),
-                  Container(width: 3, height: 3,
-                      decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: TithikaColors.festival)),
+                  Container(
+                    width: 3,
+                    height: 3,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: colors.festival,
+                    ),
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -580,6 +587,7 @@ class _NextHinduMonthNote extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = TithikaColors.of(context);
     final transitionsAsync =
         ref.watch(hinduMonthTransitionsProvider((year, month)));
     final language = ref.watch(appSettingsProvider).language;
@@ -610,7 +618,7 @@ class _NextHinduMonthNote extends ConsumerWidget {
                 style: scriptStyle(
                   language,
                   Theme.of(context).textTheme.bodySmall,
-                  color: TithikaColors.inkSoft,
+                  color: colors.inkSoft,
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
                 ),

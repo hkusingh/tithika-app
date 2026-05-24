@@ -42,6 +42,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Future<void> _useGps() async {
+    // Capture colors before any async gap.
+    final cardColor = TithikaColors.of(context).card;
     setState(() => _gpsLoading = true);
     try {
       var permission = await Geolocator.checkPermission();
@@ -58,7 +60,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ? 'Location access permanently denied. Enable it in Settings.'
                     : 'Location permission denied.',
               ),
-              backgroundColor: TithikaColors.card,
+              backgroundColor: cardColor,
             ),
           );
         }
@@ -100,9 +102,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Could not get location. Try entering your city manually.'),
-            backgroundColor: TithikaColors.card,
+          SnackBar(
+            content: const Text('Could not get location. Try entering your city manually.'),
+            backgroundColor: cardColor,
           ),
         );
       }
@@ -113,14 +115,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   Future<void> _toggleNotifications(bool enable) async {
     if (enable) {
+      final cardColor = TithikaColors.of(context).card;
       setState(() => _notifLoading = true);
       final granted = await NotificationService.requestPermission();
       if (mounted) setState(() => _notifLoading = false);
       if (!granted && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Notification permission denied.'),
-            backgroundColor: TithikaColors.card,
+          SnackBar(
+            content: const Text('Notification permission denied.'),
+            backgroundColor: cardColor,
           ),
         );
         return;
@@ -151,11 +154,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = TithikaColors.of(context);
     final settings = ref.watch(appSettingsProvider);
     final cityName = settings.location?.cityName ?? 'Not set';
     final language = settings.language;
     final monthSystem = settings.monthSystem;
     final notif = settings.notificationSettings;
+
+    final switchStyle = _SwitchStyle(colors: colors);
 
     return Scaffold(
       body: Stack(
@@ -166,7 +172,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const TithikaNavBar(title: 'Settings'),
-                const Divider(color: TithikaColors.line, height: 1),
+                Divider(color: colors.line, height: 1),
                 Expanded(
                   child: ListView(
                     padding: const EdgeInsets.symmetric(
@@ -176,8 +182,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       _SettingsRow(
                         label: 'Current location',
                         value: cityName,
-                        trailing: const Icon(Icons.chevron_right_rounded,
-                            color: TithikaColors.inkMuted, size: 18),
+                        trailing: Icon(Icons.chevron_right_rounded,
+                            color: colors.inkMuted, size: 18),
                         onTap: _pickCity,
                       ),
                       const SizedBox(height: 8),
@@ -185,17 +191,27 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         label: 'Use GPS location',
                         value: '',
                         trailing: _gpsLoading
-                            ? const SizedBox(
+                            ? SizedBox(
                                 width: 16,
                                 height: 16,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 1.5,
-                                  color: TithikaColors.shukla,
+                                  color: colors.shukla,
                                 ),
                               )
-                            : const Icon(Icons.my_location_rounded,
-                                color: TithikaColors.shukla, size: 18),
+                            : Icon(Icons.my_location_rounded,
+                                color: colors.shukla, size: 18),
                         onTap: _gpsLoading ? null : _useGps,
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      _SectionLabel('APPEARANCE'),
+                      _AppearancePicker(
+                        current: settings.theme,
+                        onChanged: (t) => ref
+                            .read(appSettingsProvider.notifier)
+                            .setTheme(t),
                       ),
 
                       const SizedBox(height: 20),
@@ -243,12 +259,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         label: 'Enable notifications',
                         value: '',
                         trailing: _notifLoading
-                            ? const SizedBox(
+                            ? SizedBox(
                                 width: 16,
                                 height: 16,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 1.5,
-                                  color: TithikaColors.shukla,
+                                  color: colors.shukla,
                                 ),
                               )
                             : Switch(
@@ -256,11 +272,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 onChanged: _notifLoading
                                     ? null
                                     : _toggleNotifications,
-                                activeThumbColor: Colors.white,
-                                activeTrackColor: TithikaColors.shukla.withValues(alpha: 0.35),
-                                inactiveThumbColor: TithikaColors.shukla.withValues(alpha: 0.5),
-                                inactiveTrackColor: Colors.black,
-                                trackOutlineColor: WidgetStatePropertyAll(TithikaColors.shukla.withValues(alpha: 0.5)),
+                                activeThumbColor: switchStyle.activeThumb,
+                                activeTrackColor: switchStyle.activeTrack,
+                                inactiveThumbColor: switchStyle.inactiveThumb,
+                                inactiveTrackColor: switchStyle.inactiveTrack,
+                                trackOutlineColor: WidgetStatePropertyAll(switchStyle.trackOutline),
                                 materialTapTargetSize:
                                     MaterialTapTargetSize.shrinkWrap,
                               ),
@@ -269,6 +285,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         const SizedBox(height: 8),
                         _NotifSubGroup(
                           notif: notif,
+                          switchStyle: switchStyle,
                           onDailyChanged: (v) => ref
                               .read(appSettingsProvider.notifier)
                               .setNotificationSettings(
@@ -292,14 +309,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         child: Text(
                           'Astronomical calculations powered by Swiss Ephemeris',
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: TithikaColors.inkMuted,
+                                color: colors.inkMuted,
                               ),
                         ),
                       ),
                       Text(
                         '© Astrodienst AG, Zurich — astro.com/swisseph',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: TithikaColors.inkMuted,
+                              color: colors.inkMuted,
                             ),
                       ),
                       const SizedBox(height: 20),
@@ -312,7 +329,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           return Text(
                             version,
                             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: TithikaColors.inkMuted,
+                                  color: colors.inkMuted,
                                 ),
                           );
                         },
@@ -325,6 +342,81 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ── Switch style helper ───────────────────────────────────────────────────────
+
+class _SwitchStyle {
+  final Color activeThumb;
+  final Color activeTrack;
+  final Color inactiveThumb;
+  final Color inactiveTrack;
+  final Color trackOutline;
+
+  _SwitchStyle({required TithikaColors colors})
+      : activeThumb = Colors.white,
+        activeTrack = colors.shukla.withValues(alpha: 0.35),
+        inactiveThumb = colors.shukla.withValues(alpha: 0.5),
+        inactiveTrack = colors.lineStrong,
+        trackOutline = colors.shukla.withValues(alpha: 0.5);
+}
+
+// ── Appearance picker ─────────────────────────────────────────────────────────
+
+class _AppearancePicker extends StatelessWidget {
+  final AppTheme current;
+  final ValueChanged<AppTheme> onChanged;
+
+  const _AppearancePicker({required this.current, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = TithikaColors.of(context);
+    const options = [AppTheme.system, AppTheme.light, AppTheme.dark];
+    const labels = ['System', 'Light', 'Dark'];
+
+    return Container(
+      decoration: BoxDecoration(
+        color: colors.card,
+        border: Border.all(color: colors.line),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      padding: const EdgeInsets.all(4),
+      child: Row(
+        children: List.generate(3, (i) {
+          final isSelected = current == options[i];
+          return Expanded(
+            child: GestureDetector(
+              onTap: () => onChanged(options[i]),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.symmetric(vertical: 9),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? colors.shukla.withValues(alpha: 0.15)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(7),
+                  border: isSelected
+                      ? Border.all(color: colors.shukla.withValues(alpha: 0.5))
+                      : null,
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  labels[i],
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight:
+                        isSelected ? FontWeight.w600 : FontWeight.w400,
+                    color: isSelected ? colors.shukla : colors.inkSoft,
+                  ),
+                ),
+              ),
+            ),
+          );
+        }),
       ),
     );
   }
@@ -364,14 +456,15 @@ class _SettingsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = TithikaColors.of(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.only(bottom: 8),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
         decoration: BoxDecoration(
-          color: TithikaColors.card,
-          border: Border.all(color: TithikaColors.line),
+          color: colors.card,
+          border: Border.all(color: colors.line),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Row(
@@ -413,6 +506,7 @@ class _RadioGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = TithikaColors.of(context);
     final defaultStyle = Theme.of(context)
         .textTheme
         .bodyMedium
@@ -420,8 +514,8 @@ class _RadioGroup extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: TithikaColors.card,
-        border: Border.all(color: TithikaColors.line),
+        color: colors.card,
+        border: Border.all(color: colors.line),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
@@ -440,16 +534,16 @@ class _RadioGroup extends StatelessWidget {
               decoration: BoxDecoration(
                 border: isLast
                     ? null
-                    : const Border(
-                        bottom: BorderSide(color: TithikaColors.line)),
+                    : Border(
+                        bottom: BorderSide(color: colors.line)),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(label, style: style),
                   if (i == selected)
-                    const Icon(Icons.check_rounded,
-                        color: TithikaColors.shukla, size: 18),
+                    Icon(Icons.check_rounded,
+                        color: colors.shukla, size: 18),
                 ],
               ),
             ),
@@ -464,6 +558,7 @@ class _RadioGroup extends StatelessWidget {
 
 class _NotifSubGroup extends StatelessWidget {
   final NotificationSettings notif;
+  final _SwitchStyle switchStyle;
   final ValueChanged<bool> onDailyChanged;
   final VoidCallback onTimeTap;
   final ValueChanged<bool> onFestivalChanged;
@@ -471,6 +566,7 @@ class _NotifSubGroup extends StatelessWidget {
 
   const _NotifSubGroup({
     required this.notif,
+    required this.switchStyle,
     required this.onDailyChanged,
     required this.onTimeTap,
     required this.onFestivalChanged,
@@ -487,10 +583,11 @@ class _NotifSubGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = TithikaColors.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: TithikaColors.card,
-        border: Border.all(color: TithikaColors.line),
+        color: colors.card,
+        border: Border.all(color: colors.line),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
@@ -500,11 +597,11 @@ class _NotifSubGroup extends StatelessWidget {
             trailing: Switch(
               value: notif.dailyReminderEnabled,
               onChanged: onDailyChanged,
-              activeThumbColor: Colors.white,
-                                activeTrackColor: TithikaColors.shukla.withValues(alpha: 0.35),
-                                inactiveThumbColor: TithikaColors.shukla.withValues(alpha: 0.5),
-                                inactiveTrackColor: Colors.black,
-                                trackOutlineColor: WidgetStatePropertyAll(TithikaColors.shukla.withValues(alpha: 0.5)),
+              activeThumbColor: switchStyle.activeThumb,
+              activeTrackColor: switchStyle.activeTrack,
+              inactiveThumbColor: switchStyle.inactiveThumb,
+              inactiveTrackColor: switchStyle.inactiveTrack,
+              trackOutlineColor: WidgetStatePropertyAll(switchStyle.trackOutline),
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
             divider: true,
@@ -517,7 +614,7 @@ class _NotifSubGroup extends StatelessWidget {
                 child: Text(
                   _fmtTime(),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: TithikaColors.shukla,
+                        color: colors.shukla,
                         fontWeight: FontWeight.w600,
                       ),
                 ),
@@ -529,11 +626,11 @@ class _NotifSubGroup extends StatelessWidget {
             trailing: Switch(
               value: notif.festivalAlertsEnabled,
               onChanged: onFestivalChanged,
-              activeThumbColor: Colors.white,
-                                activeTrackColor: TithikaColors.shukla.withValues(alpha: 0.35),
-                                inactiveThumbColor: TithikaColors.shukla.withValues(alpha: 0.5),
-                                inactiveTrackColor: Colors.black,
-                                trackOutlineColor: WidgetStatePropertyAll(TithikaColors.shukla.withValues(alpha: 0.5)),
+              activeThumbColor: switchStyle.activeThumb,
+              activeTrackColor: switchStyle.activeTrack,
+              inactiveThumbColor: switchStyle.inactiveThumb,
+              inactiveTrackColor: switchStyle.inactiveTrack,
+              trackOutlineColor: WidgetStatePropertyAll(switchStyle.trackOutline),
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
             divider: true,
@@ -543,11 +640,11 @@ class _NotifSubGroup extends StatelessWidget {
             trailing: Switch(
               value: notif.ekadashiAlertsEnabled,
               onChanged: onEkadashiChanged,
-              activeThumbColor: Colors.white,
-              activeTrackColor: TithikaColors.shukla.withValues(alpha: 0.35),
-              inactiveThumbColor: TithikaColors.shukla.withValues(alpha: 0.5),
-              inactiveTrackColor: Colors.black,
-              trackOutlineColor: WidgetStatePropertyAll(TithikaColors.shukla.withValues(alpha: 0.5)),
+              activeThumbColor: switchStyle.activeThumb,
+              activeTrackColor: switchStyle.activeTrack,
+              inactiveThumbColor: switchStyle.inactiveThumb,
+              inactiveTrackColor: switchStyle.inactiveTrack,
+              trackOutlineColor: WidgetStatePropertyAll(switchStyle.trackOutline),
             ),
             divider: false,
           ),
@@ -570,11 +667,12 @@ class _SubRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = TithikaColors.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
         border: divider
-            ? const Border(bottom: BorderSide(color: TithikaColors.line))
+            ? Border(bottom: BorderSide(color: colors.line))
             : null,
       ),
       child: Row(

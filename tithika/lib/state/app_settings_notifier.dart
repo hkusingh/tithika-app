@@ -32,6 +32,11 @@ class AppSettingsNotifier extends Notifier<AppSettings> {
     state = state.copyWith(monthSystem: monthSystem);
   }
 
+  Future<void> setTheme(AppTheme theme) async {
+    await ref.read(settingsRepositoryProvider).saveTheme(theme);
+    state = state.copyWith(theme: theme);
+  }
+
   Future<void> setNotificationSettings(NotificationSettings settings) async {
     await ref
         .read(settingsRepositoryProvider)

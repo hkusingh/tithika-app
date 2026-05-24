@@ -82,10 +82,13 @@ class TithikaApp extends ConsumerWidget {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       FlutterNativeSplash.remove();
     });
+    final themeMode = ref.watch(appSettingsProvider).theme.themeMode;
     return MaterialApp.router(
       title: 'Tithika',
       debugShowCheckedModeBanner: false,
-      theme: buildTithikaTheme(),
+      theme:      buildTithikaTheme(Brightness.light),
+      darkTheme:  buildTithikaTheme(Brightness.dark),
+      themeMode:  themeMode,
       routerConfig: buildRouter(ref),
     );
   }

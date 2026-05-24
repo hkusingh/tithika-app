@@ -100,6 +100,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = TithikaColors.of(context);
     return Scaffold(
       body: Stack(
         children: [
@@ -118,7 +119,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     'तिथिका',
                     style: devanagariStyle(
                       Theme.of(context).textTheme.titleLarge,
-                      color: TithikaColors.shukla,
+                      color: colors.shukla,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -126,7 +127,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     'Set your location to see tithis calculated\nfor your local sunrise.',
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: TithikaColors.inkSoft,
+                          color: colors.inkSoft,
                           height: 1.5,
                         ),
                   ),
@@ -148,7 +149,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       _errorMessage!,
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: TithikaColors.festival,
+                            color: colors.festival,
                             height: 1.4,
                           ),
                     ),
@@ -168,14 +169,15 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 class _MoonGlyph extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final shuklaGlow = TithikaColors.of(context).shuklaGlow;
     return Container(
       width: 160,
       height: 160,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: Color(0x60E6B85C),
+            color: shuklaGlow,
             blurRadius: 48,
             spreadRadius: 10,
           ),
@@ -206,13 +208,14 @@ class _PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final shukla = TithikaColors.of(context).shukla;
     return SizedBox(
       width: double.infinity,
       child: FilledButton.icon(
         style: FilledButton.styleFrom(
-          backgroundColor: TithikaColors.shukla,
+          backgroundColor: shukla,
           foregroundColor: const Color(0xFF1C1300),
-          disabledBackgroundColor: TithikaColors.shukla.withAlpha(120),
+          disabledBackgroundColor: shukla.withAlpha(120),
           padding: const EdgeInsets.symmetric(vertical: 14),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
@@ -238,12 +241,13 @@ class _SecondaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = TithikaColors.of(context);
     return SizedBox(
       width: double.infinity,
       child: OutlinedButton(
         style: OutlinedButton.styleFrom(
-          foregroundColor: TithikaColors.ink,
-          side: const BorderSide(color: TithikaColors.lineStrong, width: 1.5),
+          foregroundColor: colors.ink,
+          side: BorderSide(color: colors.lineStrong, width: 1.5),
           padding: const EdgeInsets.symmetric(vertical: 14),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
@@ -253,4 +257,3 @@ class _SecondaryButton extends StatelessWidget {
     );
   }
 }
-

@@ -21,13 +21,46 @@ const _monthNamesShort = [
   'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
 ];
 
-class FestivalsScreen extends ConsumerWidget {
+class FestivalsScreen extends ConsumerStatefulWidget {
   const FestivalsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final year = DateTime.now().year;
+  ConsumerState<FestivalsScreen> createState() => _FestivalsScreenState();
+}
+
+class _FestivalsScreenState extends ConsumerState<FestivalsScreen> {
+  final _scrollController = ScrollController();
+  final _currentMonthKey = GlobalKey();
+  bool _scrolledToMonth = false;
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollToCurrentMonth() {
+    if (_scrolledToMonth) return;
+    _scrolledToMonth = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final ctx = _currentMonthKey.currentContext;
+      if (ctx != null) {
+        Scrollable.ensureVisible(ctx, alignment: 0.0, duration: Duration.zero);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = TithikaColors.of(context);
+    final now = DateTime.now();
+    final year = now.year;
+    final currentMonth = now.month;
+    final isDecember = currentMonth == 12;
+
     final festivalsAsync = ref.watch(yearFestivalsProvider(year));
+    final nextYearAsync = ref.watch(yearFestivalsProvider(year + 1));
 
     return Scaffold(
       body: Stack(
@@ -38,14 +71,14 @@ class FestivalsScreen extends ConsumerWidget {
               children: [
                 // ── Header ────────────────────────────────────────────────
                 TithikaNavBar(title: 'Festivals $year'),
-                const Divider(color: TithikaColors.line, height: 1),
+                Divider(color: colors.line, height: 1),
 
                 // ── Body ──────────────────────────────────────────────────
                 Expanded(
                   child: festivalsAsync.when(
-                    loading: () => const Center(
+                    loading: () => Center(
                       child: CircularProgressIndicator(
-                          color: TithikaColors.shukla, strokeWidth: 1.5),
+                          color: colors.shukla, strokeWidth: 1.5),
                     ),
                     error: (e, _) => Center(
                       child: Text(
@@ -53,7 +86,7 @@ class FestivalsScreen extends ConsumerWidget {
                         style: Theme.of(context)
                             .textTheme
                             .bodySmall
-                            ?.copyWith(color: TithikaColors.inkMuted),
+                            ?.copyWith(color: colors.inkMuted),
                       ),
                     ),
                     data: (entries) {
@@ -64,40 +97,63 @@ class FestivalsScreen extends ConsumerWidget {
                             style: Theme.of(context)
                                 .textTheme
                                 .bodySmall
-                                ?.copyWith(color: TithikaColors.inkMuted),
+                                ?.copyWith(color: colors.inkMuted),
                           ),
                         );
                       }
 
-                      // Group by Gregorian month
+                      // Group current year by Gregorian month.
                       final Map<int, List<FestivalEntry>> byMonth = {};
                       for (final e in entries) {
                         byMonth.putIfAbsent(e.date.month, () => []).add(e);
                       }
                       final months = byMonth.keys.toList()..sort();
 
-                      return ListView.builder(
-                        padding: const EdgeInsets.only(bottom: 32),
-                        itemCount: months.fold<int>(
-                          0,
-                          (sum, m) => sum + 1 + byMonth[m]!.length,
-                        ),
-                        itemBuilder: (context, index) {
-                          // Flatten months + entries into a single list
-                          var remaining = index;
-                          for (final m in months) {
-                            if (remaining == 0) {
-                              return _MonthHeader(month: m);
+                      // Build a flat widget list so every item is in the tree
+                      // immediately, allowing GlobalKey lookup for scroll-to-month.
+                      final items = <Widget>[];
+                      for (final m in months) {
+                        items.add(_MonthHeader(
+                          key: m == currentMonth ? _currentMonthKey : null,
+                          month: m,
+                        ));
+                        for (final entry in byMonth[m]!) {
+                          items.add(_FestivalCard(entry: entry));
+                        }
+                      }
+
+                      // In December, append Jan–Mar of next year.
+                      if (isDecember) {
+                        final nextEntries = nextYearAsync.valueOrNull ?? [];
+                        if (nextEntries.isNotEmpty) {
+                          final Map<int, List<FestivalEntry>> nextByMonth = {};
+                          for (final e in nextEntries) {
+                            if (e.date.month <= 3) {
+                              nextByMonth
+                                  .putIfAbsent(e.date.month, () => [])
+                                  .add(e);
                             }
-                            remaining--;
-                            final list = byMonth[m]!;
-                            if (remaining < list.length) {
-                              return _FestivalCard(entry: list[remaining]);
-                            }
-                            remaining -= list.length;
                           }
-                          return const SizedBox.shrink();
-                        },
+                          if (nextByMonth.isNotEmpty) {
+                            items.add(_YearHeader(year: year + 1));
+                            for (final m in [1, 2, 3]) {
+                              if (nextByMonth.containsKey(m)) {
+                                items.add(_MonthHeader(month: m));
+                                for (final entry in nextByMonth[m]!) {
+                                  items.add(_FestivalCard(entry: entry));
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+
+                      _scrollToCurrentMonth();
+
+                      return ListView(
+                        controller: _scrollController,
+                        padding: const EdgeInsets.only(bottom: 32),
+                        children: items,
                       );
                     },
                   ),
@@ -111,11 +167,44 @@ class FestivalsScreen extends ConsumerWidget {
   }
 }
 
+// ── Year break header ─────────────────────────────────────────────────────────
+
+class _YearHeader extends StatelessWidget {
+  final int year;
+  const _YearHeader({required this.year});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = TithikaColors.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 28, 20, 4),
+      child: Row(
+        children: [
+          Expanded(child: Divider(color: colors.line, height: 1)),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Text(
+              '$year',
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: colors.inkSoft,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.5,
+                  ),
+            ),
+          ),
+          Expanded(child: Divider(color: colors.line, height: 1)),
+        ],
+      ),
+    );
+  }
+}
+
 // ── Month section header ──────────────────────────────────────────────────────
 
 class _MonthHeader extends StatelessWidget {
   final int month;
-  const _MonthHeader({required this.month});
+  const _MonthHeader({super.key, required this.month});
 
   @override
   Widget build(BuildContext context) {
@@ -124,7 +213,7 @@ class _MonthHeader extends StatelessWidget {
       child: Text(
         _monthNames[month - 1],
         style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: TithikaColors.shukla,
+              color: TithikaColors.of(context).shukla,
               fontWeight: FontWeight.w700,
               fontSize: 13,
               letterSpacing: 0.5,
@@ -142,12 +231,12 @@ class _FestivalCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = TithikaColors.of(context);
     final language = ref.watch(appSettingsProvider).language;
     final date = entry.date;
     final data = entry.data;
     final isShukla = data.tithi.paksha == Paksha.shukla;
-    final pakshaColor =
-        isShukla ? TithikaColors.shukla : TithikaColors.krishna;
+    final pakshaColor = isShukla ? colors.shukla : colors.krishna;
 
     final wd = _weekdays[date.weekday % 7];
     final mo = _monthNamesShort[date.month - 1];
@@ -166,10 +255,10 @@ class _FestivalCard extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: Container(
         decoration: BoxDecoration(
-          color: TithikaColors.festival.withValues(alpha: 0.07),
+          color: colors.festival.withValues(alpha: 0.07),
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
-            color: TithikaColors.festival.withValues(alpha: 0.18),
+            color: colors.festival.withValues(alpha: 0.18),
             width: 1,
           ),
         ),
@@ -180,15 +269,15 @@ class _FestivalCard extends ConsumerWidget {
               width: 36,
               height: 56,
               decoration: BoxDecoration(
-                color: TithikaColors.festival.withValues(alpha: 0.15),
+                color: colors.festival.withValues(alpha: 0.15),
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(10),
                   bottomLeft: Radius.circular(10),
                 ),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.flare_rounded,
-                color: TithikaColors.festival,
+                color: colors.festival,
                 size: 18,
               ),
             ),
@@ -204,7 +293,7 @@ class _FestivalCard extends ConsumerWidget {
                       FestivalNames.localize(entry.data.festivalName, language)!,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             fontWeight: FontWeight.w600,
-                            color: TithikaColors.ink,
+                            color: colors.ink,
                           ),
                     ),
                     const SizedBox(height: 2),
@@ -227,7 +316,7 @@ class _FestivalCard extends ConsumerWidget {
               child: Text(
                 gregDate,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: TithikaColors.inkMuted,
+                      color: colors.inkMuted,
                       fontSize: 11,
                     ),
               ),
