@@ -670,6 +670,8 @@ abstract final class AppStrings {
   static String varaRulerSub(int weekday, AppLanguage lang) =>
       switch (lang) {
         AppLanguage.hindiDevanagari => _varaRulerSubDeva[weekday - 1],
+        AppLanguage.tamil           => _varaRulerSubTamil[weekday - 1],
+        AppLanguage.bengali         => _varaRulerSubBengali[weekday - 1],
         _ => _varaRulerSubEn[weekday - 1],
       };
 
@@ -687,6 +689,8 @@ abstract final class AppStrings {
     assert(number >= 1 && number <= 27);
     return switch (lang) {
       AppLanguage.hindiDevanagari => _yogaNamesDeva[number - 1],
+      AppLanguage.tamil           => _yogaNamesTamil[number - 1],
+      AppLanguage.bengali         => _yogaNamesBengali[number - 1],
       _ => _yogaNamesEn[number - 1],
     };
   }
@@ -733,11 +737,31 @@ abstract final class AppStrings {
     'इन्द्र',   'वैधृति',
   ];
 
+  static const _yogaNamesTamil = [
+    'விஷ்கம்பம்', 'பிரீதி',     'ஆயுஷ்மான்', 'சௌபாக்கியம்', 'சோபனம்',
+    'அதிகண்டம்',  'சுகர்மம்',  'திருதி',    'சூலம்',       'கண்டம்',
+    'விருத்தி',   'த்ருவம்',   'வியாகாதம்', 'ஹர்ஷணம்',    'வஜ்ரம்',
+    'சித்தி',     'வியதீபாதம்','வரீயான்',   'பரிகம்',      'சிவம்',
+    'சித்தம்',    'சாத்தியம்', 'சுபம்',     'சுக்லம்',     'பிரம்மம்',
+    'இந்திரம்',   'வைத்ருதி',
+  ];
+
+  static const _yogaNamesBengali = [
+    'বিষ্কম্ভ', 'প্রীতি',   'আয়ুষ্মান', 'সৌভাগ্য', 'শোভন',
+    'অতিগণ্ড',  'সুকর্মা', 'ধৃতি',     'শূল',     'গণ্ড',
+    'বৃদ্ধি',   'ধ্রুব',   'ব্যাঘাত',  'হর্ষণ',   'বজ্র',
+    'সিদ্ধি',   'ব্যতীপাত','বরীয়ান্',  'পরিঘ',    'শিব',
+    'সিদ্ধ',    'সাধ্য',   'শুভ',      'শুক্ল',   'ব্রহ্ম',
+    'ইন্দ্র',   'বৈধৃতি',
+  ];
+
   // ── Karana ────────────────────────────────────────────────────────────────
 
   static String karanaName(KaranaType type, AppLanguage lang) =>
       switch (lang) {
         AppLanguage.hindiDevanagari => _karanaNameDeva(type),
+        AppLanguage.tamil           => _karanaNameTamil(type),
+        AppLanguage.bengali         => _karanaNameBengali(type),
         _ => _karanaNameEn(type),
       };
 
@@ -784,6 +808,34 @@ abstract final class AppStrings {
     KaranaType.kimstughna   => 'किंस्तुघ्न',
   };
 
+  static String _karanaNameTamil(KaranaType t) => switch (t) {
+    KaranaType.bava         => 'பவம்',
+    KaranaType.balava       => 'பாலவம்',
+    KaranaType.kaulava      => 'கௌலவம்',
+    KaranaType.taitila      => 'தைதிலம்',
+    KaranaType.gara         => 'கரஜம்',
+    KaranaType.vanija       => 'வணிஜம்',
+    KaranaType.vishti       => 'விஷ்டி',
+    KaranaType.shakuni      => 'சகுனி',
+    KaranaType.chatushpada  => 'சதுஷ்பாதம்',
+    KaranaType.naga         => 'நாகம்',
+    KaranaType.kimstughna   => 'கிம்ஸ்துக்னம்',
+  };
+
+  static String _karanaNameBengali(KaranaType t) => switch (t) {
+    KaranaType.bava         => 'বব',
+    KaranaType.balava       => 'বালব',
+    KaranaType.kaulava      => 'কৌলব',
+    KaranaType.taitila      => 'তৈতিল',
+    KaranaType.gara         => 'গর',
+    KaranaType.vanija       => 'বণিজ',
+    KaranaType.vishti       => 'বিষ্টি',
+    KaranaType.shakuni      => 'শকুনি',
+    KaranaType.chatushpada  => 'চতুষ্পাদ',
+    KaranaType.naga         => 'নাগ',
+    KaranaType.kimstughna   => 'কিংস্তুঘ্ন',
+  };
+
   // ── Five Elements data ────────────────────────────────────────────────────
 
   static const _weekdayTitleEn = [
@@ -808,5 +860,25 @@ abstract final class AppStrings {
     'शुक्रवार · शुक्र',
     'शनिवार · शनि',
     'रविवार · रवि',
+  ];
+
+  static const _varaRulerSubTamil = [
+    'சோமவாரம் · சந்திரன்',
+    'மங்கலவாரம் · செவ்வாய்',
+    'புதன்வாரம் · புதன்',
+    'குருவாரம் · வியாழன்',
+    'சுக்கிரவாரம் · வெள்ளி',
+    'சனிவாரம் · சனி',
+    'ஞாயிற்றுக்கிழமை · சூரியன்',
+  ];
+
+  static const _varaRulerSubBengali = [
+    'সোমবার · চন্দ্র',
+    'মঙ্গলবার · মঙ্গল',
+    'বুধবার · বুধ',
+    'বৃহস্পতিবার · বৃহস্পতি',
+    'শুক্রবার · শুক্র',
+    'শনিবার · শনি',
+    'রবিবার · রবি',
   ];
 }
