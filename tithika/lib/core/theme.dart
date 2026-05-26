@@ -22,6 +22,7 @@ class TithikaColors extends ThemeExtension<TithikaColors> {
     required this.moonDark,
     required this.line,
     required this.lineStrong,
+    required this.muWarn,
   });
 
   final Color background;
@@ -39,6 +40,8 @@ class TithikaColors extends ThemeExtension<TithikaColors> {
   final Color moonDark;
   final Color line;
   final Color lineStrong;
+  /// Red used for inauspicious muhurta periods (Rahu Kaal etc.).
+  final Color muWarn;
 
   static const dark = TithikaColors._(
     background:  Color(0xFF0B0F1E),
@@ -56,6 +59,7 @@ class TithikaColors extends ThemeExtension<TithikaColors> {
     moonDark:    Color(0xFF1C2147),
     line:        Color(0x14FFFFFF),
     lineStrong:  Color(0x26FFFFFF),
+    muWarn:      Color(0xFFD46060),
   );
 
   static const light = TithikaColors._(
@@ -74,6 +78,7 @@ class TithikaColors extends ThemeExtension<TithikaColors> {
     moonDark:    Color(0xFF1C2147),
     line:        Color(0x14000000),
     lineStrong:  Color(0x26000000),
+    muWarn:      Color(0xFFB84040),
   );
 
   /// Shorthand for `Theme.of(context).extension<TithikaColors>()!`.
@@ -89,6 +94,7 @@ class TithikaColors extends ThemeExtension<TithikaColors> {
     Color? ink, Color? inkSoft, Color? inkMuted,
     Color? moonLight, Color? moonDark,
     Color? line, Color? lineStrong,
+    Color? muWarn,
   }) => TithikaColors._(
     background:  background  ?? this.background,
     panel:       panel       ?? this.panel,
@@ -105,6 +111,7 @@ class TithikaColors extends ThemeExtension<TithikaColors> {
     moonDark:    moonDark    ?? this.moonDark,
     line:        line        ?? this.line,
     lineStrong:  lineStrong  ?? this.lineStrong,
+    muWarn:      muWarn      ?? this.muWarn,
   );
 
   @override
@@ -124,6 +131,7 @@ class TithikaColors extends ThemeExtension<TithikaColors> {
     moonDark:    Color.lerp(moonDark,    other.moonDark,    t)!,
     line:        Color.lerp(line,        other.line,        t)!,
     lineStrong:  Color.lerp(lineStrong,  other.lineStrong,  t)!,
+    muWarn:      Color.lerp(muWarn,      other.muWarn,      t)!,
   );
 }
 

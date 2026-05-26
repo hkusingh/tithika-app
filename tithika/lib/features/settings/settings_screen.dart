@@ -171,7 +171,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const TithikaNavBar(title: 'Settings'),
+                const TithikaNavBar(),
                 Divider(color: colors.line, height: 1),
                 Expanded(
                   child: ListView(

@@ -7,6 +7,7 @@ import '../../core/time_format.dart';
 import '../../models/app_settings.dart';
 import '../../models/hora_data.dart';
 import '../../state/providers.dart';
+import '../shared/page_title_bar.dart';
 import '../shared/tithika_nav_bar.dart';
 
 class HoraScreen extends ConsumerStatefulWidget {
@@ -57,8 +58,12 @@ class _HoraScreenState extends ConsumerState<HoraScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            TithikaNavBar(title: AppStrings.hora(language)),
+            TithikaNavBar(),
             Divider(color: colors.line, height: 1),
+            PageTitleBar(
+              title: AppStrings.horaPageTitle(language),
+              meta: location.cityName,
+            ),
             // Date navigation row
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),

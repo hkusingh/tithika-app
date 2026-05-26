@@ -1,5 +1,7 @@
 import '../models/app_settings.dart';
+import '../models/muhurta_data.dart';
 import '../models/paksha.dart';
+import '../models/pancha_data.dart';
 
 /// Central string localisation hub.
 ///
@@ -179,6 +181,24 @@ abstract final class AppStrings {
         _ => 'HORA',
       };
 
+  /// Title-case "Hora" for PageTitleBar (distinct from all-caps HORA label).
+  static String horaPageTitle(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'होरा',
+        AppLanguage.tamil           => 'ஹோரா',
+        AppLanguage.bengali         => 'হোরা',
+        _ => 'Hora',
+      };
+
+  /// Title-case "Festivals" for PageTitleBar.
+  static String festivalsPageTitle(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'त्योहार',
+        AppLanguage.tamil           => 'விழாக்கள்',
+        AppLanguage.bengali         => 'উৎসব',
+        _ => 'Festivals',
+      };
+
   static String horaDay(AppLanguage lang) =>
       switch (lang) {
         AppLanguage.hindiDevanagari => 'दिन',
@@ -344,5 +364,449 @@ abstract final class AppStrings {
   static const _gregMonthShortBengali = [
     'জান', 'ফেব', 'মার্চ', 'এপ্র', 'মে', 'জুন',
     'জুলাই', 'আগ', 'সেপ', 'অক্ট', 'নভ', 'ডিস',
+  ];
+
+  // ── Muhurta ───────────────────────────────────────────────────────────────
+
+  static String muhurta(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'मुहूर्त',
+        AppLanguage.tamil           => 'முகூர்த்தம்',
+        AppLanguage.bengali         => 'মুহূর্ত',
+        _ => 'Muhurta',
+      };
+
+  static String sectionAuspicious(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'शुभ',
+        AppLanguage.tamil           => 'சுபம்',
+        AppLanguage.bengali         => 'শুভ',
+        _ => 'Auspicious',
+      };
+
+  static String sectionInauspicious(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'अशुभ',
+        AppLanguage.tamil           => 'அசுபம்',
+        AppLanguage.bengali         => 'অশুভ',
+        _ => 'Inauspicious',
+      };
+
+  static String brahmaMuhurta(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'ब्रह्म मुहूर्त',
+        AppLanguage.tamil           => 'பிரம்ம முகூர்த்தம்',
+        AppLanguage.bengali         => 'ব্রহ্ম মুহূর্ত',
+        _ => 'Brahma Muhurta',
+      };
+
+  static String brahmaMuhurtaSub(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'ध्यान और पूजा',
+        AppLanguage.tamil           => 'தியானம் மற்றும் வழிபாடு',
+        AppLanguage.bengali         => 'ধ্যান ও পূজা',
+        _ => 'meditation & prayer',
+      };
+
+  static String abhijitMuhurta(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'अभिजित् मुहूर्त',
+        AppLanguage.tamil           => 'அபிஜித் முகூர்த்தம்',
+        AppLanguage.bengali         => 'অভিজিৎ মুহূর্ত',
+        _ => 'Abhijit Muhurta',
+      };
+
+  static String abhijitMuhurtaSub(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'सर्वाधिक शुभ समय',
+        AppLanguage.tamil           => 'மிகவும் சுபகரமான நேரம்',
+        AppLanguage.bengali         => 'সবচেয়ে শুভ সময়',
+        _ => 'most auspicious window',
+      };
+
+  static String abhijitNotObserved(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'बुधवार को नहीं होता',
+        AppLanguage.tamil           => 'புதன்கிழமை கொண்டாடப்படுவதில்லை',
+        AppLanguage.bengali         => 'বুধবারে পালিত হয় না',
+        _ => 'not observed on Wednesday',
+      };
+
+  static String rahuKaal(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'राहु काल',
+        AppLanguage.tamil           => 'ராகு காலம்',
+        AppLanguage.bengali         => 'রাহু কাল',
+        _ => 'Rahu Kaal',
+      };
+
+  static String yamaganda(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'यमगण्ड',
+        AppLanguage.tamil           => 'யமகண்டம்',
+        AppLanguage.bengali         => 'যমগণ্ড',
+        _ => 'Yamaganda',
+      };
+
+  static String gulika(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'गुलिक',
+        AppLanguage.tamil           => 'குலிகன்',
+        AppLanguage.bengali         => 'গুলিক',
+        _ => 'Gulika',
+      };
+
+  static String avoidNewStarts(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'नए काम न करें',
+        AppLanguage.tamil           => 'புதிய தொடக்கங்களை தவிர்க்கவும்',
+        AppLanguage.bengali         => 'নতুন কাজ এড়িয়ে চলুন',
+        _ => 'avoid new starts',
+      };
+
+  static String dayChoghadiya(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'दिन का चौघड़िया',
+        AppLanguage.tamil           => 'பகல் சோகடியா',
+        AppLanguage.bengali         => 'দিনের চৌঘড়িয়া',
+        _ => 'Day Choghadiya',
+      };
+
+  static String nightChoghadiya(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'रात का चौघड़िया',
+        AppLanguage.tamil           => 'இரவு சோகடியா',
+        AppLanguage.bengali         => 'রাতের চৌঘড়িয়া',
+        _ => 'Night Choghadiya',
+      };
+
+  static String nightChoghadiyaExpand(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => '▸ विस्तार करें',
+        AppLanguage.tamil           => '▸ விரிவாக்கு',
+        AppLanguage.bengali         => '▸ বিস্তার করুন',
+        _ => '▸ expand',
+      };
+
+  static String nightChoghadiyaCollapse(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => '▾ छुपाएं',
+        AppLanguage.tamil           => '▾ மறை',
+        AppLanguage.bengali         => '▾ লুকান',
+        _ => '▾ collapse',
+      };
+
+  static String muhurtaCardTitle(AppLanguage lang) => muhurta(lang);
+
+  static String labelNow(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'अभी',
+        AppLanguage.tamil           => 'இப்போது',
+        AppLanguage.bengali         => 'এখন',
+        _ => 'NOW',
+      };
+
+  // ── Choghadiya type names ─────────────────────────────────────────────────
+
+  static String choghadiyaName(ChoghadiyaType type, AppLanguage lang) =>
+      switch (type) {
+        ChoghadiyaType.amrit => _chogNameAmrit(lang),
+        ChoghadiyaType.shubh => _chogNameShubh(lang),
+        ChoghadiyaType.labh  => _chogNameLabh(lang),
+        ChoghadiyaType.char  => _chogNameChar(lang),
+        ChoghadiyaType.udveg => _chogNameUdveg(lang),
+        ChoghadiyaType.kaal  => _chogNameKaal(lang),
+        ChoghadiyaType.rog   => _chogNameRog(lang),
+      };
+
+  static String _chogNameAmrit(AppLanguage lang) => switch (lang) {
+    AppLanguage.hindiDevanagari => 'अमृत',
+    AppLanguage.tamil           => 'அமிர்தம்',
+    AppLanguage.bengali         => 'অমৃত',
+    _ => 'Amrit',
+  };
+  static String _chogNameShubh(AppLanguage lang) => switch (lang) {
+    AppLanguage.hindiDevanagari => 'शुभ',
+    AppLanguage.tamil           => 'சுபம்',
+    AppLanguage.bengali         => 'শুভ',
+    _ => 'Shubh',
+  };
+  static String _chogNameLabh(AppLanguage lang) => switch (lang) {
+    AppLanguage.hindiDevanagari => 'लाभ',
+    AppLanguage.tamil           => 'லாபம்',
+    AppLanguage.bengali         => 'লাভ',
+    _ => 'Labh',
+  };
+  static String _chogNameChar(AppLanguage lang) => switch (lang) {
+    AppLanguage.hindiDevanagari => 'चर',
+    AppLanguage.tamil           => 'சரம்',
+    AppLanguage.bengali         => 'চর',
+    _ => 'Char',
+  };
+  static String _chogNameUdveg(AppLanguage lang) => switch (lang) {
+    AppLanguage.hindiDevanagari => 'उद्वेग',
+    AppLanguage.tamil           => 'உத்வேகம்',
+    AppLanguage.bengali         => 'উদ্বেগ',
+    _ => 'Udveg',
+  };
+  static String _chogNameKaal(AppLanguage lang) => switch (lang) {
+    AppLanguage.hindiDevanagari => 'काल',
+    AppLanguage.tamil           => 'காலம்',
+    AppLanguage.bengali         => 'কাল',
+    _ => 'Kaal',
+  };
+  static String _chogNameRog(AppLanguage lang) => switch (lang) {
+    AppLanguage.hindiDevanagari => 'रोग',
+    AppLanguage.tamil           => 'ரோகம்',
+    AppLanguage.bengali         => 'রোগ',
+    _ => 'Rog',
+  };
+
+  // ── Choghadiya quality labels ─────────────────────────────────────────────
+
+  static String choghadiyaQuality(ChoghadiyaType type, AppLanguage lang) =>
+      switch (type) {
+        ChoghadiyaType.amrit => qualityExcellent(lang),
+        ChoghadiyaType.shubh => qualityAuspicious(lang),
+        ChoghadiyaType.labh  => qualityProfitable(lang),
+        ChoghadiyaType.char  => qualityNeutral(lang),
+        ChoghadiyaType.udveg => qualityInauspicious(lang),
+        ChoghadiyaType.kaal  => qualityInauspicious(lang),
+        ChoghadiyaType.rog   => qualityInauspicious(lang),
+      };
+
+  static String qualityExcellent(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'सर्वश्रेष्ठ',
+        AppLanguage.tamil           => 'சிறந்தது',
+        AppLanguage.bengali         => 'চমৎকার',
+        _ => 'excellent',
+      };
+
+  static String qualityAuspicious(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'शुभ',
+        AppLanguage.tamil           => 'சுபகரமான',
+        AppLanguage.bengali         => 'শুভ',
+        _ => 'auspicious',
+      };
+
+  static String qualityProfitable(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'लाभदायक',
+        AppLanguage.tamil           => 'இலாபகரமான',
+        AppLanguage.bengali         => 'লাভজনক',
+        _ => 'profitable',
+      };
+
+  static String qualityNeutral(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'सामान्य',
+        AppLanguage.tamil           => 'நடுநிலை',
+        AppLanguage.bengali         => 'নিরপেক্ষ',
+        _ => 'neutral',
+      };
+
+  static String qualityInauspicious(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'अशुभ',
+        AppLanguage.tamil           => 'அசுபகரமான',
+        AppLanguage.bengali         => 'অশুভ',
+        _ => 'inauspicious',
+      };
+
+  // ── Panchanga ─────────────────────────────────────────────────────────────
+
+  static String panchaTitle(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'पंचांग',
+        AppLanguage.tamil           => 'பஞ்சாங்கம்',
+        AppLanguage.bengali         => 'পঞ্চাঙ্গ',
+        _ => 'Panchanga',
+      };
+
+  static String fiveElementsLabel(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'पंच तत्त्व',
+        AppLanguage.tamil           => 'ஐந்து அங்கங்கள்',
+        AppLanguage.bengali         => 'পঞ্চতত্ত্ব',
+        _ => 'Five Elements',
+      };
+
+  static String varaLabel(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'वार',
+        AppLanguage.tamil           => 'வாரம்',
+        AppLanguage.bengali         => 'বার',
+        _ => 'Vara',
+      };
+
+  static String tithiLabel(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'तिथि',
+        AppLanguage.tamil           => 'திதி',
+        AppLanguage.bengali         => 'তিথি',
+        _ => 'Tithi',
+      };
+
+  static String nakshatraLabel(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'नक्षत्र',
+        AppLanguage.tamil           => 'நட்சத்திரம்',
+        AppLanguage.bengali         => 'নক্ষত্র',
+        _ => 'Nakshatra',
+      };
+
+  /// Title-case weekday name for display in the Five Elements card.
+  static String weekdayTitle(int weekday, AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => _weekdayFullDeva[weekday - 1],
+        AppLanguage.tamil           => _weekdayFullTamil[weekday - 1],
+        AppLanguage.bengali         => _weekdayFullBengali[weekday - 1],
+        _ => _weekdayTitleEn[weekday - 1],
+      };
+
+  /// Sanskrit vara name · ruling planet sub-line for the Five Elements card.
+  static String varaRulerSub(int weekday, AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => _varaRulerSubDeva[weekday - 1],
+        _ => _varaRulerSubEn[weekday - 1],
+      };
+
+  static String avoidNewBeginnings(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'नई शुरुआत न करें',
+        AppLanguage.tamil           => 'புதிய தொடக்கங்களை தவிர்க்கவும்',
+        AppLanguage.bengali         => 'নতুন সূচনা এড়িয়ে চলুন',
+        _ => 'avoid new beginnings',
+      };
+
+  // ── Yoga ─────────────────────────────────────────────────────────────────
+
+  static String yogaName(int number, AppLanguage lang) {
+    assert(number >= 1 && number <= 27);
+    return switch (lang) {
+      AppLanguage.hindiDevanagari => _yogaNamesDeva[number - 1],
+      _ => _yogaNamesEn[number - 1],
+    };
+  }
+
+  static String yogaQualityLabel(YogaQuality q, AppLanguage lang) =>
+      switch (q) {
+        YogaQuality.excellent    => qualityExcellent(lang),
+        YogaQuality.auspicious   => qualityAuspicious(lang),
+        YogaQuality.neutral      => qualityNeutral(lang),
+        YogaQuality.inauspicious => qualityInauspicious(lang),
+      };
+
+  static String yogaLabel(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'योग',
+        AppLanguage.tamil           => 'யோகம்',
+        AppLanguage.bengali         => 'যোগ',
+        _ => 'Yoga',
+      };
+
+  static String nextYogaLabel(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'अगला',
+        AppLanguage.tamil           => 'அடுத்து',
+        AppLanguage.bengali         => 'পরবর্তী',
+        _ => 'Next',
+      };
+
+  static const _yogaNamesEn = [
+    'Vishkambha', 'Priti',    'Ayushman', 'Saubhagya', 'Shobhana',
+    'Atiganda',   'Sukarma',  'Dhriti',   'Shula',     'Ganda',
+    'Vriddhi',    'Dhruva',   'Vyaghata', 'Harshana',  'Vajra',
+    'Siddhi',     'Vyatipata','Variyan',  'Parigha',   'Shiva',
+    'Siddha',     'Sadhya',   'Shubha',   'Shukla',    'Brahma',
+    'Indra',      'Vaidhriti',
+  ];
+
+  static const _yogaNamesDeva = [
+    'विष्कम्भ', 'प्रीति',   'आयुष्मान', 'सौभाग्य', 'शोभन',
+    'अतिगण्ड',  'सुकर्मा', 'धृति',     'शूल',     'गण्ड',
+    'वृद्धि',   'ध्रुव',   'व्याघात',  'हर्षण',   'वज्र',
+    'सिद्धि',   'व्यतीपात','वरीयान्',  'परिघ',    'शिव',
+    'सिद्ध',    'साध्य',   'शुभ',      'शुक्ल',   'ब्रह्म',
+    'इन्द्र',   'वैधृति',
+  ];
+
+  // ── Karana ────────────────────────────────────────────────────────────────
+
+  static String karanaName(KaranaType type, AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => _karanaNameDeva(type),
+        _ => _karanaNameEn(type),
+      };
+
+  static String karanaQuality(KaranaType type, AppLanguage lang) =>
+      type.isInauspicious
+          ? qualityInauspicious(lang)
+          : type.isFixed
+              ? qualityNeutral(lang)
+              : qualityAuspicious(lang);
+
+  static String karanaLabel(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'करण',
+        AppLanguage.tamil           => 'கரணம்',
+        AppLanguage.bengali         => 'করণ',
+        _ => 'Karana',
+      };
+
+  static String _karanaNameEn(KaranaType t) => switch (t) {
+    KaranaType.bava         => 'Bava',
+    KaranaType.balava       => 'Balava',
+    KaranaType.kaulava      => 'Kaulava',
+    KaranaType.taitila      => 'Taitila',
+    KaranaType.gara         => 'Gara',
+    KaranaType.vanija       => 'Vanija',
+    KaranaType.vishti       => 'Vishti',
+    KaranaType.shakuni      => 'Shakuni',
+    KaranaType.chatushpada  => 'Chatushpada',
+    KaranaType.naga         => 'Naga',
+    KaranaType.kimstughna   => 'Kimstughna',
+  };
+
+  static String _karanaNameDeva(KaranaType t) => switch (t) {
+    KaranaType.bava         => 'बव',
+    KaranaType.balava       => 'बालव',
+    KaranaType.kaulava      => 'कौलव',
+    KaranaType.taitila      => 'तैतिल',
+    KaranaType.gara         => 'गर',
+    KaranaType.vanija       => 'वणिज',
+    KaranaType.vishti       => 'विष्टि',
+    KaranaType.shakuni      => 'शकुनि',
+    KaranaType.chatushpada  => 'चतुष्पाद',
+    KaranaType.naga         => 'नाग',
+    KaranaType.kimstughna   => 'किंस्तुघ्न',
+  };
+
+  // ── Five Elements data ────────────────────────────────────────────────────
+
+  static const _weekdayTitleEn = [
+    'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday',
+  ];
+
+  static const _varaRulerSubEn = [
+    'Somavara · Moon',
+    'Mangalavara · Mars',
+    'Budhavara · Mercury',
+    'Guruvara · Jupiter',
+    'Shukravara · Venus',
+    'Shanivara · Saturn',
+    'Ravivara · Sun',
+  ];
+
+  static const _varaRulerSubDeva = [
+    'सोमवार · चंद्र',
+    'मंगलवार · मंगल',
+    'बुधवार · बुध',
+    'गुरुवार · गुरु',
+    'शुक्रवार · शुक्र',
+    'शनिवार · शनि',
+    'रविवार · रवि',
   ];
 }

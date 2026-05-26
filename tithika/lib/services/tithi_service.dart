@@ -57,6 +57,12 @@ class TithiService {
     final sunZodiacEntryToday =
         _sunZodiacSign(referenceJd - 1.0) != sunZodiacSign;
 
+    final sidSunLon  = _ephe.siderealSunLongitude(referenceJd);
+    final sidMoonLon = _ephe.siderealMoonLongitude(referenceJd);
+    final tropMoon   = _ephe.moonLongitude(referenceJd);
+    final tropSun    = _ephe.sunLongitude(referenceJd);
+    final tropElong  = (tropMoon - tropSun + 360.0) % 360.0;
+
     // Check for a secondary (kshaya) tithi: if the sunrise tithi ends before
     // the next sunrise, a second tithi begins within this calendar day.
     final nextDayUtcMidnight = utcMidnight.add(const Duration(days: 1));
@@ -88,6 +94,9 @@ class TithiService {
       secondaryTithi: secondaryTithi,
       secondaryIsKshaya: secondaryIsKshaya,
       isAdhika: isAdhika,
+      sidSunLonDeg: sidSunLon,
+      sidMoonLonDeg: sidMoonLon,
+      tropElongDeg: tropElong,
     );
   }
 

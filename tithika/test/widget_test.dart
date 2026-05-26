@@ -18,7 +18,7 @@ void main() {
           sharedPreferencesProvider.overrideWithValue(prefs),
         ],
         child: MaterialApp(
-          theme: buildTithikaTheme(),
+          theme: buildTithikaTheme(Brightness.dark),
           home: const OnboardingScreen(),
         ),
       ),

@@ -260,7 +260,8 @@ class _DayContent extends ConsumerWidget {
       _                           => data.nakshatra.nameEn,
     };
 
-    return Padding(
+    return SingleChildScrollView(
+      child: Padding(
       padding: const EdgeInsets.symmetric(horizontal: 18),
       child: Column(
         children: [
@@ -377,6 +378,7 @@ class _DayContent extends ConsumerWidget {
           ),
         ],
       ),
+    ),
     );
   }
 }
@@ -630,7 +632,6 @@ class _HoraCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Only show for the currently selected page to avoid stale data.
     final selectedDate = ref.watch(selectedDateProvider);
     if (date.year != selectedDate.year ||
         date.month != selectedDate.month ||
@@ -640,6 +641,7 @@ class _HoraCard extends ConsumerWidget {
 
     final colors = TithikaColors.of(context);
     final horaAsync = ref.watch(horaProvider);
+    final muhurtaAsync = ref.watch(muhurtaProvider);
     final language = ref.watch(appSettingsProvider).language;
 
     return horaAsync.when(
@@ -661,89 +663,183 @@ class _HoraCard extends ConsumerWidget {
         final color = active.planet.accentColor;
         final endStr = _horaEndTime(active.end, slots.first.start);
 
+        // ── Rahu warning state ─────────────────────────────────────────────
+        _RahuState rahuState = _RahuState.none;
+        String rahuText = '';
+        String rahuTime = '';
+
+        final muhurta = muhurtaAsync.valueOrNull;
+        if (muhurta != null) {
+          final rahu = muhurta.rahuKaal;
+          final rahuActive = !now.isBefore(rahu.start) && now.isBefore(rahu.end);
+          final minsAway = rahu.start.difference(now).inMinutes;
+          final approaching = !rahuActive && minsAway >= 0 && minsAway <= 30;
+
+          if (rahuActive) {
+            rahuState = _RahuState.active;
+            rahuText = '${AppStrings.rahuKaal(language)} — ${AppStrings.avoidNewStarts(language)}';
+            rahuTime = 'ends ${formatLocalTime(rahu.end, tz)}';
+          } else if (approaching) {
+            rahuState = _RahuState.approaching;
+            rahuText = '${AppStrings.rahuKaal(language)} in $minsAway min — ${AppStrings.avoidNewStarts(language)}';
+            rahuTime = formatLocalTime(rahu.start, tz);
+          }
+        }
+
         return GestureDetector(
           onTap: () => context.go('/hora'),
           child: Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            clipBehavior: Clip.antiAlias,
             decoration: BoxDecoration(
               color: colors.card,
               border: Border.all(color: colors.line),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  AppStrings.hora(language),
-                  style: Theme.of(context)
-                      .textTheme
-                      .labelSmall
-                      ?.copyWith(fontSize: 10),
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    Container(
-                      width: 20,
-                      height: 20,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: color.withValues(alpha: 0.15),
-                        border: Border.all(
-                            color: color.withValues(alpha: 0.5), width: 0.5),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        AppStrings.hora(language),
+                        style: Theme.of(context)
+                            .textTheme
+                            .labelSmall
+                            ?.copyWith(fontSize: 10),
                       ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        active.planet.glyph,
-                        style: TextStyle(fontSize: 10, color: color),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      const SizedBox(height: 4),
+                      Row(
                         children: [
-                          Text(
-                            active.planet.name(language),
-                            style: scriptStyle(
-                              language,
-                              null,
-                              color: colors.ink,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 13,
+                          Container(
+                            width: 20,
+                            height: 20,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: color.withValues(alpha: 0.15),
+                              border: Border.all(
+                                  color: color.withValues(alpha: 0.5), width: 0.5),
+                            ),
+                            alignment: Alignment.center,
+                            child: Text(
+                              active.planet.glyph,
+                              style: TextStyle(fontSize: 10, color: color),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  active.planet.name(language),
+                                  style: scriptStyle(
+                                    language,
+                                    null,
+                                    color: colors.ink,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                                Text(
+                                  AppStrings.horaSubLabel(
+                                      horaNum, active.isDay, language),
+                                  style: scriptStyle(
+                                    language,
+                                    null,
+                                    color: colors.inkMuted,
+                                    fontSize: 11,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                           Text(
-                            AppStrings.horaSubLabel(
-                                horaNum, active.isDay, language),
-                            style: scriptStyle(
-                              language,
-                              null,
-                              color: colors.inkMuted,
+                            AppStrings.nakshatraUntil(endStr, language),
+                            style: TextStyle(
+                              color: colors.inkSoft,
                               fontSize: 11,
                             ),
                           ),
+                          const SizedBox(width: 4),
+                          Icon(Icons.chevron_right_rounded,
+                              size: 16, color: colors.inkMuted),
                         ],
                       ),
-                    ),
-                    Text(
-                      AppStrings.nakshatraUntil(endStr, language),
-                      style: TextStyle(
-                        color: colors.inkSoft,
-                        fontSize: 11,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Icon(Icons.chevron_right_rounded,
-                        size: 16, color: colors.inkMuted),
-                  ],
+                    ],
+                  ),
                 ),
+                // ── Rahu warning row ───────────────────────────────────────
+                if (rahuState != _RahuState.none)
+                  _RahuWarnRow(
+                    state: rahuState,
+                    text: rahuText,
+                    time: rahuTime,
+                    colors: colors,
+                  ),
               ],
             ),
           ),
         );
       },
+    );
+  }
+}
+
+enum _RahuState { none, approaching, active }
+
+class _RahuWarnRow extends StatelessWidget {
+  final _RahuState state;
+  final String text;
+  final String time;
+  final TithikaColors colors;
+
+  const _RahuWarnRow({
+    required this.state,
+    required this.text,
+    required this.time,
+    required this.colors,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final warn = colors.muWarn;
+    final icon = state == _RahuState.active
+        ? Icons.block_rounded
+        : Icons.warning_amber_rounded;
+    return Container(
+      padding: const EdgeInsets.fromLTRB(12, 7, 12, 7),
+      decoration: BoxDecoration(
+        color: warn.withValues(alpha: 0.07),
+        border: Border(top: BorderSide(color: warn.withValues(alpha: 0.18))),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 13, color: warn),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                color: warn,
+              ),
+            ),
+          ),
+          Text(
+            time,
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              color: warn,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

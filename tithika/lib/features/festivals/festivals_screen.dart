@@ -9,6 +9,7 @@ import '../../models/lunar_month.dart';
 import '../../models/paksha.dart';
 import '../../state/providers.dart';
 import '../shared/starfield_background.dart';
+import '../shared/page_title_bar.dart';
 import '../shared/tithika_nav_bar.dart';
 
 const _weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -54,6 +55,7 @@ class _FestivalsScreenState extends ConsumerState<FestivalsScreen> {
   @override
   Widget build(BuildContext context) {
     final colors = TithikaColors.of(context);
+    final language = ref.watch(appSettingsProvider).language;
     final now = DateTime.now();
     final year = now.year;
     final currentMonth = now.month;
@@ -70,8 +72,12 @@ class _FestivalsScreenState extends ConsumerState<FestivalsScreen> {
             child: Column(
               children: [
                 // ── Header ────────────────────────────────────────────────
-                TithikaNavBar(title: 'Festivals $year'),
+                TithikaNavBar(),
                 Divider(color: colors.line, height: 1),
+                PageTitleBar(
+                  title: AppStrings.festivalsPageTitle(language),
+                  meta: '$year',
+                ),
 
                 // ── Body ──────────────────────────────────────────────────
                 Expanded(

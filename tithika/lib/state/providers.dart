@@ -5,9 +5,13 @@ import '../models/app_settings.dart';
 import '../models/day_data.dart';
 import '../models/hora_data.dart';
 import '../models/lunar_month.dart';
+import '../models/muhurta_data.dart';
 import '../models/paksha.dart';
+import '../models/pancha_data.dart';
 import '../services/festival_detector.dart';
 import '../services/hora_service.dart';
+import '../services/muhurta_service.dart';
+import '../services/pancha_service.dart';
 import '../services/providers.dart' as svc;
 import 'app_settings_notifier.dart';
 
@@ -203,6 +207,50 @@ final horaProvider = FutureProvider<List<HoraSlot>?>((ref) async {
     sunsetUtc: dayData.sunsetUtc!,
     nextSunriseUtc: nextSunrise,
     weekday: date.weekday,
+  );
+});
+
+// ── Muhurta ───────────────────────────────────────────────────────────────────
+
+/// Rahu Kaal, Yamaganda, Gulika, Abhijit, Brahma Muhurta, and Choghadiya
+/// for the selected date. Returns null while hora data is loading.
+final muhurtaProvider = FutureProvider<MuhurtaData?>((ref) async {
+  final dayData   = await ref.watch(dayDataProvider.future);
+  final horaSlots = await ref.watch(horaProvider.future);
+  final date      = ref.watch(selectedDateProvider);
+
+  if (dayData == null) return null;
+  if (dayData.sunriseUtc == null || dayData.sunsetUtc == null) return null;
+  if (horaSlots == null || horaSlots.isEmpty) return null;
+
+  return MuhurtaService.calculate(
+    sunriseUtc:     dayData.sunriseUtc!,
+    sunsetUtc:      dayData.sunsetUtc!,
+    nextSunriseUtc: horaSlots.last.end, // last night slot ends at next sunrise
+    weekday:        date.weekday,
+  );
+});
+
+// ── Panchanga (Yoga + Karana) ─────────────────────────────────────────────────
+
+/// Yoga and Karana data for the selected date.
+/// Returns null while hora data is loading or sunrise/sunset is unavailable.
+final panchaProvider = FutureProvider<PanchaData?>((ref) async {
+  final dayData   = await ref.watch(dayDataProvider.future);
+  final horaSlots = await ref.watch(horaProvider.future);
+
+  if (dayData == null) return null;
+  if (dayData.sunriseUtc == null) return null;
+  if (dayData.sidSunLonDeg == null || dayData.sidMoonLonDeg == null) return null;
+  if (dayData.tropElongDeg == null) return null;
+  if (horaSlots == null || horaSlots.isEmpty) return null;
+
+  return PanchaService.calculate(
+    sunriseUtc:     dayData.sunriseUtc!,
+    nextSunriseUtc: horaSlots.last.end,
+    sidSunLonDeg:   dayData.sidSunLonDeg!,
+    sidMoonLonDeg:  dayData.sidMoonLonDeg!,
+    tropElongDeg:   dayData.tropElongDeg!,
   );
 });
 

@@ -47,6 +47,17 @@ class DayData {
   /// i.e. no solar Sankranti occurs between two consecutive Purnimas.
   final bool isAdhika;
 
+  /// Sidereal (Lahiri) ecliptic longitude of the Sun at sunrise, in degrees.
+  /// Used for Yoga calculation (sum of sun + moon sidereal longitudes).
+  final double? sidSunLonDeg;
+
+  /// Sidereal (Lahiri) ecliptic longitude of the Moon at sunrise, in degrees.
+  final double? sidMoonLonDeg;
+
+  /// Tropical Moon–Sun elongation at sunrise, in degrees (0–360).
+  /// Used for Karana calculation (each Karana spans 6° of elongation).
+  final double? tropElongDeg;
+
   const DayData({
     required this.localDate,
     required this.tithi,
@@ -62,6 +73,9 @@ class DayData {
     this.secondaryTithi,
     this.secondaryIsKshaya = false,
     this.isAdhika = false,
+    this.sidSunLonDeg,
+    this.sidMoonLonDeg,
+    this.tropElongDeg,
   });
 
   DayData copyWith({
@@ -86,6 +100,9 @@ class DayData {
       secondaryTithi: secondaryTithi ?? this.secondaryTithi,
       secondaryIsKshaya: secondaryIsKshaya ?? this.secondaryIsKshaya,
       isAdhika: isAdhika ?? this.isAdhika,
+      sidSunLonDeg: sidSunLonDeg,
+      sidMoonLonDeg: sidMoonLonDeg,
+      tropElongDeg: tropElongDeg,
     );
   }
 }

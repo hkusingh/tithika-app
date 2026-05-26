@@ -47,12 +47,11 @@ class _CityPickerSheetState extends ConsumerState<CityPickerSheet> {
     final bottom = MediaQuery.viewInsetsOf(context).bottom;
     return Container(
       margin: const EdgeInsets.fromLTRB(12, 0, 12, 0),
-      decoration: BoxDecoration(
+      height: MediaQuery.sizeOf(context).height * 0.85,
+      child: Material(
         color: colors.panel,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      height: MediaQuery.sizeOf(context).height * 0.85,
-      child: Column(
+        child: Column(
         children: [
           const SizedBox(height: 10),
           Container(
@@ -116,6 +115,7 @@ class _CityPickerSheetState extends ConsumerState<CityPickerSheet> {
                   ),
           ),
         ],
+        ),
       ),
     );
   }
