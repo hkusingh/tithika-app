@@ -34,10 +34,21 @@ class TithiInfo {
   String get nameBengali => _tithiNamesBengali[number - 1];
 
   /// Human-readable paksha + tithi, e.g. "Shukla Pratipada".
-  String get fullNameEn => '${paksha == Paksha.shukla ? "Shukla" : "Krishna"} $nameEn';
-  String get fullNameDeva => '${paksha == Paksha.shukla ? "शुक्ल" : "कृष्ण"} $nameDeva';
-  String get fullNameTamil => '${paksha == Paksha.shukla ? "வளர்பிறை" : "தேய்பிறை"} $nameTamil';
-  String get fullNameBengali => '${paksha == Paksha.shukla ? "শুক্ল" : "কৃষ্ণ"} $nameBengali';
+  /// Purnima (15) and Amavasya (30) are self-describing — no paksha prefix.
+  bool get _needsPakshaPrefix => number != 15 && number != 30;
+
+  String get fullNameEn => _needsPakshaPrefix
+      ? '${paksha == Paksha.shukla ? "Shukla" : "Krishna"} $nameEn'
+      : nameEn;
+  String get fullNameDeva => _needsPakshaPrefix
+      ? '${paksha == Paksha.shukla ? "शुक्ल" : "कृष्ण"} $nameDeva'
+      : nameDeva;
+  String get fullNameTamil => _needsPakshaPrefix
+      ? '${paksha == Paksha.shukla ? "வளர்பிறை" : "தேய்பிறை"} $nameTamil'
+      : nameTamil;
+  String get fullNameBengali => _needsPakshaPrefix
+      ? '${paksha == Paksha.shukla ? "শুক্ল" : "কৃষ্ণ"} $nameBengali'
+      : nameBengali;
 }
 
 // ── String tables ─────────────────────────────────────────────────────────────

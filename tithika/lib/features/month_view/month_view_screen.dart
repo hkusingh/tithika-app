@@ -131,13 +131,18 @@ class _MonthViewScreenState extends ConsumerState<MonthViewScreen> {
                             if (hinduMonthLabel.isNotEmpty)
                               Padding(
                                 padding: const EdgeInsets.only(top: 2),
-                                child: Text(
-                                  hinduMonthLabel,
-                                  style: scriptStyle(
-                                    language,
-                                    Theme.of(context).textTheme.labelSmall,
-                                    color: colors.shukla,
-                                    fontSize: 11,
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    hinduMonthLabel,
+                                    maxLines: 1,
+                                    softWrap: false,
+                                    style: scriptStyle(
+                                      language,
+                                      Theme.of(context).textTheme.labelSmall,
+                                      color: colors.shukla,
+                                      fontSize: 11,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -237,9 +242,9 @@ class _MonthPage extends ConsumerWidget {
           final firstWeekday = DateTime(year, month, 1).weekday % 7;
           final daysInMonth = DateTime(year, month + 1, 0).day;
           final rows = ((firstWeekday + daysInMonth) / 7).ceil();
-          // Grid has horizontal padding 6 each side; childAspectRatio 0.72.
+          // Grid has horizontal padding 6 each side; childAspectRatio 0.70.
           final cellWidth = (constraints.maxWidth - 12) / 7;
-          final gridHeight = rows * cellWidth / 0.72 + 8;
+          final gridHeight = rows * cellWidth / 0.70 + 8;
 
           return SingleChildScrollView(
             child: Column(
@@ -309,7 +314,7 @@ class _MonthGrid extends ConsumerWidget {
         physics: const NeverScrollableScrollPhysics(),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 7,
-          childAspectRatio: 0.72,
+          childAspectRatio: 0.70,
         ),
         itemCount: totalCells,
         itemBuilder: (context, index) {
@@ -379,6 +384,7 @@ class _MonthCell extends StatelessWidget {
 
     return Container(
       margin: const EdgeInsets.all(1),
+      clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(
         color: bgColor,
         border: Border(
@@ -393,7 +399,8 @@ class _MonthCell extends StatelessWidget {
           right: BorderSide(color: colors.line),
         ),
       ),
-      child: Column(
+      child: ClipRect(
+        child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -475,6 +482,7 @@ class _MonthCell extends StatelessWidget {
               ),
             ),
         ],
+        ),
       ),
     );
   }

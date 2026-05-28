@@ -11,7 +11,26 @@ import 'package:tithika/core/router.dart' show buildRouter;
 import 'package:tithika/core/theme.dart';
 import 'package:tithika/services/notification_service.dart';
 import 'package:tithika/services/providers.dart';
-import 'package:tithika/state/providers.dart' show appSettingsProvider;
+import 'package:tithika/services/widget_data_service.dart';
+import 'package:tithika/state/providers.dart'
+    show appSettingsProvider, dayDataProvider, effectiveLocationProvider, muhurtaProvider, selectedDateProvider, yearFestivalsProvider;
+
+Future<void> _refreshWidget(ProviderContainer container) async {
+  try {
+    final dayData = await container.read(dayDataProvider.future);
+    if (dayData == null) return;
+    final muhurta = await container.read(muhurtaProvider.future);
+    final settings = container.read(appSettingsProvider);
+    final location = container.read(effectiveLocationProvider);
+    final date = container.read(selectedDateProvider);
+    await WidgetDataService.update(
+      dayData: dayData,
+      muhurta: muhurta,
+      settings: settings,
+      tzOffset: location.tzOffsetAt(date),
+    );
+  } catch (_) {}
+}
 
 Future<void> _precacheMoonImage() async {
   final completer = Completer<void>();
@@ -48,6 +67,18 @@ void main() async {
     _precacheMoonImage(),
   ]).timeout(const Duration(seconds: 15), onTimeout: () => []);
 
+  // Pre-warm festival list for the current year (and next year in December)
+  // so the festivals screen loads instantly on first visit.
+  unawaited(() async {
+    try {
+      final now = DateTime.now();
+      await container.read(yearFestivalsProvider(now.year).future);
+      if (now.month == 12) {
+        await container.read(yearFestivalsProvider(now.year + 1).future);
+      }
+    } catch (_) {}
+  }());
+
   // Reschedule notifications after ephemeris is warmed up.
   unawaited(() async {
     try {
@@ -63,6 +94,9 @@ void main() async {
       }
     } catch (_) {}
   }());
+
+  // Refresh Android home-screen widget data after providers resolve.
+  unawaited(_refreshWidget(container));
   await Future.delayed(const Duration(seconds: 1));
 
   runApp(
@@ -80,8 +114,29 @@ class TithikaApp extends ConsumerStatefulWidget {
   ConsumerState<TithikaApp> createState() => _TithikaAppState();
 }
 
-class _TithikaAppState extends ConsumerState<TithikaApp> {
+class _TithikaAppState extends ConsumerState<TithikaApp>
+    with WidgetsBindingObserver {
   GoRouter? _router;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      final container = ProviderScope.containerOf(context, listen: false);
+      unawaited(_refreshWidget(container));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

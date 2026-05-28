@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tithika — Wireframes v3 (Light Mode — Warm Parchment)</title>
+<style>
+  /* ── Page-level (dark surround so phones pop) ── */
+  :root {
+    --bg-page:   #0a0a14;
+    --bg-panel:  #11132a;
+    --line-page: rgba(255,255,255,0.08);
+    --ink-page:  #f3eedf;
+    --ink-page-soft: #aab0c5;
+    --ink-page-muted: #6c7290;
+
+    /* ── Light-mode phone palette ── */
+    --lm-bg:          #F5F0E8;
+    --lm-panel:       #EDE8D8;
+    --lm-card:        rgba(0,0,0,0.04);
+    --lm-ink:         #1A1F3C;
+    --lm-ink-soft:    #4A5070;
+    --lm-ink-muted:   #8890A8;
+    --lm-line:        rgba(0,0,0,0.08);
+    --lm-line-strong: rgba(0,0,0,0.15);
+    --lm-shukla:      #C8922A;
+    --lm-shukla-glow: rgba(200,146,42,0.20);
+    --lm-krishna:     #5A6BD8;
+    --lm-festival:    #D46A1E;
+    --lm-moon-light:  #F7F2DC;
+    --lm-moon-dark:   #1C2147;
+    --lm-border-phone: #C4BBAB;
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg-page);
+    color: var(--ink-page);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  header {
+    padding: 40px 40px 16px;
+    border-bottom: 1px solid var(--line-page);
+  }
+  header h1 {
+    margin: 0 0 6px;
+    font-size: 28px; font-weight: 700;
+    letter-spacing: -0.02em; color: var(--ink-page);
+  }
+  header .subtitle { color: var(--ink-page-soft); font-size: 15px; margin: 0; }
+  header .meta { color: var(--ink-page-muted); font-size: 13px; margin-top: 10px; }
+
+  main { padding: 32px 40px 80px; }
+
+  .legend {
+    display: flex; gap: 24px; flex-wrap: wrap;
+    padding: 14px 18px;
+    background: var(--bg-panel);
+    border: 1px solid var(--line-page);
+    border-radius: 10px;
+    margin-bottom: 32px;
+    font-size: 13px; color: var(--ink-page-soft);
+  }
+  .legend-item { display: flex; align-items: center; gap: 8px; }
+  .legend-swatch { width: 14px; height: 14px; border-radius: 3px; display: inline-block; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 48px 32px;
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+
+  .screen { display: flex; flex-direction: column; align-items: center; }
+  .screen-title {
+    font-size: 14px; font-weight: 600; letter-spacing: 0.04em;
+    text-transform: uppercase; color: var(--ink-page-muted);
+    margin-bottom: 4px;
+  }
+  .screen-name { font-size: 19px; font-weight: 700; margin: 0 0 4px; color: var(--ink-page); }
+  .screen-desc {
+    font-size: 13px; color: var(--ink-page-soft);
+    text-align: center; max-width: 290px;
+    margin: 0 0 18px; line-height: 1.4;
+  }
+
+  /* ── Phone frame ── */
+  .phone {
+    width: 320px; height: 670px;
+    background: var(--lm-bg);
+    border: 9px solid var(--lm-border-phone);
+    border-radius: 38px;
+    position: relative; overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.55), 0 0 0 1px rgba(0,0,0,0.15);
+  }
+  .phone .notch {
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 110px; height: 22px;
+    background: var(--lm-border-phone);
+    border-radius: 0 0 14px 14px; z-index: 50;
+  }
+  .phone .status-bar {
+    height: 32px; padding: 6px 22px 0;
+    display: flex; justify-content: space-between; align-items: flex-end;
+    font-size: 12px; font-weight: 600; color: var(--lm-ink-soft);
+    position: relative; z-index: 2;
+  }
+  .phone-screen { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; }
+
+  /* ── Dawn sky background (light mode equivalent of starfield) ── */
+  .dawn-sky {
+    position: absolute; inset: 0;
+    background:
+      /* Subtle warm cloud/haze wisps */
+      radial-gradient(ellipse 120px 40px at 20% 18%, rgba(255,200,120,0.12), transparent 70%),
+      radial-gradient(ellipse 80px 30px at 75% 12%, rgba(255,180,100,0.10), transparent 70%),
+      radial-gradient(ellipse 60px 20px at 50% 8%,  rgba(255,160,80,0.08),  transparent 70%),
+      /* Very faint dark speckles for texture */
+      radial-gradient(0.8px 0.8px at 12% 22%, rgba(30,25,50,0.08), transparent 60%),
+      radial-gradient(0.8px 0.8px at 34% 15%, rgba(30,25,50,0.07), transparent 60%),
+      radial-gradient(0.8px 0.8px at 56% 28%, rgba(30,25,50,0.06), transparent 60%),
+      radial-gradient(0.8px 0.8px at 78% 20%, rgba(30,25,50,0.08), transparent 60%),
+      radial-gradient(0.8px 0.8px at 22% 42%, rgba(30,25,50,0.05), transparent 60%),
+      radial-gradient(0.8px 0.8px at 44% 55%, rgba(30,25,50,0.07), transparent 60%),
+      radial-gradient(0.8px 0.8px at 88% 45%, rgba(30,25,50,0.06), transparent 60%),
+      radial-gradient(0.8px 0.8px at 66% 68%, rgba(30,25,50,0.05), transparent 60%),
+      radial-gradient(0.8px 0.8px at 8%  78%, rgba(30,25,50,0.07), transparent 60%),
+      radial-gradient(0.8px 0.8px at 38% 82%, rgba(30,25,50,0.06), transparent 60%),
+      radial-gradient(0.8px 0.8px at 72% 88%, rgba(30,25,50,0.05), transparent 60%),
+      /* Dawn gradient: warm amber/saffron at top → parchment at bottom */
+      linear-gradient(180deg,
+        #F0DFB8 0%,
+        #F3E8CE 25%,
+        #F5EEE2 55%,
+        #F5F0E8 100%);
+    pointer-events: none;
+  }
+
+  /* ── App nav bar ── */
+  .app-header {
+    position: relative; z-index: 1;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 4px 14px 8px;
+    border-bottom: 1px solid var(--lm-line);
+    background: rgba(245,240,232,0.85);
+    backdrop-filter: blur(8px);
+  }
+  .app-header .icon {
+    width: 28px; height: 28px; display: grid; place-items: center;
+    cursor: pointer; color: var(--lm-ink-soft); font-size: 16px;
+  }
+  .app-header .title { font-weight: 700; color: var(--lm-ink); font-size: 13px; letter-spacing: 0.06em; }
+  .app-header .nav-icons { display: flex; gap: 2px; }
+
+  /* ── DAY VIEW ── */
+  .day-view-top {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; padding: 8px 16px 8px;
+    position: relative; z-index: 1; overflow: hidden;
+  }
+  .date-nav {
+    display: flex; align-items: center; justify-content: space-between;
+    width: 100%; margin-bottom: 4px;
+  }
+  .date-nav-btn { background: none; border: none; color: var(--lm-ink-muted); font-size: 18px; cursor: pointer; padding: 2px 6px; }
+  .date-nav-center { text-align: center; }
+  .date-nav-dow { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--lm-ink-muted); }
+  .date-nav-date { font-size: 13px; font-weight: 600; color: var(--lm-ink-soft); }
+  .date-nav-month { font-size: 10px; font-weight: 600; color: var(--lm-shukla); letter-spacing: 0.06em; text-transform: uppercase; }
+
+  .moon-svg-wrap {
+    width: 88px; height: 88px; margin: 2px 0 6px;
+    filter: drop-shadow(0 0 14px var(--lm-shukla-glow));
+  }
+
+  .tithi-card {
+    width: 100%;
+    background: var(--lm-panel);
+    border: 1px solid var(--lm-line);
+    border-radius: 10px;
+    padding: 10px 12px 8px;
+    margin-bottom: 5px;
+    position: relative;
+  }
+  .tithi-card-bar {
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    border-radius: 10px 10px 0 0;
+    background: var(--lm-shukla);
+  }
+  .tithi-card-bar.krishna { background: var(--lm-krishna); }
+  .tithi-card-label {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.10em;
+    text-transform: uppercase; color: var(--lm-shukla); margin-bottom: 2px;
+  }
+  .tithi-card-label.krishna { color: var(--lm-krishna); }
+  .tithi-card-name { font-size: 16px; font-weight: 700; color: var(--lm-ink); letter-spacing: -0.01em; }
+  .tithi-card-sub { font-size: 10px; color: var(--lm-ink-muted); margin-top: 1px; }
+  .tithi-card-until { font-size: 10px; color: var(--lm-ink-soft); margin-top: 3px; }
+  .tithi-card-until strong { color: var(--lm-ink); font-weight: 600; }
+
+  .detail-row {
+    width: 100%; display: flex; align-items: center;
+    justify-content: space-between;
+    padding: 6px 10px;
+    background: var(--lm-panel);
+    border: 1px solid var(--lm-line);
+    border-radius: 8px;
+    font-size: 11px; margin-bottom: 4px;
+  }
+  .detail-row .lbl {
+    color: var(--lm-ink-muted); font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.06em; font-size: 9px;
+  }
+  .detail-row .val { color: var(--lm-ink); font-weight: 600; font-size: 11px; }
+  .detail-row .val small { color: var(--lm-ink-soft); font-weight: 500; font-size: 10px; margin-left: 3px; }
+
+  .sun-moon-card {
+    width: 100%;
+    background: var(--lm-panel);
+    border: 1px solid var(--lm-line);
+    border-radius: 8px;
+    display: grid; grid-template-columns: 1fr 1fr;
+    margin-bottom: 4px; overflow: hidden;
+  }
+  .sun-moon-cell {
+    padding: 7px 10px;
+    display: flex; flex-direction: column; gap: 1px;
+  }
+  .sun-moon-cell:not(:last-child) { border-right: 1px solid var(--lm-line); }
+  .sun-moon-cell.bottom-left, .sun-moon-cell.bottom-right {
+    border-top: 1px solid var(--lm-line);
+  }
+  .sun-moon-label { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--lm-ink-muted); display: flex; align-items: center; gap: 3px; }
+  .sun-moon-time { font-size: 12px; font-weight: 700; color: var(--lm-ink); }
+
+  .hora-card {
+    width: 100%;
+    background: var(--lm-panel);
+    border: 1px solid var(--lm-line);
+    border-left: 3px solid #FFB347;
+    border-radius: 8px;
+    padding: 7px 10px;
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 4px;
+  }
+  .hora-card-left { display: flex; align-items: center; gap: 8px; }
+  .hora-glyph { font-size: 18px; color: #C8922A; }
+  .hora-planet { font-size: 12px; font-weight: 700; color: var(--lm-ink); }
+  .hora-sub { font-size: 10px; color: var(--lm-ink-muted); }
+  .hora-until { font-size: 10px; color: var(--lm-ink-soft); text-align: right; }
+  .hora-chevron { color: var(--lm-ink-muted); font-size: 12px; margin-left: 4px; }
+
+  /* Day strip */
+  .day-strip {
+    border-top: 1px solid var(--lm-line);
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    background: var(--lm-panel);
+    position: relative; z-index: 1; flex-shrink: 0;
+  }
+  .day-cell {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 2px;
+    padding: 7px 4px;
+    border-right: 1px solid var(--lm-line);
+  }
+  .day-cell:last-child { border-right: none; }
+  .day-cell.today { background: rgba(200,146,42,0.08); box-shadow: inset 0 3px 0 var(--lm-shukla); }
+  .day-cell .wk { font-size: 9px; color: var(--lm-ink-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+  .day-cell .greg { font-size: 16px; font-weight: 700; color: var(--lm-ink); }
+  .day-cell.today .greg { color: var(--lm-shukla); }
+  .day-cell .tithi-num { font-size: 9px; color: var(--lm-ink-soft); display: flex; align-items: center; gap: 3px; }
+  .paksha-dot { width: 5px; height: 5px; border-radius: 50%; display: inline-block; }
+  .paksha-dot.shukla { background: var(--lm-shukla); }
+  .paksha-dot.krishna { background: var(--lm-krishna); }
+  .special-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--lm-festival); margin-top: 1px; }
+
+  /* ── MONTH VIEW ── */
+  .month-header-bar {
+    position: relative; z-index: 1;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 14px 4px;
+    background: rgba(245,240,232,0.9);
+  }
+  .month-title-block .month-title { font-size: 17px; font-weight: 700; color: var(--lm-ink); }
+  .month-title-block .month-sub { font-size: 10px; color: var(--lm-shukla); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+  .month-nav-btn { background: none; border: none; font-size: 18px; color: var(--lm-ink-soft); cursor: pointer; padding: 2px 6px; }
+
+  .weekday-row {
+    position: relative; z-index: 1;
+    display: grid; grid-template-columns: repeat(7, 1fr);
+    padding: 4px 6px 4px;
+    border-bottom: 1px solid var(--lm-line);
+    background: var(--lm-panel);
+  }
+  .weekday-row > div {
+    text-align: center; font-size: 9px;
+    color: var(--lm-ink-muted); font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .month-grid {
+    position: relative; z-index: 1;
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+    border-left: 1px solid var(--lm-line);
+    background: var(--lm-bg);
+  }
+  .month-cell {
+    border-right: 1px solid var(--lm-line);
+    border-bottom: 1px solid var(--lm-line);
+    display: flex; flex-direction: column;
+    align-items: center; padding: 3px 1px 2px;
+    cursor: pointer; position: relative;
+  }
+  .month-cell.today { background: rgba(200,146,42,0.07); }
+  .month-cell.selected { background: rgba(200,146,42,0.12); outline: 1.5px solid var(--lm-shukla); outline-offset: -1px; border-radius: 2px; }
+  .month-cell.other-month { opacity: 0.35; }
+  .mc-hindu { font-size: 7px; font-weight: 600; color: var(--lm-shukla); letter-spacing: 0.03em; min-height: 9px; }
+  .mc-greg-wrap { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+  .month-cell.today .mc-greg-wrap { background: var(--lm-shukla); }
+  .mc-greg { font-size: 12px; font-weight: 700; color: var(--lm-ink); }
+  .month-cell.today .mc-greg { color: white; }
+  .mc-moon { font-size: 11px; margin: 1px 0; }
+  .mc-tithi { font-size: 8px; font-weight: 600; color: var(--lm-ink-muted); }
+  .mc-tithi.shukla { color: var(--lm-shukla); }
+  .mc-tithi.krishna { color: var(--lm-krishna); }
+  .mc-fest { width: 4px; height: 4px; border-radius: 50%; background: var(--lm-festival); margin-top: 1px; }
+
+  /* ── FESTIVALS SCREEN ── */
+  .screen-page-title {
+    position: relative; z-index: 1;
+    padding: 8px 14px 6px;
+    font-size: 18px; font-weight: 700; color: var(--lm-ink);
+    border-bottom: 1px solid var(--lm-line);
+    background: rgba(245,240,232,0.9);
+  }
+  .festivals-scroll { flex: 1; overflow: hidden; position: relative; z-index: 1; padding: 8px 10px; }
+  .month-section-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.10em;
+    text-transform: uppercase; color: var(--lm-shukla);
+    margin: 6px 2px 4px;
+  }
+  .festival-card {
+    background: var(--lm-panel);
+    border: 1px solid var(--lm-line);
+    border-left: 3px solid var(--lm-festival);
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin-bottom: 5px;
+  }
+  .festival-card-name { font-size: 13px; font-weight: 700; color: var(--lm-ink); }
+  .festival-card-sub { font-size: 10px; color: var(--lm-ink-muted); margin-top: 2px; }
+  .festival-card-date { font-size: 10px; font-weight: 600; color: var(--lm-ink-soft); margin-top: 1px; }
+
+  /* ── SETTINGS SCREEN ── */
+  .settings-scroll { flex: 1; overflow: hidden; position: relative; z-index: 1; padding: 6px 10px; }
+  .settings-section-label {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.10em;
+    text-transform: uppercase; color: var(--lm-ink-muted);
+    margin: 10px 2px 4px;
+  }
+  .settings-group {
+    background: var(--lm-panel);
+    border: 1px solid var(--lm-line);
+    border-radius: 10px; overflow: hidden;
+    margin-bottom: 4px;
+  }
+  .settings-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--lm-line);
+    font-size: 12px; color: var(--lm-ink);
+  }
+  .settings-row:last-child { border-bottom: none; }
+  .settings-row .sub { font-size: 10px; color: var(--lm-ink-muted); margin-top: 1px; }
+  .settings-check { color: var(--lm-shukla); font-weight: 700; font-size: 13px; }
+  .settings-arrow { color: var(--lm-ink-muted); font-size: 12px; }
+
+  /* Segmented control */
+  .seg-control {
+    display: flex; background: rgba(0,0,0,0.06); border-radius: 8px; padding: 3px; gap: 2px;
+  }
+  .seg-btn {
+    flex: 1; padding: 5px 6px; border-radius: 6px; border: none;
+    font-size: 10px; font-weight: 600; cursor: pointer;
+    background: transparent; color: var(--lm-ink-soft);
+  }
+  .seg-btn.active {
+    background: var(--lm-shukla); color: white;
+    box-shadow: 0 1px 4px rgba(200,146,42,0.35);
+  }
+  .seg-wrap { padding: 10px 12px; }
+
+  /* ── HORA SCREEN ── */
+  .hora-screen-header {
+    position: relative; z-index: 1;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 4px 14px 8px;
+    border-bottom: 1px solid var(--lm-line);
+    background: rgba(245,240,232,0.9);
+  }
+  .hora-screen-title { font-size: 14px; font-weight: 700; color: var(--lm-ink); letter-spacing: 0.06em; }
+  .hora-date-nav {
+    position: relative; z-index: 1;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 14px;
+    border-bottom: 1px solid var(--lm-line);
+    background: var(--lm-panel);
+    font-size: 12px; font-weight: 600; color: var(--lm-ink);
+  }
+  .hora-date-nav-btn { color: var(--lm-ink-soft); font-size: 16px; }
+  .hora-table-scroll { flex: 1; overflow: hidden; position: relative; z-index: 1; padding: 6px 10px; }
+  .hora-section-label {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase;
+    color: var(--lm-ink-muted); margin: 4px 2px 4px;
+  }
+  .hora-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 10px;
+    background: var(--lm-panel);
+    border: 1px solid var(--lm-line);
+    border-radius: 7px;
+    margin-bottom: 3px;
+    font-size: 11px;
+  }
+  .hora-row.active {
+    border-color: var(--lm-shukla);
+    background: rgba(200,146,42,0.07);
+  }
+  .hora-row.past { opacity: 0.38; }
+  .hora-row-left { display: flex; align-items: center; gap: 8px; }
+  .hora-row-glyph { font-size: 15px; width: 20px; text-align: center; }
+  .hora-row-planet { font-size: 11px; font-weight: 700; color: var(--lm-ink); }
+  .hora-row-sub { font-size: 9px; color: var(--lm-ink-muted); }
+  .hora-row-time { font-size: 10px; color: var(--lm-ink-soft); text-align: right; }
+  .now-pill {
+    display: inline-block;
+    background: var(--lm-shukla); color: white;
+    font-size: 8px; font-weight: 700; letter-spacing: 0.04em;
+    padding: 2px 5px; border-radius: 4px; margin-left: 4px;
+    vertical-align: middle;
+  }
+
+  /* Moon phase SVG helper */
+  .moon-face {
+    width: 88px; height: 88px;
+    border-radius: 50%;
+    background: var(--lm-moon-light);
+    position: relative; overflow: hidden;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.10);
+  }
+  .moon-shadow {
+    position: absolute; top: 0; right: 0;
+    width: 50%; height: 100%;
+    background: var(--lm-moon-dark);
+    border-radius: 0 44px 44px 0;
+  }
+  .moon-shadow.gibbous { width: 20%; border-radius: 0 44px 44px 0; }
+  .moon-shadow.crescent { width: 75%; border-radius: 0 44px 44px 0; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Tithika — Light Mode Wireframes</h1>
+  <p class="subtitle">Warm Parchment palette · Phase 3 candidate</p>
+  <p class="meta">v3 · 2026-05-22 · Corresponds to lovely-baking-crayon plan</p>
+</header>
+
+<main>
+
+  <!-- Legend -->
+  <div class="legend">
+    <div class="legend-item"><span class="legend-swatch" style="background:#F5F0E8;border:1px solid rgba(0,0,0,0.15)"></span> Background #F5F0E8</div>
+    <div class="legend-item"><span class="legend-swatch" style="background:#EDE8D8;border:1px solid rgba(0,0,0,0.12)"></span> Panel #EDE8D8</div>
+    <div class="legend-item"><span class="legend-swatch" style="background:#1A1F3C"></span> Ink #1A1F3C</div>
+    <div class="legend-item"><span class="legend-swatch" style="background:#C8922A"></span> Shukla #C8922A</div>
+    <div class="legend-item"><span class="legend-swatch" style="background:#5A6BD8"></span> Krishna #5A6BD8</div>
+    <div class="legend-item"><span class="legend-swatch" style="background:#D46A1E"></span> Festival #D46A1E</div>
+    <div class="legend-item"><span class="legend-swatch" style="background:#4A5070"></span> Ink Soft #4A5070</div>
+    <div class="legend-item"><span class="legend-swatch" style="background:#8890A8"></span> Ink Muted #8890A8</div>
+  </div>
+
+  <div class="grid">
+
+    <!-- ══════════════════════════════════════════════════════
+         SCREEN 1 — DAY VIEW (light)
+    ══════════════════════════════════════════════════════ -->
+    <div class="screen">
+      <div class="screen-title">Screen 01</div>
+      <div class="screen-name">Day View</div>
+      <div class="screen-desc">Dawn sky replaces starfield. Tithi card uses amber accent bar. 2×2 sun/moon grid.</div>
+
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="phone-screen">
+          <div class="dawn-sky"></div>
+
+          <!-- Status bar -->
+          <div class="status-bar" style="position:relative;z-index:2;color:#4A5070;font-size:11px;font-weight:600;padding:6px 22px 0;display:flex;justify-content:space-between;align-items:flex-end;height:32px;">
+            <span>9:41</span><span>●●●  WiFi  🔋</span>
+          </div>
+
+          <!-- App nav -->
+          <div class="app-header">
+            <div class="icon">🏠</div>
+            <div class="title">TITHIKA</div>
+            <div class="nav-icons">
+              <div class="icon" style="font-size:14px;">📅</div>
+              <div class="icon" style="font-size:14px;">🗓</div>
+              <div class="icon" style="font-size:14px;">⚙</div>
+            </div>
+          </div>
+
+          <!-- Day content -->
+          <div class="day-view-top">
+            <!-- Date nav -->
+            <div class="date-nav">
+              <button class="date-nav-btn">‹</button>
+              <div class="date-nav-center">
+                <div class="date-nav-dow">Thursday</div>
+                <div class="date-nav-date" style="font-size:15px;font-weight:700;color:#1A1F3C;">21 May 2026</div>
+                <div class="date-nav-month">Vaishakha · Shukla</div>
+              </div>
+              <button class="date-nav-btn">›</button>
+            </div>
+
+            <!-- Moon -->
+            <div class="moon-svg-wrap">
+              <div class="moon-face">
+                <div class="moon-shadow gibbous"></div>
+              </div>
+            </div>
+
+            <!-- Tithi card -->
+            <div class="tithi-card">
+              <div class="tithi-card-bar"></div>
+              <div class="tithi-card-label">Shukla · Vaishakha</div>
+              <div class="tithi-card-name">Trayodashi</div>
+              <div class="tithi-card-until">until <strong>8:42 PM</strong></div>
+            </div>
+
+            <!-- Nakshatra -->
+            <div class="detail-row">
+              <div>
+                <div class="lbl">Nakshatra</div>
+                <div class="val">Uttara Phalguni <small>until 6:15 AM</small></div>
+              </div>
+            </div>
+
+            <!-- Sun & Moon 2×2 grid -->
+            <div class="sun-moon-card" style="grid-template-rows:1fr 1fr;">
+              <div class="sun-moon-cell">
+                <div class="sun-moon-label">☀ Sunrise</div>
+                <div class="sun-moon-time">6:02 AM</div>
+              </div>
+              <div class="sun-moon-cell" style="border-left:1px solid var(--lm-line);">
+                <div class="sun-moon-label">Sunset ☀</div>
+                <div class="sun-moon-time">7:48 PM</div>
+              </div>
+              <div class="sun-moon-cell bottom-left">
+                <div class="sun-moon-label">☽ Moonrise</div>
+                <div class="sun-moon-time">10:24 PM</div>
+              </div>
+              <div class="sun-moon-cell bottom-right" style="border-left:1px solid var(--lm-line);">
+                <div class="sun-moon-label">Moonset ☽</div>
+                <div class="sun-moon-time">9:58 AM</div>
+              </div>
+            </div>
+
+            <!-- Hora card -->
+            <div class="hora-card">
+              <div class="hora-card-left">
+                <div class="hora-glyph">☉</div>
+                <div>
+                  <div class="hora-planet">Sun Hora</div>
+                  <div class="hora-sub">Hour 3 · Day</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;">
+                <div class="hora-until">until 8:44 AM</div>
+                <div class="hora-chevron">›</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4-day strip -->
+          <div class="day-strip">
+            <div class="day-cell">
+              <div class="wk">Wed</div>
+              <div class="greg">20</div>
+              <div class="tithi-num"><span class="paksha-dot shukla"></span>12</div>
+            </div>
+            <div class="day-cell today">
+              <div class="wk">Thu</div>
+              <div class="greg" style="color:var(--lm-shukla);">21</div>
+              <div class="tithi-num"><span class="paksha-dot shukla"></span>13</div>
+            </div>
+            <div class="day-cell">
+              <div class="wk">Fri</div>
+              <div class="greg">22</div>
+              <div class="tithi-num"><span class="paksha-dot shukla"></span>14</div>
+            </div>
+            <div class="day-cell">
+              <div class="wk">Sat</div>
+              <div class="greg">23</div>
+              <div class="tithi-num"><span class="paksha-dot shukla"></span>15</div>
+              <div class="special-dot"></div>
+            </div>
+          </div>
+
+        </div><!-- phone-screen -->
+      </div><!-- phone -->
+    </div><!-- screen -->
+
+
+    <!-- ══════════════════════════════════════════════════════
+         SCREEN 2 — MONTH VIEW (light)
+    ══════════════════════════════════════════════════════ -->
+    <div class="screen">
+      <div class="screen-title">Screen 02</div>
+      <div class="screen-name">Month View</div>
+      <div class="screen-desc">Moon phase icons replace paksha dots. Amber selected-cell border. Festival dot in saffron.</div>
+
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="phone-screen">
+          <div class="dawn-sky"></div>
+
+          <div class="status-bar" style="position:relative;z-index:2;color:#4A5070;font-size:11px;font-weight:600;padding:6px 22px 0;display:flex;justify-content:space-between;align-items:flex-end;height:32px;">
+            <span>9:41</span><span>●●●  WiFi  🔋</span>
+          </div>
+
+          <div class="app-header">
+            <div class="icon">‹ Day View</div>
+            <div class="title">MAY 2026</div>
+            <div class="nav-icons"><div class="icon" style="font-size:14px;">⚙</div></div>
+          </div>
+
+          <!-- Month header -->
+          <div class="month-header-bar">
+            <button class="month-nav-btn">‹</button>
+            <div class="month-title-block" style="text-align:center;">
+              <div class="month-title">May 2026</div>
+              <div class="month-sub">Vaishakha – Jyeshtha</div>
+            </div>
+            <button class="month-nav-btn">›</button>
+          </div>
+
+          <!-- Weekday headers -->
+          <div class="weekday-row">
+            <div>Su</div><div>Mo</div><div>Tu</div><div>We</div>
+            <div>Th</div><div>Fr</div><div>Sa</div>
+          </div>
+
+          <!-- Month grid — 5 rows × 7 cols -->
+          <div class="month-grid" style="grid-template-rows:repeat(5,1fr);">
+            <!-- Row 1 -->
+            <div class="month-cell other-month"><div class="mc-greg-wrap"><div class="mc-greg" style="color:#8890A8;">27</div></div><div class="mc-moon">🌘</div><div class="mc-tithi">27</div></div>
+            <div class="month-cell other-month"><div class="mc-greg-wrap"><div class="mc-greg" style="color:#8890A8;">28</div></div><div class="mc-moon">🌘</div><div class="mc-tithi">28</div></div>
+            <div class="month-cell other-month"><div class="mc-greg-wrap"><div class="mc-greg" style="color:#8890A8;">29</div></div><div class="mc-moon">🌑</div><div class="mc-tithi">30</div></div>
+            <div class="month-cell other-month"><div class="mc-greg-wrap"><div class="mc-greg" style="color:#8890A8;">30</div></div><div class="mc-moon">🌒</div><div class="mc-tithi krishna">1</div></div>
+            <div class="month-cell"><div class="mc-hindu">Vai</div><div class="mc-greg-wrap"><div class="mc-greg">1</div></div><div class="mc-moon">🌒</div><div class="mc-tithi shukla">2</div></div>
+            <div class="month-cell"><div class="mc-greg-wrap"><div class="mc-greg">2</div></div><div class="mc-moon">🌒</div><div class="mc-tithi shukla">3</div><div class="mc-fest"></div></div>
+            <div class="month-cell"><div class="mc-greg-wrap"><div class="mc-greg">3</div></div><div class="mc-moon">🌓</div><div class="mc-tithi shukla">4</div></div>
+
+            <!-- Row 2 -->
+            <div class="month-cell"><div class="mc-greg-wrap"><div class="mc-greg">4</div></div><div class="mc-moon">🌓</div><div class="mc-tithi shukla">5</div></div>
+            <div class="month-cell"><div class="mc-greg-wrap"><div class="mc-greg">5</div></div><div class="mc-moon">🌔</div><div class="mc-tithi shukla">6</div></div>
+            <div class="month-cell"><div class="mc-greg-wrap"><div class="mc-greg">6</div></div><div class="mc-moon">🌔</div><div class="mc-tithi shukla">7</div></div>
+            <div class="month-cell"><div class="mc-greg-wrap"><div class="mc-greg">7</div></div><div class="mc-moon">🌔</div><div class="mc-tithi shukla">8</div></div>
+            <div class="month-cell"><div class="mc-greg-wrap"><div class="mc-greg">8</div></div><div class="mc-moon">🌕</div><div class="mc-tithi shukla">9</div></div>
+            <div class="month-cell"><div class="mc-greg-wrap"><div class="mc-greg">9</div></div><div class="mc-moon">🌕</div><div class="mc-tithi shukla">10</div></div>
+            <div class="month-cell"><div class="mc-greg-wrap"><div class="mc-greg">10</div></div><div class="mc-moon">🌕</div><div class="mc-tithi shukla">11</div></div>
+
+            <!-- Row 3 -->
+            <div class="month-cell"><div class="mc-greg-wrap"><div class="mc-greg">11</div></div><div class="mc-moon">🌕</div><div class="mc-tithi shukla">12</div><div class="mc-fest"></div></div>
+            <div class="month-cell"><div class="mc-greg-wrap"><div class="mc-greg">12</div></div><div class="mc-moon">🌕</div><div class="mc-tithi shukla">15</div><div class="mc-fest"></div></div>
+            <div class="month-cell"><div class="mc-greg-wrap"><div class="mc-greg">13</div></div><div class="mc-moon">🌖</div><div class="mc-tithi krishna" style="color:var(--lm-krishna);">1</div></div>
+            <div class="month-cell"><div class="mc-greg-wrap"><div class="mc-greg">14</div></div><div class="mc-moon">🌖</div><div class="mc-tithi krishna" style="color:var(--lm-krishna);">2</div></div>
+            <div class="month-cell selected"><div class="mc-greg-wrap"><div class="mc-greg" style="color:var(--lm-shukla);font-weight:800;">15</div></div><div class="mc-moon">🌗</div><div class="mc-tithi krishna" style="color:var(--lm-krishna);">3</div></div>
+            <div class="month-cell today"><div class="mc-greg-wrap" style="background:var(--lm-shukla);border-radius:50%;"><div class="mc-greg" style="color:white;">16</div></div><div class="mc-moon">🌗</div><div class="mc-tithi krishna" style="color:var(--lm-krishna);">4</div></div>
+            <div class="month-cell"><div class="mc-greg-wrap"><div class="mc-greg">17</div></div><div class="mc-moon">🌗</div><div class="mc-tithi krishna" style="color:var(--lm-krishna);">5</div></div>
+
+            <!-- Row 4 -->
+            <div class="month-cell"><div class="mc-greg-wrap"><div class="mc-greg">18</div></div><div class="mc-moon">🌘</div><div class="mc-tithi krishna" style="color:var(--lm-krishna);">6</div></div>
+            <div class="month-cell"><div class="mc-greg-wrap"><div class="mc-greg">19</div></div><div class="mc-moon">🌘</div><div class="mc-tithi krishna" style="color:var(--lm-krishna);">7</div></div>
+            <div class="month-cell"><div class="mc-greg-wrap"><div class="mc-greg">20</div></div><div class="mc-moon">🌘</div><div class="mc-tithi krishna" style="color:var(--lm-krishna);">8</div></div>
+            <div class="month-cell"><div class="mc-greg-wrap"><div class="mc-greg">21</div></div><div class="mc-moon">🌑</div><div class="mc-tithi krishna" style="color:var(--lm-krishna);">9</div></div>
+            <div class="month-cell"><div class="mc-greg-wrap"><div class="mc-greg">22</div></div><div class="mc-moon">🌑</div><div class="mc-tithi krishna" style="color:var(--lm-krishna);">10</div></div>
+            <div class="month-cell"><div class="mc-greg-wrap"><div class="mc-greg">23</div></div><div class="mc-moon">🌑</div><div class="mc-tithi shukla">1</div></div>
+            <div class="month-cell"><div class="mc-hindu">Jye</div><div class="mc-greg-wrap"><div class="mc-greg">24</div></div><div class="mc-moon">🌒</div><div class="mc-tithi shukla">2</div></div>
+
+            <!-- Row 5 -->
+            <div class="month-cell"><div class="mc-greg-wrap"><div class="mc-greg">25</div></div><div class="mc-moon">🌒</div><div class="mc-tithi shukla">3</div></div>
+            <div class="month-cell"><div class="mc-greg-wrap"><div class="mc-greg">26</div></div><div class="mc-moon">🌒</div><div class="mc-tithi shukla">4</div></div>
+            <div class="month-cell"><div class="mc-greg-wrap"><div class="mc-greg">27</div></div><div class="mc-moon">🌓</div><div class="mc-tithi shukla">5</div></div>
+            <div class="month-cell"><div class="mc-greg-wrap"><div class="mc-greg">28</div></div><div class="mc-moon">🌓</div><div class="mc-tithi shukla">6</div></div>
+            <div class="month-cell"><div class="mc-greg-wrap"><div class="mc-greg">29</div></div><div class="mc-moon">🌔</div><div class="mc-tithi shukla">7</div></div>
+            <div class="month-cell"><div class="mc-greg-wrap"><div class="mc-greg">30</div></div><div class="mc-moon">🌔</div><div class="mc-tithi shukla">8</div></div>
+            <div class="month-cell"><div class="mc-greg-wrap"><div class="mc-greg">31</div></div><div class="mc-moon">🌔</div><div class="mc-tithi shukla">9</div></div>
+          </div><!-- month-grid -->
+
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════════════
+         SCREEN 3 — FESTIVALS (light)
+    ══════════════════════════════════════════════════════ -->
+    <div class="screen">
+      <div class="screen-title">Screen 03</div>
+      <div class="screen-name">Festivals</div>
+      <div class="screen-desc">Saffron accent strip on cards. Month label in amber. Parchment card bg.</div>
+
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="phone-screen">
+          <div class="dawn-sky"></div>
+
+          <div class="status-bar" style="position:relative;z-index:2;color:#4A5070;font-size:11px;font-weight:600;padding:6px 22px 0;display:flex;justify-content:space-between;align-items:flex-end;height:32px;">
+            <span>9:41</span><span>●●●  WiFi  🔋</span>
+          </div>
+
+          <div class="app-header">
+            <div class="icon">🏠</div>
+            <div class="title">TITHIKA</div>
+            <div class="nav-icons">
+              <div class="icon" style="font-size:14px;">📅</div>
+              <div class="icon" style="font-size:14px;">🗓</div>
+              <div class="icon" style="font-size:14px;">⚙</div>
+            </div>
+          </div>
+
+          <div class="screen-page-title">Festivals 2026</div>
+
+          <div class="festivals-scroll">
+            <div class="month-section-label">MAY</div>
+            <div class="festival-card">
+              <div class="festival-card-name">Akshaya Tritiya</div>
+              <div class="festival-card-sub">Vaishakha · Shukla 3</div>
+              <div class="festival-card-date">Mon, May 2</div>
+            </div>
+            <div class="festival-card">
+              <div class="festival-card-name">Buddha Purnima</div>
+              <div class="festival-card-sub">Vaishakha · Shukla 15</div>
+              <div class="festival-card-date">Sun, May 12</div>
+            </div>
+
+            <div class="month-section-label">JUNE</div>
+            <div class="festival-card">
+              <div class="festival-card-name">Nirjala Ekadashi</div>
+              <div class="festival-card-sub">Jyeshtha · Shukla 11</div>
+              <div class="festival-card-date">Wed, Jun 3</div>
+            </div>
+            <div class="festival-card">
+              <div class="festival-card-name">Vat Savitri</div>
+              <div class="festival-card-sub">Jyeshtha · Amavasya</div>
+              <div class="festival-card-date">Mon, Jun 23</div>
+            </div>
+
+            <div class="month-section-label">JULY</div>
+            <div class="festival-card">
+              <div class="festival-card-name">Rath Yatra</div>
+              <div class="festival-card-sub">Ashadha · Shukla 2</div>
+              <div class="festival-card-date">Sat, Jul 18</div>
+            </div>
+            <div class="festival-card">
+              <div class="festival-card-name">Guru Purnima</div>
+              <div class="festival-card-sub">Ashadha · Purnima</div>
+              <div class="festival-card-date">Thu, Jul 3</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════════════
+         SCREEN 4 — SETTINGS / APPEARANCE (light)
+    ══════════════════════════════════════════════════════ -->
+    <div class="screen">
+      <div class="screen-title">Screen 04</div>
+      <div class="screen-name">Settings — Appearance</div>
+      <div class="screen-desc">New APPEARANCE section with System / Light / Dark segmented control above Language.</div>
+
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="phone-screen">
+          <div class="dawn-sky"></div>
+
+          <div class="status-bar" style="position:relative;z-index:2;color:#4A5070;font-size:11px;font-weight:600;padding:6px 22px 0;display:flex;justify-content:space-between;align-items:flex-end;height:32px;">
+            <span>9:41</span><span>●●●  WiFi  🔋</span>
+          </div>
+
+          <div class="app-header">
+            <div class="icon">🏠</div>
+            <div class="title">TITHIKA</div>
+            <div class="nav-icons"><div class="icon" style="font-size:14px;">⚙</div></div>
+          </div>
+
+          <div class="screen-page-title">Settings</div>
+
+          <div class="settings-scroll">
+
+            <div class="settings-section-label">APPEARANCE</div>
+            <div class="settings-group">
+              <div class="seg-wrap">
+                <div class="seg-control">
+                  <button class="seg-btn">System</button>
+                  <button class="seg-btn active">Light</button>
+                  <button class="seg-btn">Dark</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-section-label">LANGUAGE</div>
+            <div class="settings-group">
+              <div class="settings-row">
+                <span>English</span>
+                <span class="settings-check">✓</span>
+              </div>
+              <div class="settings-row">
+                <span>Hindi (Latin)</span>
+              </div>
+              <div class="settings-row">
+                <span style="font-size:13px;">हिन्दी</span>
+              </div>
+              <div class="settings-row">
+                <span style="font-size:13px;">தமிழ்</span>
+              </div>
+              <div class="settings-row">
+                <span style="font-size:13px;">বাংলা</span>
+              </div>
+            </div>
+
+            <div class="settings-section-label">MONTH SYSTEM</div>
+            <div class="settings-group">
+              <div class="settings-row">
+                <div>
+                  <div>Purnimanta</div>
+                  <div class="sub">Month ends at full moon</div>
+                </div>
+                <span class="settings-check">✓</span>
+              </div>
+              <div class="settings-row">
+                <div>
+                  <div>Amanta</div>
+                  <div class="sub">Month ends at new moon</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-section-label">LOCATION</div>
+            <div class="settings-group">
+              <div class="settings-row">
+                <div>
+                  <div>San Francisco, CA</div>
+                  <div class="sub">37.77° N · 122.42° W</div>
+                </div>
+                <span class="settings-arrow">›</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════════════
+         SCREEN 5 — HORA (light)
+    ══════════════════════════════════════════════════════ -->
+    <div class="screen">
+      <div class="screen-title">Screen 05</div>
+      <div class="screen-name">Hora Screen</div>
+      <div class="screen-desc">Amber active-hora border. Past horas dimmed. NOW pill in amber. Planet glyphs unchanged.</div>
+
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="phone-screen">
+          <div class="dawn-sky"></div>
+
+          <div class="status-bar" style="position:relative;z-index:2;color:#4A5070;font-size:11px;font-weight:600;padding:6px 22px 0;display:flex;justify-content:space-between;align-items:flex-end;height:32px;">
+            <span>9:41</span><span>●●●  WiFi  🔋</span>
+          </div>
+
+          <!-- Hora header -->
+          <div class="hora-screen-header">
+            <div class="icon" style="color:var(--lm-ink-soft);font-size:15px;cursor:pointer;">🏠</div>
+            <div class="hora-screen-title">HORA</div>
+            <div style="width:28px;"></div>
+          </div>
+
+          <!-- Date nav -->
+          <div class="hora-date-nav">
+            <span class="hora-date-nav-btn">‹</span>
+            <span>Thursday, May 21</span>
+            <span class="hora-date-nav-btn">›</span>
+          </div>
+
+          <!-- Hora table -->
+          <div class="hora-table-scroll">
+            <div class="hora-section-label">DAY</div>
+
+            <div class="hora-row past">
+              <div class="hora-row-left">
+                <div class="hora-row-glyph" style="color:#FFB347;">☉</div>
+                <div>
+                  <div class="hora-row-planet">Sun</div>
+                  <div class="hora-row-sub">Hour 1 · Day</div>
+                </div>
+              </div>
+              <div class="hora-row-time">6:02 – 7:10 AM</div>
+            </div>
+
+            <div class="hora-row past">
+              <div class="hora-row-left">
+                <div class="hora-row-glyph" style="color:#C8922A;">♀</div>
+                <div>
+                  <div class="hora-row-planet">Venus</div>
+                  <div class="hora-row-sub">Hour 2 · Day</div>
+                </div>
+              </div>
+              <div class="hora-row-time">7:10 – 8:19 AM</div>
+            </div>
+
+            <div class="hora-row active">
+              <div class="hora-row-left">
+                <div class="hora-row-glyph" style="color:#5A6BD8;">☿</div>
+                <div>
+                  <div class="hora-row-planet">Mercury <span class="now-pill">NOW</span></div>
+                  <div class="hora-row-sub">Hour 3 · Day</div>
+                </div>
+              </div>
+              <div class="hora-row-time">8:19 – 9:27 AM</div>
+            </div>
+
+            <div class="hora-row">
+              <div class="hora-row-left">
+                <div class="hora-row-glyph" style="color:#F7F2DC;text-shadow:0 0 4px rgba(0,0,0,0.3);">☽</div>
+                <div>
+                  <div class="hora-row-planet">Moon</div>
+                  <div class="hora-row-sub">Hour 4 · Day</div>
+                </div>
+              </div>
+              <div class="hora-row-time">9:27 – 10:36 AM</div>
+            </div>
+
+            <div class="hora-row">
+              <div class="hora-row-left">
+                <div class="hora-row-glyph" style="color:#8890A8;">♄</div>
+                <div>
+                  <div class="hora-row-planet">Saturn</div>
+                  <div class="hora-row-sub">Hour 5 · Day</div>
+                </div>
+              </div>
+              <div class="hora-row-time">10:36 – 11:44 AM</div>
+            </div>
+
+            <div class="hora-row">
+              <div class="hora-row-left">
+                <div class="hora-row-glyph" style="color:#C8922A;">♃</div>
+                <div>
+                  <div class="hora-row-planet">Jupiter</div>
+                  <div class="hora-row-sub">Hour 6 · Day</div>
+                </div>
+              </div>
+              <div class="hora-row-time">11:44 AM – 12:53 PM</div>
+            </div>
+
+            <div class="hora-section-label" style="margin-top:8px;">NIGHT</div>
+
+            <div class="hora-row">
+              <div class="hora-row-left">
+                <div class="hora-row-glyph" style="color:#FFB347;">☉</div>
+                <div>
+                  <div class="hora-row-planet">Sun</div>
+                  <div class="hora-row-sub">Hour 1 · Night</div>
+                </div>
+              </div>
+              <div class="hora-row-time">7:48 – 8:50 PM</div>
+            </div>
+
+            <div class="hora-row">
+              <div class="hora-row-left">
+                <div class="hora-row-glyph" style="color:#C8922A;">♀</div>
+                <div>
+                  <div class="hora-row-planet">Venus</div>
+                  <div class="hora-row-sub">Hour 2 · Night</div>
+                </div>
+              </div>
+              <div class="hora-row-time">8:50 – 9:52 PM</div>
+            </div>
+
+          </div><!-- hora-table-scroll -->
+        </div>
+      </div>
+    </div>
+
+  </div><!-- grid -->
+</main>
+</body>
+</html>

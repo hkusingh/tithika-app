@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tithika — Panchanga Screen (Phase 3.3 · Option C)</title>
+<style>
+  :root {
+    --bg-page:   #0a0a14;
+    --bg-panel:  #11132a;
+    --line-page: rgba(255,255,255,0.08);
+    --ink-page:  #f3eedf;
+    --ink-page-soft: #aab0c5;
+    --ink-page-muted: #6c7290;
+
+    --lm-bg:          #F5F0E8;
+    --lm-panel:       #EDE8D8;
+    --lm-ink:         #1A1F3C;
+    --lm-ink-soft:    #4A5070;
+    --lm-ink-muted:   #8890A8;
+    --lm-line:        rgba(0,0,0,0.08);
+    --lm-shukla:      #C8922A;
+    --lm-shukla-bg:   rgba(200,146,42,0.08);
+    --lm-krishna:     #5A6BD8;
+    --lm-border-phone:#C4BBAB;
+
+    --yoga-ausp:      #2A8A5A;
+    --yoga-ausp-bg:   rgba(42,138,90,0.07);
+    --yoga-excel:     #C8922A;
+    --yoga-excel-bg:  rgba(200,146,42,0.07);
+    --yoga-inausp:    #B84040;
+    --yoga-inausp-bg: rgba(184,64,64,0.06);
+    --yoga-neutral:   #8890A8;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg-page); color: var(--ink-page);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  header { padding: 40px 40px 16px; border-bottom: 1px solid var(--line-page); }
+  header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 6px; }
+  header .subtitle { color: var(--ink-page-soft); font-size: 15px; }
+  header .meta { color: var(--ink-page-muted); font-size: 13px; margin-top: 10px; }
+  main { padding: 32px 40px 80px; }
+
+  .section-header { margin: 0 0 24px; padding-bottom: 12px; border-bottom: 1px solid var(--line-page); }
+  .section-header h2 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .section-header p  { font-size: 13px; color: var(--ink-page-soft); line-height: 1.5; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 56px 40px; max-width: 1600px; margin: 0 auto 72px;
+  }
+
+  .screen { display: flex; flex-direction: column; align-items: center; }
+  .screen-title { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-page-muted); margin-bottom: 4px; }
+  .screen-name { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .screen-desc { font-size: 13px; color: var(--ink-page-soft); text-align: center; max-width: 295px; margin: 0 0 14px; line-height: 1.45; }
+  .screen-badge { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 8px; border-radius: 5px; margin-bottom: 14px; }
+  .badge-new     { background: rgba(200,146,42,0.18); color: #C8922A; }
+  .badge-warn    { background: rgba(184,64,64,0.18); color: #D46060; }
+  .badge-neutral { background: rgba(255,255,255,0.06); color: var(--ink-page-muted); }
+
+  /* ── Phone frame ── */
+  .phone {
+    width: 320px; height: 690px;
+    background: var(--lm-bg);
+    border: 9px solid var(--lm-border-phone);
+    border-radius: 38px; position: relative; overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.55), 0 0 0 1px rgba(0,0,0,0.15);
+  }
+  .notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 110px; height: 22px; background: var(--lm-border-phone); border-radius: 0 0 14px 14px; z-index: 50; }
+  .phone-screen { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; }
+
+  .dawn-sky {
+    position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(180deg, #F0DFB8 0%, #F3E8CE 25%, #F5EEE2 55%, #F5F0E8 100%);
+  }
+
+  /* ── Shared chrome ── */
+  .status-bar { position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: flex-end; height: 32px; padding: 6px 22px 0; font-size: 11px; font-weight: 600; color: var(--lm-ink-soft); }
+
+  .app-header { position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; padding: 4px 14px 8px; border-bottom: 1px solid var(--lm-line); background: rgba(245,240,232,0.94); }
+  .nav-icon { width: 26px; height: 26px; display: grid; place-items: center; color: var(--lm-ink-soft); font-size: 15px; }
+  .nav-icon.active { color: var(--lm-shukla); }
+  .app-title { font-weight: 700; color: var(--lm-ink); font-size: 13px; letter-spacing: 0.06em; }
+  .nav-icons { display: flex; gap: 1px; }
+
+  .page-title-bar { position: relative; z-index: 2; padding: 9px 14px 8px; border-bottom: 1px solid var(--lm-line); background: rgba(245,240,232,0.94); display: flex; align-items: baseline; justify-content: space-between; }
+  .page-title { font-size: 19px; font-weight: 700; color: var(--lm-ink); letter-spacing: -0.01em; }
+  .page-title-meta { font-size: 10px; color: var(--lm-ink-muted); }
+
+  .date-nav { position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; padding: 6px 14px; border-bottom: 1px solid var(--lm-line); background: var(--lm-panel); flex-shrink: 0; }
+  .dnav-btn { background: none; border: none; color: var(--lm-ink-muted); font-size: 17px; cursor: pointer; }
+  .dnav-dow  { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--lm-ink-muted); text-align: center; }
+  .dnav-date { font-size: 13px; font-weight: 700; color: var(--lm-ink); text-align: center; }
+
+  /* ── Scroll area ── */
+  .p-scroll { flex: 1; overflow: hidden; position: relative; z-index: 1; padding: 8px 10px 0; display: flex; flex-direction: column; gap: 2px; }
+
+  /* Section labels */
+  .p-sec { font-size: 9px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase; color: var(--lm-ink-muted); margin: 8px 2px 4px; }
+  .p-sec:first-child { margin-top: 2px; }
+
+  /* ── Five Elements summary card ── */
+  .five-card { background: var(--lm-panel); border: 1px solid var(--lm-line); border-radius: 8px; overflow: hidden; margin-bottom: 2px; }
+  .five-row { display: flex; align-items: flex-start; gap: 7px; padding: 6px 10px; border-bottom: 1px solid var(--lm-line); }
+  .five-row:last-child { border-bottom: none; }
+  .five-row.yoga-ausp   { background: var(--yoga-ausp-bg); }
+  .five-row.yoga-excel  { background: var(--yoga-excel-bg); }
+  .five-row.yoga-inausp { background: var(--yoga-inausp-bg); }
+
+  .five-icon { font-size: 12px; width: 16px; text-align: center; flex-shrink: 0; color: var(--lm-ink-muted); margin-top: 1px; }
+  .five-label { font-size: 8px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--lm-ink-muted); width: 60px; flex-shrink: 0; padding-top: 2px; }
+  .five-body { flex: 1; }
+  .five-name { font-size: 11px; font-weight: 700; color: var(--lm-ink); }
+  .five-sub  { font-size: 9px; color: var(--lm-ink-muted); margin-top: 1px; }
+  .five-ql   { display: inline-flex; align-items: center; gap: 3px; margin-top: 2px; }
+  .five-qdot { width: 5px; height: 5px; border-radius: 50%; }
+  .five-qt   { font-size: 9px; }
+  .five-time { font-size: 10px; color: var(--lm-ink-soft); text-align: right; white-space: nowrap; flex-shrink: 0; padding-top: 2px; }
+
+  /* ── Yoga card ── */
+  .yoga-card { background: var(--lm-panel); border: 1px solid var(--lm-line); border-radius: 8px; overflow: hidden; margin-bottom: 2px; }
+
+  .yoga-current { padding: 10px 12px 8px; }
+  .yoga-curr-top { display: flex; align-items: flex-start; justify-content: space-between; }
+  .yoga-curr-name { font-size: 16px; font-weight: 700; }
+  .yoga-curr-until { font-size: 10px; color: var(--lm-ink-soft); text-align: right; margin-top: 2px; }
+  .yoga-badge { display: inline-flex; align-items: center; gap: 4px; margin-top: 4px; }
+  .yoga-bdot  { width: 6px; height: 6px; border-radius: 50%; }
+  .yoga-btext { font-size: 10px; font-weight: 600; }
+
+  /* Progress bar */
+  .yoga-progress { margin-top: 8px; }
+  .yoga-prog-track { height: 3px; background: var(--lm-line); border-radius: 2px; overflow: hidden; }
+  .yoga-prog-fill  { height: 100%; border-radius: 2px; }
+  .yoga-prog-lbl   { display: flex; justify-content: space-between; margin-top: 3px; font-size: 9px; color: var(--lm-ink-muted); }
+
+  /* Next yoga row */
+  .yoga-next { display: flex; align-items: center; gap: 8px; padding: 7px 12px; border-top: 1px solid var(--lm-line); }
+  .yoga-next-lbl  { font-size: 9px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--lm-ink-muted); width: 30px; flex-shrink: 0; }
+  .yoga-next-name { font-size: 11px; font-weight: 700; color: var(--lm-ink); flex: 1; }
+  .yoga-next-ql   { display: inline-flex; align-items: center; gap: 3px; }
+  .yoga-next-dot  { width: 5px; height: 5px; border-radius: 50%; }
+  .yoga-next-qt   { font-size: 9px; }
+  .yoga-next-time { font-size: 10px; color: var(--lm-ink-muted); text-align: right; white-space: nowrap; }
+
+  /* ── Karana list ── */
+  .karana-list { background: var(--lm-panel); border: 1px solid var(--lm-line); border-radius: 8px; overflow: hidden; margin-bottom: 8px; }
+  .karana-row  { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-bottom: 1px solid var(--lm-line); }
+  .karana-row:last-child { border-bottom: none; }
+  .karana-row.active { background: var(--yoga-ausp-bg); }
+  .karana-row.active.inausp { background: var(--yoga-inausp-bg); }
+  .karana-row.past   { opacity: 0.38; }
+
+  .k-dot  { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .k-name { font-size: 11px; font-weight: 700; color: var(--lm-ink); flex: 1; }
+  .k-name.active-ausp  { color: var(--yoga-ausp); }
+  .k-name.active-inausp { color: var(--yoga-inausp); }
+  .k-quality { font-size: 9px; color: var(--lm-ink-muted); width: 60px; text-align: right; flex-shrink: 0; }
+  .k-time  { font-size: 10px; color: var(--lm-ink-soft); text-align: right; white-space: nowrap; flex-shrink: 0; }
+  .k-time.active-ausp   { color: var(--yoga-ausp); font-weight: 600; }
+  .k-time.active-inausp { color: var(--yoga-inausp); font-weight: 600; }
+  .now-pill { display: inline-block; font-size: 8px; font-weight: 700; padding: 1px 5px; border-radius: 3px; margin-left: 4px; vertical-align: middle; }
+  .now-pill.green { background: var(--yoga-ausp); color: white; }
+  .now-pill.red   { background: var(--yoga-inausp); color: white; }
+
+  /* ── Annotations ── */
+  .annotations { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; max-width: 295px; }
+  .ann { display: flex; gap: 9px; align-items: flex-start; font-size: 12px; color: var(--ink-page-soft); line-height: 1.45; }
+  .ann-num { width: 18px; height: 18px; flex-shrink: 0; background: var(--bg-panel); border: 1px solid var(--line-page); border-radius: 50%; display: grid; place-items: center; font-size: 10px; font-weight: 700; color: var(--lm-shukla); }
+  .ann strong { color: var(--ink-page); }
+
+  /* ── Design notes panel ── */
+  .note-panel { background: var(--bg-panel); border: 1px solid var(--line-page); border-radius: 12px; padding: 24px 28px; margin-bottom: 72px; }
+  .note-panel h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .note-panel p  { font-size: 13px; color: var(--ink-page-soft); line-height: 1.6; margin-bottom: 12px; }
+  .note-panel p:last-child { margin-bottom: 0; }
+  .note-panel strong { color: var(--ink-page); }
+  .note-panel em { color: var(--lm-shukla); font-style: normal; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Tithika — Panchanga Screen</h1>
+  <p class="subtitle">Phase 3.3 · Option C · Dedicated /panchanga route · Day View untouched</p>
+  <p class="meta">v5b · 2026-05-25 · New nav icon navigates to screen · Summary card + Yoga card with progress + Karana timeline · Vishti and bad-yoga warning states</p>
+</header>
+
+<main>
+
+
+  <!-- ═══════════════════════════════════════════
+       SECTION 1 — Panchanga Screen (three states)
+  ═══════════════════════════════════════════ -->
+  <div class="section-header">
+    <h2>Section 1 — Panchanga Screen</h2>
+    <p>A dedicated screen accessed via a new nav icon (⊕ or similar). Structured in three blocks: <strong>Five Elements summary</strong> at top (all 5 panchanga limbs at a glance), <strong>Yoga card</strong> with progress bar + next yoga preview, and a <strong>Karana timeline</strong> listing every karana slot for the day — active one highlighted, past ones dimmed.</p>
+  </div>
+
+  <div class="grid">
+
+    <!-- SCREEN A: Normal auspicious day -->
+    <div class="screen">
+      <div class="screen-title">Screen 01 — A</div>
+      <div class="screen-name">Panchanga</div>
+      <div class="screen-desc">10:20 AM · Shubha Yoga (auspicious) · Bava Karana (auspicious). Standard positive day — everything green.</div>
+      <span class="screen-badge badge-new">new screen</span>
+
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="phone-screen">
+          <div class="dawn-sky"></div>
+          <div class="status-bar"><span>10:20 AM</span><span>●●● WiFi 🔋</span></div>
+
+          <div class="app-header">
+            <div class="nav-icon">🏠</div>
+            <div class="app-title">TITHIKA</div>
+            <div class="nav-icons">
+              <div class="nav-icon" style="font-size:13px">📅</div>
+              <div class="nav-icon" style="font-size:13px">🗓</div>
+              <div class="nav-icon" style="font-size:13px">☆</div>
+              <div class="nav-icon active" style="font-size:14px">⊕</div>
+              <div class="nav-icon" style="font-size:13px">⚙</div>
+            </div>
+          </div>
+
+          <div class="page-title-bar">
+            <div class="page-title">Panchanga</div>
+            <div class="page-title-meta">Mumbai</div>
+          </div>
+
+          <div class="date-nav">
+            <button class="dnav-btn">‹</button>
+            <div>
+              <div class="dnav-dow">Thursday</div>
+              <div class="dnav-date">May 28</div>
+            </div>
+            <button class="dnav-btn">›</button>
+          </div>
+
+          <div class="p-scroll">
+            <div class="p-sec">Five Elements</div>
+
+            <div class="five-card">
+              <!-- Vara -->
+              <div class="five-row">
+                <div class="five-icon">☼</div>
+                <div class="five-label">Vara</div>
+                <div class="five-body">
+                  <div class="five-name">Thursday</div>
+                  <div class="five-sub">Guruvara · Jupiter</div>
+                </div>
+                <div class="five-time">—</div>
+              </div>
+              <!-- Tithi -->
+              <div class="five-row">
+                <div class="five-icon">◐</div>
+                <div class="five-label">Tithi</div>
+                <div class="five-body">
+                  <div class="five-name">Shukla Dvitiya</div>
+                </div>
+                <div class="five-time">9:18 PM</div>
+              </div>
+              <!-- Nakshatra -->
+              <div class="five-row">
+                <div class="five-icon">✦</div>
+                <div class="five-label">Nakshatra</div>
+                <div class="five-body">
+                  <div class="five-name">Mrigashira</div>
+                </div>
+                <div class="five-time">11:42 PM</div>
+              </div>
+              <!-- Yoga — auspicious -->
+              <div class="five-row yoga-ausp">
+                <div class="five-icon" style="color:var(--yoga-ausp)">⊕</div>
+                <div class="five-label">Yoga</div>
+                <div class="five-body">
+                  <div class="five-name" style="color:var(--yoga-ausp)">Shubha</div>
+                  <div class="five-ql">
+                    <span class="five-qdot" style="background:var(--yoga-ausp)"></span>
+                    <span class="five-qt" style="color:var(--yoga-ausp)">auspicious</span>
+                  </div>
+                </div>
+                <div class="five-time">3:22 PM</div>
+              </div>
+              <!-- Karana — auspicious -->
+              <div class="five-row yoga-ausp">
+                <div class="five-icon" style="color:var(--yoga-ausp)">◑</div>
+                <div class="five-label">Karana</div>
+                <div class="five-body">
+                  <div class="five-name" style="color:var(--yoga-ausp)">Bava</div>
+                  <div class="five-ql">
+                    <span class="five-qdot" style="background:var(--yoga-ausp)"></span>
+                    <span class="five-qt" style="color:var(--yoga-ausp)">auspicious</span>
+                  </div>
+                </div>
+                <div class="five-time">9:18 PM</div>
+              </div>
+            </div>
+
+            <div class="p-sec">Yoga</div>
+
+            <div class="yoga-card">
+              <div class="yoga-current" style="background:var(--yoga-ausp-bg)">
+                <div class="yoga-curr-top">
+                  <div>
+                    <div class="yoga-curr-name" style="color:var(--yoga-ausp)">Shubha</div>
+                    <div class="yoga-badge">
+                      <span class="yoga-bdot" style="background:var(--yoga-ausp)"></span>
+                      <span class="yoga-btext" style="color:var(--yoga-ausp)">auspicious · yoga 23 of 27</span>
+                    </div>
+                  </div>
+                  <div class="yoga-curr-until">until 3:22 PM</div>
+                </div>
+                <div class="yoga-progress">
+                  <div class="yoga-prog-track">
+                    <div class="yoga-prog-fill" style="width:42%;background:var(--yoga-ausp)"></div>
+                  </div>
+                  <div class="yoga-prog-lbl">
+                    <span>began 11:14 PM ←</span>
+                    <span>→ 3:22 PM</span>
+                  </div>
+                </div>
+              </div>
+              <div class="yoga-next">
+                <div class="yoga-next-lbl">Next</div>
+                <div class="yoga-next-name">Shukla</div>
+                <div class="yoga-next-ql">
+                  <span class="yoga-next-dot" style="background:var(--yoga-ausp)"></span>
+                  <span class="yoga-next-qt" style="color:var(--yoga-ausp)">auspicious</span>
+                </div>
+                <div class="yoga-next-time">from 3:22 PM</div>
+              </div>
+            </div>
+
+            <div class="p-sec">Karana</div>
+
+            <div class="karana-list">
+              <!-- past -->
+              <div class="karana-row past">
+                <span class="k-dot" style="background:var(--yoga-ausp)"></span>
+                <span class="k-name">Kaulava</span>
+                <span class="k-quality">auspicious</span>
+                <span class="k-time">5:58 AM – 9:18 AM</span>
+              </div>
+              <!-- active -->
+              <div class="karana-row active">
+                <span class="k-dot" style="background:var(--yoga-ausp)"></span>
+                <span class="k-name active-ausp">Bava <span class="now-pill green">NOW</span></span>
+                <span class="k-quality" style="color:var(--yoga-ausp)">auspicious</span>
+                <span class="k-time active-ausp">9:18 AM – 9:18 PM</span>
+              </div>
+              <!-- upcoming -->
+              <div class="karana-row">
+                <span class="k-dot" style="background:var(--yoga-ausp)"></span>
+                <span class="k-name">Balava</span>
+                <span class="k-quality">auspicious</span>
+                <span class="k-time">9:18 PM – 9:28 AM +1</span>
+              </div>
+              <div class="karana-row">
+                <span class="k-dot" style="background:var(--yoga-ausp)"></span>
+                <span class="k-name">Kaulava</span>
+                <span class="k-quality">auspicious</span>
+                <span class="k-time">9:28 AM – 9:38 PM +1</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="annotations">
+        <div class="ann"><div class="ann-num">1</div><div><strong>Five Elements card</strong> is a fixed always-visible summary — no collapse. Yoga + Karana rows get a colored tint; Vara/Tithi/Nakshatra are neutral.</div></div>
+        <div class="ann"><div class="ann-num">2</div><div><strong>Yoga progress bar</strong> shows the fraction of the yoga that has elapsed — useful because yoga spans ~24h and users want to know how much is left.</div></div>
+        <div class="ann"><div class="ann-num">3</div><div><strong>Karana timeline</strong> lists every slot for the day (typically 4). Past rows dim to 38%. Active row has a colored NOW pill — same pattern as Hora screen.</div></div>
+        <div class="ann"><div class="ann-num">4</div><div>Nav icon ⊕ (or a custom "5-limb" icon) is added to the right side of TithikaNavBar. Highlighted amber when on this screen.</div></div>
+      </div>
+    </div>
+
+
+    <!-- SCREEN B: Vishti Karana active -->
+    <div class="screen">
+      <div class="screen-title">Screen 01 — B</div>
+      <div class="screen-name">Panchanga</div>
+      <div class="screen-desc">2:15 PM · Vishti (Bhadra) Karana active. Yoga (Priti) is auspicious. Vishti row gets a red tint + NOW pill. Five Elements card shows red for Karana.</div>
+      <span class="screen-badge badge-warn">vishti karana active</span>
+
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="phone-screen">
+          <div class="dawn-sky"></div>
+          <div class="status-bar"><span>2:15 PM</span><span>●●● WiFi 🔋</span></div>
+
+          <div class="app-header">
+            <div class="nav-icon">🏠</div>
+            <div class="app-title">TITHIKA</div>
+            <div class="nav-icons">
+              <div class="nav-icon" style="font-size:13px">📅</div>
+              <div class="nav-icon" style="font-size:13px">🗓</div>
+              <div class="nav-icon" style="font-size:13px">☆</div>
+              <div class="nav-icon active" style="font-size:14px">⊕</div>
+              <div class="nav-icon" style="font-size:13px">⚙</div>
+            </div>
+          </div>
+
+          <div class="page-title-bar">
+            <div class="page-title">Panchanga</div>
+            <div class="page-title-meta">Mumbai</div>
+          </div>
+
+          <div class="date-nav">
+            <button class="dnav-btn">‹</button>
+            <div>
+              <div class="dnav-dow">Friday</div>
+              <div class="dnav-date">May 29</div>
+            </div>
+            <button class="dnav-btn">›</button>
+          </div>
+
+          <div class="p-scroll">
+            <div class="p-sec">Five Elements</div>
+
+            <div class="five-card">
+              <div class="five-row">
+                <div class="five-icon">☼</div>
+                <div class="five-label">Vara</div>
+                <div class="five-body"><div class="five-name">Friday</div><div class="five-sub">Shukravara · Venus</div></div>
+                <div class="five-time">—</div>
+              </div>
+              <div class="five-row">
+                <div class="five-icon">◐</div>
+                <div class="five-label">Tithi</div>
+                <div class="five-body"><div class="five-name">Shukla Tritiya</div></div>
+                <div class="five-time">10:04 PM</div>
+              </div>
+              <div class="five-row">
+                <div class="five-icon">✦</div>
+                <div class="five-label">Nakshatra</div>
+                <div class="five-body"><div class="five-name">Ardra</div></div>
+                <div class="five-time">1:14 AM +1</div>
+              </div>
+              <!-- Yoga — auspicious -->
+              <div class="five-row yoga-ausp">
+                <div class="five-icon" style="color:var(--yoga-ausp)">⊕</div>
+                <div class="five-label">Yoga</div>
+                <div class="five-body">
+                  <div class="five-name" style="color:var(--yoga-ausp)">Priti</div>
+                  <div class="five-ql"><span class="five-qdot" style="background:var(--yoga-ausp)"></span><span class="five-qt" style="color:var(--yoga-ausp)">auspicious</span></div>
+                </div>
+                <div class="five-time">4:08 PM</div>
+              </div>
+              <!-- Karana — Vishti (inauspicious) -->
+              <div class="five-row yoga-inausp">
+                <div class="five-icon" style="color:var(--yoga-inausp)">◑</div>
+                <div class="five-label">Karana</div>
+                <div class="five-body">
+                  <div class="five-name" style="color:var(--yoga-inausp)">Vishti (Bhadra)</div>
+                  <div class="five-ql"><span class="five-qdot" style="background:var(--yoga-inausp)"></span><span class="five-qt" style="color:var(--yoga-inausp)">avoid new beginnings</span></div>
+                </div>
+                <div class="five-time" style="color:var(--yoga-inausp);font-weight:600">10:04 PM</div>
+              </div>
+            </div>
+
+            <div class="p-sec">Yoga</div>
+
+            <div class="yoga-card">
+              <div class="yoga-current" style="background:var(--yoga-ausp-bg)">
+                <div class="yoga-curr-top">
+                  <div>
+                    <div class="yoga-curr-name" style="color:var(--yoga-ausp)">Priti</div>
+                    <div class="yoga-badge">
+                      <span class="yoga-bdot" style="background:var(--yoga-ausp)"></span>
+                      <span class="yoga-btext" style="color:var(--yoga-ausp)">auspicious · yoga 2 of 27</span>
+                    </div>
+                  </div>
+                  <div class="yoga-curr-until">until 4:08 PM</div>
+                </div>
+                <div class="yoga-progress">
+                  <div class="yoga-prog-track"><div class="yoga-prog-fill" style="width:71%;background:var(--yoga-ausp)"></div></div>
+                  <div class="yoga-prog-lbl"><span>began 12:24 AM ←</span><span>→ 4:08 PM</span></div>
+                </div>
+              </div>
+              <div class="yoga-next">
+                <div class="yoga-next-lbl">Next</div>
+                <div class="yoga-next-name">Ayushman</div>
+                <div class="yoga-next-ql"><span class="yoga-next-dot" style="background:var(--yoga-ausp)"></span><span class="yoga-next-qt" style="color:var(--yoga-ausp)">auspicious</span></div>
+                <div class="yoga-next-time">from 4:08 PM</div>
+              </div>
+            </div>
+
+            <div class="p-sec">Karana</div>
+
+            <div class="karana-list">
+              <div class="karana-row past">
+                <span class="k-dot" style="background:var(--yoga-ausp)"></span>
+                <span class="k-name">Taitila</span>
+                <span class="k-quality">auspicious</span>
+                <span class="k-time">5:58 AM – 10:01 AM</span>
+              </div>
+              <div class="karana-row past">
+                <span class="k-dot" style="background:var(--yoga-ausp)"></span>
+                <span class="k-name">Garaja</span>
+                <span class="k-quality">auspicious</span>
+                <span class="k-time">10:01 AM – 10:02 PM</span>
+              </div>
+              <!-- Vishti active -->
+              <div class="karana-row active inausp">
+                <span class="k-dot" style="background:var(--yoga-inausp)"></span>
+                <span class="k-name active-inausp">Vishti (Bhadra) <span class="now-pill red">NOW</span></span>
+                <span class="k-quality" style="color:var(--yoga-inausp)">inauspicious</span>
+                <span class="k-time active-inausp">10:02 PM – 10:04 PM +1</span>
+              </div>
+              <div class="karana-row">
+                <span class="k-dot" style="background:var(--yoga-ausp)"></span>
+                <span class="k-name">Vanija</span>
+                <span class="k-quality">auspicious</span>
+                <span class="k-time">10:04 PM – 10:06 AM +2</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="annotations">
+        <div class="ann"><div class="ann-num">1</div><div>Vishti row in both the Five Elements card and the Karana list gets a <strong>red tint + red text</strong>. The Yoga row stays green — the two elements are visually independent.</div></div>
+        <div class="ann"><div class="ann-num">2</div><div>Sub-label on Vishti: <strong>"avoid new beginnings"</strong> — specific and actionable rather than just "inauspicious".</div></div>
+        <div class="ann"><div class="ann-num">3</div><div>Karana times are long (roughly 12h each) — the "+1" and "+2" suffixes signal times crossing into the next calendar day.</div></div>
+      </div>
+    </div>
+
+
+    <!-- SCREEN C: Inauspicious Yoga (Vyatipata) -->
+    <div class="screen">
+      <div class="screen-title">Screen 01 — C</div>
+      <div class="screen-name">Panchanga</div>
+      <div class="screen-desc">9:45 AM · Vyatipata Yoga active — one of the 3 most inauspicious. Yoga card gets red treatment. Karana (Kaulava) is neutral.</div>
+      <span class="screen-badge badge-warn">inauspicious yoga</span>
+
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="phone-screen">
+          <div class="dawn-sky"></div>
+          <div class="status-bar"><span>9:45 AM</span><span>●●● WiFi 🔋</span></div>
+
+          <div class="app-header">
+            <div class="nav-icon">🏠</div>
+            <div class="app-title">TITHIKA</div>
+            <div class="nav-icons">
+              <div class="nav-icon" style="font-size:13px">📅</div>
+              <div class="nav-icon" style="font-size:13px">🗓</div>
+              <div class="nav-icon" style="font-size:13px">☆</div>
+              <div class="nav-icon active" style="font-size:14px">⊕</div>
+              <div class="nav-icon" style="font-size:13px">⚙</div>
+            </div>
+          </div>
+
+          <div class="page-title-bar">
+            <div class="page-title">Panchanga</div>
+            <div class="page-title-meta">Mumbai</div>
+          </div>
+
+          <div class="date-nav">
+            <button class="dnav-btn">‹</button>
+            <div>
+              <div class="dnav-dow">Monday</div>
+              <div class="dnav-date">Jun 8</div>
+            </div>
+            <button class="dnav-btn">›</button>
+          </div>
+
+          <div class="p-scroll">
+            <div class="p-sec">Five Elements</div>
+
+            <div class="five-card">
+              <div class="five-row">
+                <div class="five-icon">☼</div>
+                <div class="five-label">Vara</div>
+                <div class="five-body"><div class="five-name">Monday</div><div class="five-sub">Somavara · Moon</div></div>
+                <div class="five-time">—</div>
+              </div>
+              <div class="five-row">
+                <div class="five-icon">◐</div>
+                <div class="five-label">Tithi</div>
+                <div class="five-body"><div class="five-name">Shukla Chaturdashi</div></div>
+                <div class="five-time">7:55 AM +1</div>
+              </div>
+              <div class="five-row">
+                <div class="five-icon">✦</div>
+                <div class="five-label">Nakshatra</div>
+                <div class="five-body"><div class="five-name">Anuradha</div></div>
+                <div class="five-time">8:22 PM</div>
+              </div>
+              <!-- Yoga — inauspicious -->
+              <div class="five-row yoga-inausp">
+                <div class="five-icon" style="color:var(--yoga-inausp)">⊕</div>
+                <div class="five-label">Yoga</div>
+                <div class="five-body">
+                  <div class="five-name" style="color:var(--yoga-inausp)">Vyatipata</div>
+                  <div class="five-ql"><span class="five-qdot" style="background:var(--yoga-inausp)"></span><span class="five-qt" style="color:var(--yoga-inausp)">inauspicious</span></div>
+                </div>
+                <div class="five-time" style="color:var(--yoga-inausp);font-weight:600">2:14 PM</div>
+              </div>
+              <!-- Karana — neutral -->
+              <div class="five-row">
+                <div class="five-icon">◑</div>
+                <div class="five-label">Karana</div>
+                <div class="five-body">
+                  <div class="five-name">Kaulava</div>
+                  <div class="five-ql"><span class="five-qdot" style="background:var(--yoga-neutral)"></span><span class="five-qt" style="color:var(--yoga-neutral)">neutral</span></div>
+                </div>
+                <div class="five-time">7:55 AM</div>
+              </div>
+            </div>
+
+            <div class="p-sec">Yoga</div>
+
+            <!-- Yoga card — inauspicious -->
+            <div class="yoga-card">
+              <div class="yoga-current" style="background:var(--yoga-inausp-bg)">
+                <div class="yoga-curr-top">
+                  <div>
+                    <div class="yoga-curr-name" style="color:var(--yoga-inausp)">Vyatipata</div>
+                    <div class="yoga-badge">
+                      <span class="yoga-bdot" style="background:var(--yoga-inausp)"></span>
+                      <span class="yoga-btext" style="color:var(--yoga-inausp)">inauspicious · yoga 17 of 27</span>
+                    </div>
+                  </div>
+                  <div class="yoga-curr-until">until 2:14 PM</div>
+                </div>
+                <div class="yoga-progress">
+                  <div class="yoga-prog-track"><div class="yoga-prog-fill" style="width:28%;background:var(--yoga-inausp)"></div></div>
+                  <div class="yoga-prog-lbl"><span>began 2:18 AM ←</span><span>→ 2:14 PM</span></div>
+                </div>
+              </div>
+              <div class="yoga-next">
+                <div class="yoga-next-lbl">Next</div>
+                <div class="yoga-next-name">Variyana</div>
+                <div class="yoga-next-ql"><span class="yoga-next-dot" style="background:var(--yoga-ausp)"></span><span class="yoga-next-qt" style="color:var(--yoga-ausp)">auspicious</span></div>
+                <div class="yoga-next-time">from 2:14 PM</div>
+              </div>
+            </div>
+
+            <div class="p-sec">Karana</div>
+
+            <div class="karana-list">
+              <div class="karana-row past">
+                <span class="k-dot" style="background:var(--yoga-ausp)"></span>
+                <span class="k-name">Taitila</span>
+                <span class="k-quality">auspicious</span>
+                <span class="k-time">5:56 AM – 7:55 AM</span>
+              </div>
+              <div class="karana-row active">
+                <span class="k-dot" style="background:var(--yoga-neutral)"></span>
+                <span class="k-name" style="color:var(--lm-shukla)">Kaulava <span class="now-pill green">NOW</span></span>
+                <span class="k-quality" style="color:var(--yoga-neutral)">neutral</span>
+                <span class="k-time" style="color:var(--lm-shukla);font-weight:600">7:55 AM – 7:55 PM</span>
+              </div>
+              <div class="karana-row">
+                <span class="k-dot" style="background:var(--yoga-inausp)"></span>
+                <span class="k-name">Vishti (Bhadra)</span>
+                <span class="k-quality" style="color:var(--yoga-inausp)">inauspicious</span>
+                <span class="k-time">7:55 PM – 7:55 AM +1</span>
+              </div>
+              <div class="karana-row">
+                <span class="k-dot" style="background:var(--yoga-ausp)"></span>
+                <span class="k-name">Vanija</span>
+                <span class="k-quality">auspicious</span>
+                <span class="k-time">7:55 AM – 7:55 PM +1</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="annotations">
+        <div class="ann"><div class="ann-num">1</div><div>The Yoga card turns red for inauspicious yogas — background tint, name color, progress bar fill, quality badge all use <strong>#B84040</strong>.</div></div>
+        <div class="ann"><div class="ann-num">2</div><div>Upcoming Vishti in the Karana list renders in red text (but no tint — it's not active yet). Becomes active-red only when NOW.</div></div>
+        <div class="ann"><div class="ann-num">3</div><div>Neutral karanas (Kaulava here) use amber for the active NOW pill, not green — consistent with the "active but not auspicious" signal in the Choghadiya screen.</div></div>
+      </div>
+    </div>
+
+  </div><!-- /grid -->
+
+
+  <!-- ═══════════════════════════════════════════
+       SECTION 2 — Design notes + open questions
+  ═══════════════════════════════════════════ -->
+  <div class="section-header">
+    <h2>Section 2 — Design notes</h2>
+  </div>
+
+  <div class="note-panel">
+    <h3>Why no separate Yoga timeline?</h3>
+    <p>Yoga changes roughly once per day (~every 24 hours), so there is no need for a multi-row timeline like Karana or Choghadiya. A single "current + next" two-row card is sufficient. The progress bar fills the role that a timeline would fill for a faster-changing element.</p>
+
+    <h3>Karana vs Choghadiya — why list all karanas even if they span into tomorrow?</h3>
+    <p>Each karana is ~12 hours long. A sunrise-to-next-sunrise day typically overlaps with <strong>4 karanas</strong>. Showing all 4 gives the user a complete picture of what's coming. Rows that extend past midnight use a <em>"+1"</em> suffix on the end time — same convention already used on the Hora screen.</p>
+
+    <h3>Nav icon choice</h3>
+    <p>The current nav bar right side has 4 icons (festivals, month, hora/muhurta, settings). Adding a 5th requires either <strong>(a)</strong> making the icons slightly smaller, or <strong>(b)</strong> moving one feature behind a long-press / secondary sheet. Recommended: use <em>⊕</em> (circled plus — evokes "the five additions") at the same size, or replace the ☆ (hora/muhurta bookmark) with a menu that opens a bottom sheet listing Hora, Muhurta, and Panchanga. Open question for UX review.</p>
+
+    <h3>Day View — zero changes needed</h3>
+    <p>Option C means the Day View is <strong>untouched</strong>. Yoga and Karana are only visible when the user deliberately navigates to the Panchanga screen. This is the right trade-off if the primary user need is "quick daily overview" rather than "deep panchanga consultation".</p>
+  </div>
+
+</main>
+</body>
+</html>

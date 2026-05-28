@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tithika — Wireframes v4 (Muhurta · Phase 3a)</title>
+<style>
+  :root {
+    --bg-page:   #0a0a14;
+    --bg-panel:  #11132a;
+    --line-page: rgba(255,255,255,0.08);
+    --ink-page:  #f3eedf;
+    --ink-page-soft: #aab0c5;
+    --ink-page-muted: #6c7290;
+
+    --lm-bg:          #F5F0E8;
+    --lm-panel:       #EDE8D8;
+    --lm-ink:         #1A1F3C;
+    --lm-ink-soft:    #4A5070;
+    --lm-ink-muted:   #8890A8;
+    --lm-line:        rgba(0,0,0,0.08);
+    --lm-line-strong: rgba(0,0,0,0.15);
+    --lm-shukla:      #C8922A;
+    --lm-shukla-bg:   rgba(200,146,42,0.08);
+    --lm-krishna:     #5A6BD8;
+    --lm-festival:    #D46A1E;
+    --lm-moon-light:  #F7F2DC;
+    --lm-moon-dark:   #1C2147;
+    --lm-border-phone:#C4BBAB;
+
+    --mu-auspicious:  #C8922A;
+    --mu-ausp-bg:     rgba(200,146,42,0.07);
+    --mu-warn:        #B84040;
+    --mu-warn-bg:     rgba(184,64,64,0.06);
+    --mu-neutral-bar: rgba(136,144,168,0.35);
+
+    --chog-amrit: #2A8A5A;
+    --chog-shubh: #C8922A;
+    --chog-labh:  #5A6BD8;
+    --chog-char:  #8890A8;
+    --chog-udveg: #B84040;
+    --chog-kaal:  #7A4080;
+    --chog-rog:   #B84040;
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg-page); color: var(--ink-page);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  header { padding: 40px 40px 16px; border-bottom: 1px solid var(--line-page); }
+  header h1 { margin: 0 0 6px; font-size: 28px; font-weight: 700; letter-spacing: -0.02em; }
+  header .subtitle { color: var(--ink-page-soft); font-size: 15px; margin: 0; }
+  header .meta { color: var(--ink-page-muted); font-size: 13px; margin-top: 10px; }
+  main { padding: 32px 40px 80px; }
+
+  .legend {
+    display: flex; gap: 20px; flex-wrap: wrap;
+    padding: 14px 18px; background: var(--bg-panel);
+    border: 1px solid var(--line-page); border-radius: 10px; margin-bottom: 48px;
+    font-size: 13px; color: var(--ink-page-soft);
+  }
+  .legend-item { display: flex; align-items: center; gap: 7px; }
+  .legend-swatch { width: 14px; height: 14px; border-radius: 3px; }
+
+  .section-header { margin: 0 0 24px; padding-bottom: 12px; border-bottom: 1px solid var(--line-page); }
+  .section-header h2 { margin: 0 0 4px; font-size: 20px; font-weight: 700; }
+  .section-header p { margin: 0; font-size: 13px; color: var(--ink-page-soft); line-height: 1.5; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 56px 40px; max-width: 1600px; margin: 0 auto 72px;
+  }
+
+  .screen { display: flex; flex-direction: column; align-items: center; }
+  .screen-title { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-page-muted); margin-bottom: 4px; }
+  .screen-name { font-size: 20px; font-weight: 700; margin: 0 0 4px; }
+  .screen-desc { font-size: 13px; color: var(--ink-page-soft); text-align: center; max-width: 295px; margin: 0 0 14px; line-height: 1.45; }
+  .screen-badge { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 8px; border-radius: 5px; margin-bottom: 14px; }
+  .badge-new      { background: rgba(200,146,42,0.18); color: #C8922A; }
+  .badge-existing { background: rgba(255,255,255,0.06); color: var(--ink-page-muted); }
+  .badge-updated  { background: rgba(90,107,216,0.18); color: #8A9AE8; }
+
+  /* Phone frame */
+  .phone {
+    width: 320px; height: 690px;
+    background: var(--lm-bg);
+    border: 9px solid var(--lm-border-phone);
+    border-radius: 38px; position: relative; overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.55), 0 0 0 1px rgba(0,0,0,0.15);
+  }
+  .notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 110px; height: 22px; background: var(--lm-border-phone); border-radius: 0 0 14px 14px; z-index: 50; }
+  .phone-screen { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; }
+
+  /* Dawn sky */
+  .dawn-sky {
+    position: absolute; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse 120px 40px at 20% 18%, rgba(255,200,120,0.12), transparent 70%),
+      radial-gradient(ellipse 80px 30px at 75% 12%, rgba(255,180,100,0.10), transparent 70%),
+      radial-gradient(0.8px 0.8px at 34% 15%, rgba(30,25,50,0.07), transparent 60%),
+      radial-gradient(0.8px 0.8px at 78% 20%, rgba(30,25,50,0.08), transparent 60%),
+      linear-gradient(180deg, #F0DFB8 0%, #F3E8CE 25%, #F5EEE2 55%, #F5F0E8 100%);
+  }
+
+  /* ── SHARED NAV BAR (identical on every screen) ── */
+  .app-header {
+    position: relative; z-index: 2;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 4px 14px 8px;
+    border-bottom: 1px solid var(--lm-line);
+    background: rgba(245,240,232,0.94);
+  }
+  .app-header .icon { width: 28px; height: 28px; display: grid; place-items: center; color: var(--lm-ink-soft); font-size: 16px; cursor: pointer; }
+  .app-header .app-title { font-weight: 700; color: var(--lm-ink); font-size: 13px; letter-spacing: 0.06em; }
+  .app-header .nav-icons { display: flex; gap: 2px; }
+
+  .status-bar {
+    position: relative; z-index: 2;
+    display: flex; justify-content: space-between; align-items: flex-end;
+    height: 32px; padding: 6px 22px 0;
+    font-size: 11px; font-weight: 600; color: var(--lm-ink-soft);
+  }
+
+  /* ── PAGE TITLE BAR — sits directly under nav, above date strip ── */
+  .page-title-bar {
+    position: relative; z-index: 2;
+    padding: 9px 14px 8px;
+    border-bottom: 1px solid var(--lm-line);
+    background: rgba(245,240,232,0.94);
+    display: flex; align-items: baseline; justify-content: space-between;
+  }
+  .page-title { font-size: 19px; font-weight: 700; color: var(--lm-ink); letter-spacing: -0.01em; }
+  .page-title-meta { font-size: 10px; color: var(--lm-ink-muted); }
+
+  /* Date nav strip */
+  .date-nav-strip {
+    position: relative; z-index: 2;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 14px;
+    border-bottom: 1px solid var(--lm-line);
+    background: var(--lm-panel);
+  }
+  .dnav-btn { background: none; border: none; color: var(--lm-ink-muted); font-size: 17px; cursor: pointer; padding: 0 4px; }
+  .dnav-center { text-align: center; }
+  .dnav-dow { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--lm-ink-muted); }
+  .dnav-date { font-size: 13px; font-weight: 700; color: var(--lm-ink); }
+
+  /* ── Day view elements ── */
+  .day-scroll { flex: 1; overflow: hidden; position: relative; z-index: 1; padding: 8px 12px; display: flex; flex-direction: column; gap: 5px; }
+
+  .moon-wrap { display: flex; justify-content: center; margin: 2px 0 4px; }
+  .moon-face { width: 68px; height: 68px; border-radius: 50%; background: var(--lm-moon-light); position: relative; overflow: hidden; box-shadow: 0 0 0 1px rgba(0,0,0,0.10), 0 0 14px rgba(200,146,42,0.20); }
+  .moon-shadow { position: absolute; top: 0; right: 0; width: 50%; height: 100%; background: var(--lm-moon-dark); border-radius: 0 34px 34px 0; }
+  .moon-shadow.gibbous { width: 20%; }
+
+  .tithi-card { background: var(--lm-panel); border: 1px solid var(--lm-line); border-radius: 10px; padding: 10px 12px 8px; position: relative; }
+  .tithi-card-bar { position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: 10px 10px 0 0; background: var(--lm-shukla); }
+  .tithi-label { font-size: 9px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase; color: var(--lm-shukla); margin-bottom: 2px; }
+  .tithi-name { font-size: 15px; font-weight: 700; color: var(--lm-ink); }
+  .tithi-until { font-size: 10px; color: var(--lm-ink-soft); margin-top: 2px; }
+  .tithi-until strong { color: var(--lm-ink); font-weight: 600; }
+
+  .detail-row { background: var(--lm-panel); border: 1px solid var(--lm-line); border-radius: 8px; padding: 6px 10px; display: flex; align-items: center; justify-content: space-between; }
+  .dlbl { font-size: 9px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--lm-ink-muted); }
+  .dval { font-size: 11px; font-weight: 600; color: var(--lm-ink); }
+  .dval small { color: var(--lm-ink-soft); font-weight: 500; font-size: 10px; }
+
+  .sun-moon-card { background: var(--lm-panel); border: 1px solid var(--lm-line); border-radius: 8px; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; overflow: hidden; }
+  .smc { padding: 7px 10px; }
+  .smc:nth-child(odd)  { border-right: 1px solid var(--lm-line); }
+  .smc:nth-child(3), .smc:nth-child(4) { border-top: 1px solid var(--lm-line); }
+  .smc-label { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--lm-ink-muted); }
+  .smc-time  { font-size: 12px; font-weight: 700; color: var(--lm-ink); }
+
+  .hora-card { background: var(--lm-panel); border: 1px solid var(--lm-line); border-left: 3px solid #E8A030; border-radius: 8px; padding: 7px 10px; display: flex; align-items: center; justify-content: space-between; }
+  .hora-card-left { display: flex; align-items: center; gap: 8px; }
+  .hora-glyph { font-size: 17px; color: var(--lm-shukla); }
+  .hora-planet { font-size: 12px; font-weight: 700; color: var(--lm-ink); }
+  .hora-sub { font-size: 10px; color: var(--lm-ink-muted); }
+  .hora-until { font-size: 10px; color: var(--lm-ink-soft); }
+  .chevron { font-size: 12px; color: var(--lm-ink-muted); margin-left: 4px; }
+
+  /* ── MUHURTA CARD — Option C, always two rows ── */
+  .mu-card {
+    background: var(--lm-panel);
+    border: 1px solid var(--lm-line);
+    border-left: 3px solid var(--mu-auspicious);
+    border-radius: 8px; padding: 8px 10px; cursor: pointer;
+  }
+  .mu-card.warn { border-left-color: var(--mu-warn); background: var(--mu-warn-bg); }
+
+  .mu-card-hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 7px; }
+  .mu-card-title { font-size: 9px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase; color: var(--lm-ink-muted); }
+  .mu-card-chev  { font-size: 12px; color: var(--lm-ink-muted); }
+
+  .amb-row { display: flex; align-items: center; gap: 9px; padding: 4px 0; }
+  .amb-row + .amb-row { border-top: 1px solid var(--lm-line); margin-top: 5px; padding-top: 9px; }
+  .amb-bar { width: 3px; border-radius: 2px; flex-shrink: 0; align-self: stretch; min-height: 28px; }
+  .amb-bar.gold  { background: var(--mu-auspicious); }
+  .amb-bar.red   { background: var(--mu-warn); }
+  .amb-bar.muted { background: var(--mu-neutral-bar); }
+  .amb-body { flex: 1; }
+  .amb-name { font-size: 12px; font-weight: 700; color: var(--lm-ink); }
+  .amb-name.gold { color: var(--mu-auspicious); }
+  .amb-name.red  { color: var(--mu-warn); }
+  .amb-sub  { font-size: 9px; color: var(--lm-ink-muted); margin-top: 1px; }
+  .amb-right { text-align: right; flex-shrink: 0; }
+  .amb-time { font-size: 10px; color: var(--lm-ink-soft); }
+  .amb-time.red  { color: var(--mu-warn); font-weight: 600; }
+  .now-pill { display: inline-block; font-size: 8px; font-weight: 700; letter-spacing: 0.03em; padding: 1px 5px; border-radius: 3px; margin-left: 4px; vertical-align: middle; }
+  .now-pill.amber { background: var(--lm-shukla); color: white; }
+  .now-pill.red   { background: var(--mu-warn);   color: white; }
+
+  /* 4-day strip */
+  .day-strip { border-top: 1px solid var(--lm-line); display: grid; grid-template-columns: repeat(4, 1fr); background: var(--lm-panel); position: relative; z-index: 2; flex-shrink: 0; }
+  .day-cell { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 7px 4px; border-right: 1px solid var(--lm-line); }
+  .day-cell:last-child { border-right: none; }
+  .day-cell.today { background: var(--lm-shukla-bg); box-shadow: inset 0 3px 0 var(--lm-shukla); }
+  .day-wk   { font-size: 9px; color: var(--lm-ink-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+  .day-greg { font-size: 16px; font-weight: 700; color: var(--lm-ink); }
+  .day-cell.today .day-greg { color: var(--lm-shukla); }
+  .day-tithi { font-size: 9px; color: var(--lm-ink-soft); display: flex; align-items: center; gap: 3px; }
+  .pdot { width: 5px; height: 5px; border-radius: 50%; }
+  .pdot.s { background: var(--lm-shukla); } .pdot.k { background: var(--lm-krishna); }
+  .fest-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--lm-festival); margin-top: 1px; }
+
+  /* ── MUHURTA SCREEN internals ── */
+  .mu-scroll { flex: 1; overflow: hidden; position: relative; z-index: 1; padding: 8px 10px; display: flex; flex-direction: column; gap: 2px; }
+
+  .mu-sec-label { font-size: 9px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase; color: var(--lm-ink-muted); margin: 8px 2px 5px; }
+  .mu-sec-label:first-child { margin-top: 2px; }
+
+  /* Auspicious rows */
+  .mu-ausp-row { background: var(--lm-panel); border: 1px solid var(--lm-line); border-left: 3px solid var(--mu-auspicious); border-radius: 8px; padding: 8px 10px; display: flex; align-items: center; gap: 10px; margin-bottom: 3px; }
+  .mu-ausp-row.past    { opacity: 0.38; }
+  .mu-ausp-row.dimmed  { opacity: 0.45; border-left-color: var(--lm-ink-muted); }
+  .mu-ausp-icon { font-size: 15px; color: var(--mu-auspicious); width: 18px; text-align: center; flex-shrink: 0; }
+  .mu-ausp-icon.dim { color: var(--lm-ink-muted); }
+  .mu-ausp-name { font-size: 12px; font-weight: 700; color: var(--lm-ink); }
+  .mu-ausp-sub  { font-size: 10px; color: var(--lm-ink-muted); margin-top: 1px; }
+  .mu-ausp-time { font-size: 11px; color: var(--lm-ink-soft); margin-left: auto; text-align: right; white-space: nowrap; flex-shrink: 0; }
+  .mu-ausp-time.dim { color: var(--lm-ink-muted); font-style: italic; }
+
+  /* Inauspicious block */
+  .mu-inausp-block { background: var(--lm-panel); border: 1px solid var(--lm-line); border-radius: 8px; overflow: hidden; margin-bottom: 3px; }
+  .mu-inausp-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-bottom: 1px solid var(--lm-line); }
+  .mu-inausp-row:last-child { border-bottom: none; }
+  .mu-inausp-row.active { background: var(--mu-warn-bg); }
+  .mu-inausp-row.past   { opacity: 0.38; }
+  .mu-warn-icon { font-size: 14px; color: var(--mu-warn); width: 18px; text-align: center; flex-shrink: 0; }
+  .mu-inausp-name { font-size: 12px; font-weight: 700; color: var(--lm-ink); flex: 1; }
+  .mu-inausp-name.active { color: var(--mu-warn); }
+  .mu-inausp-time { font-size: 10px; color: var(--lm-ink-soft); text-align: right; white-space: nowrap; }
+  .mu-inausp-time.active { color: var(--mu-warn); font-weight: 600; }
+
+  /* Choghadiya list */
+  .chog-list { background: var(--lm-panel); border: 1px solid var(--lm-line); border-radius: 8px; overflow: hidden; margin-bottom: 3px; }
+  .chog-row { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-bottom: 1px solid var(--lm-line); font-size: 11px; }
+  .chog-row:last-child { border-bottom: none; }
+  .chog-row.active { background: var(--lm-shukla-bg); }
+  .chog-row.active.warn { background: var(--mu-warn-bg); }
+  .chog-row.past { opacity: 0.38; }
+  .chog-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .chog-name { font-weight: 700; color: var(--lm-ink); flex: 1; }
+  .chog-name.active-amber { color: var(--lm-shukla); }
+  .chog-name.active-warn  { color: var(--mu-warn); }
+  .chog-quality { font-size: 9px; color: var(--lm-ink-muted); }
+  .chog-time { font-size: 10px; color: var(--lm-ink-soft); text-align: right; white-space: nowrap; }
+  .chog-time.active-amber { color: var(--lm-shukla); font-weight: 600; }
+  .chog-time.active-warn  { color: var(--mu-warn); font-weight: 600; }
+  .chog-now { display: inline-block; font-size: 8px; font-weight: 700; padding: 1px 5px; border-radius: 3px; margin-left: 4px; vertical-align: middle; }
+  .chog-now.amber { background: var(--lm-shukla); color: white; }
+  .chog-now.red   { background: var(--mu-warn); color: white; }
+
+  /* Night Choghadiya — collapsed row */
+  .night-chog-collapsed {
+    background: var(--lm-panel);
+    border: 1px solid var(--lm-line);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 12px;
+    cursor: pointer; margin-bottom: 3px;
+  }
+  .night-chog-label { display: flex; align-items: center; gap: 8px; }
+  .night-chog-name  { font-size: 12px; font-weight: 700; color: var(--lm-ink); }
+  .night-chog-sub   { font-size: 10px; color: var(--lm-ink-muted); }
+  .night-chog-expand { font-size: 11px; color: var(--lm-ink-muted); }
+
+  /* ── FESTIVALS SCREEN ── */
+  .fest-scroll { flex: 1; overflow: hidden; position: relative; z-index: 1; padding: 8px 10px; }
+  .fest-month-label { font-size: 10px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase; color: var(--lm-shukla); margin: 8px 2px 5px; }
+  .fest-card { background: var(--lm-panel); border: 1px solid var(--lm-line); border-left: 3px solid var(--lm-festival); border-radius: 8px; padding: 8px 10px; margin-bottom: 4px; }
+  .fest-card-name { font-size: 13px; font-weight: 700; color: var(--lm-ink); }
+  .fest-card-sub  { font-size: 10px; color: var(--lm-ink-muted); margin-top: 2px; }
+  .fest-card-date { font-size: 10px; font-weight: 600; color: var(--lm-ink-soft); margin-top: 1px; }
+
+  /* ── Annotation panels ── */
+  .annotations { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; max-width: 295px; }
+  .ann { display: flex; gap: 9px; align-items: flex-start; font-size: 12px; color: var(--ink-page-soft); line-height: 1.45; }
+  .ann-num { width: 18px; height: 18px; flex-shrink: 0; background: var(--bg-panel); border: 1px solid var(--line-page); border-radius: 50%; display: grid; place-items: center; font-size: 10px; font-weight: 700; color: var(--lm-shukla); }
+  .ann strong { color: var(--ink-page); }
+
+  /* ── Localization panel ── */
+  .l10n-panel {
+    background: var(--bg-panel); border: 1px solid var(--line-page);
+    border-radius: 12px; padding: 24px 28px; margin-top: 0;
+  }
+  .l10n-panel h3 { margin: 0 0 6px; font-size: 16px; font-weight: 700; color: var(--ink-page); }
+  .l10n-panel p  { margin: 0 0 20px; font-size: 13px; color: var(--ink-page-soft); line-height: 1.5; }
+  .l10n-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .l10n-table th { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-page-muted); padding: 0 12px 8px 0; text-align: left; border-bottom: 1px solid var(--line-page); }
+  .l10n-table td { padding: 8px 12px 8px 0; color: var(--ink-page-soft); border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: top; line-height: 1.5; }
+  .l10n-table td:first-child { color: var(--ink-page); font-weight: 600; white-space: nowrap; }
+  .l10n-tag { display: inline-block; font-size: 9px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; margin-bottom: 4px; }
+  .l10n-tag.new     { background: rgba(200,146,42,0.18); color: #C8922A; }
+  .l10n-tag.updated { background: rgba(90,107,216,0.18); color: #8A9AE8; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Tithika — Phase 3a Muhurta</h1>
+  <p class="subtitle">Wireframes v4 · Warm Parchment palette · Updated nav consistency · Option C card</p>
+  <p class="meta">v4.1 · 2026-05-25 · Top nav unchanged across all screens · Page title below nav · Always two card rows · Night Choghadiya collapsed · Abhijit greyed on Wednesday</p>
+</header>
+
+<main>
+
+  <div class="legend">
+    <div class="legend-item"><span class="legend-swatch" style="background:#F5F0E8;border:1px solid rgba(0,0,0,0.15)"></span> Background</div>
+    <div class="legend-item"><span class="legend-swatch" style="background:#EDE8D8;border:1px solid rgba(0,0,0,0.12)"></span> Panel</div>
+    <div class="legend-item"><span class="legend-swatch" style="background:#1A1F3C"></span> Ink</div>
+    <div class="legend-item"><span class="legend-swatch" style="background:#C8922A"></span> Amber · Auspicious</div>
+    <div class="legend-item"><span class="legend-swatch" style="background:#2A8A5A"></span> Green · Amrit</div>
+    <div class="legend-item"><span class="legend-swatch" style="background:#5A6BD8"></span> Blue · Labh</div>
+    <div class="legend-item"><span class="legend-swatch" style="background:#B84040"></span> Red · Inauspicious</div>
+    <div class="legend-item"><span class="legend-swatch" style="background:#7A4080"></span> Purple · Kaal</div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════
+       ROW 1 — DAY VIEW (two states)
+  ═══════════════════════════════════════════ -->
+  <div class="section-header">
+    <h2>Day View — Muhurta card (always two rows)</h2>
+    <p>Card sits below Hora. Row 1 = current Choghadiya. Row 2 = next inauspicious period (always visible regardless of how far away it is, so card height is stable on scroll).</p>
+  </div>
+
+  <div class="grid">
+
+    <!-- STATE A: Auspicious + Rahu upcoming -->
+    <div class="screen">
+      <div class="screen-title">Screen 01 — A</div>
+      <div class="screen-name">Day View</div>
+      <div class="screen-desc">11:40 AM · in an auspicious Labh Choghadiya. Rahu Kaal is 18 min away — second row surfaces the early warning.</div>
+      <span class="screen-badge badge-existing">existing + new card</span>
+
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="phone-screen">
+          <div class="dawn-sky"></div>
+          <div class="status-bar"><span>11:40 AM</span><span>●●● WiFi 🔋</span></div>
+
+          <div class="app-header">
+            <div class="icon">🏠</div>
+            <div class="app-title">TITHIKA</div>
+            <div class="nav-icons">
+              <div class="icon" style="font-size:14px">📅</div>
+              <div class="icon" style="font-size:14px">🗓</div>
+              <div class="icon" style="font-size:14px">☆</div>
+              <div class="icon" style="font-size:14px">⚙</div>
+            </div>
+          </div>
+
+          <div class="day-scroll">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
+              <button style="background:none;border:none;font-size:17px;color:var(--lm-ink-muted);cursor:pointer">‹</button>
+              <div style="text-align:center">
+                <div style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--lm-ink-muted)">Thursday</div>
+                <div style="font-size:14px;font-weight:700;color:var(--lm-ink)">21 May 2026</div>
+                <div style="font-size:10px;font-weight:600;color:var(--lm-shukla);letter-spacing:0.05em;text-transform:uppercase">Vaishakha · Shukla</div>
+              </div>
+              <button style="background:none;border:none;font-size:17px;color:var(--lm-ink-muted);cursor:pointer">›</button>
+            </div>
+            <div class="moon-wrap"><div class="moon-face"><div class="moon-shadow gibbous"></div></div></div>
+            <div class="tithi-card">
+              <div class="tithi-card-bar"></div>
+              <div class="tithi-label">Shukla · Vaishakha</div>
+              <div class="tithi-name">Trayodashi</div>
+              <div class="tithi-until">until <strong>8:42 PM</strong></div>
+            </div>
+            <div class="detail-row">
+              <div><div class="dlbl">Nakshatra</div><div class="dval">Uttara Phalguni <small>until 6:15 AM</small></div></div>
+            </div>
+            <div class="sun-moon-card">
+              <div class="smc"><div class="smc-label">☀ Sunrise</div><div class="smc-time">6:02 AM</div></div>
+              <div class="smc"><div class="smc-label">Sunset ☀</div><div class="smc-time">7:48 PM</div></div>
+              <div class="smc"><div class="smc-label">☽ Moonrise</div><div class="smc-time">10:24 PM</div></div>
+              <div class="smc"><div class="smc-label">Moonset ☽</div><div class="smc-time">9:58 AM</div></div>
+            </div>
+            <div class="hora-card">
+              <div class="hora-card-left">
+                <div class="hora-glyph">☿</div>
+                <div><div class="hora-planet">Mercury Hora</div><div class="hora-sub">Hour 4 · Day</div></div>
+              </div>
+              <div style="display:flex;align-items:center"><div class="hora-until">until 1:30 PM</div><span class="chevron">›</span></div>
+            </div>
+
+            <!-- MUHURTA CARD — always two rows -->
+            <div class="mu-card">
+              <div class="mu-card-hd">
+                <div class="mu-card-title">Muhurta</div>
+                <span class="mu-card-chev">›</span>
+              </div>
+              <div class="amb-row">
+                <div class="amb-bar gold"></div>
+                <div class="amb-body">
+                  <div class="amb-name gold">Labh Choghadiya</div>
+                  <div class="amb-sub">profitable · day 4 of 8</div>
+                </div>
+                <div class="amb-right"><div class="amb-time">until 1:30 PM</div></div>
+              </div>
+              <div class="amb-row">
+                <div class="amb-bar red"></div>
+                <div class="amb-body">
+                  <div class="amb-name red">Rahu Kaal upcoming</div>
+                  <div class="amb-sub">avoid starting new work</div>
+                </div>
+                <div class="amb-right"><div class="amb-time red">in 18 min</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="day-strip">
+            <div class="day-cell"><div class="day-wk">Wed</div><div class="day-greg">20</div><div class="day-tithi"><span class="pdot s"></span>12</div></div>
+            <div class="day-cell today"><div class="day-wk">Thu</div><div class="day-greg">21</div><div class="day-tithi"><span class="pdot s"></span>13</div></div>
+            <div class="day-cell"><div class="day-wk">Fri</div><div class="day-greg">22</div><div class="day-tithi"><span class="pdot s"></span>14</div></div>
+            <div class="day-cell"><div class="day-wk">Sat</div><div class="day-greg">23</div><div class="day-tithi"><span class="pdot s"></span>15</div><div class="fest-dot"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="annotations">
+        <div class="ann"><div class="ann-num">1</div><div>Row 2 always visible — shows the next inauspicious period even if hours away. Keeps card height <strong>stable while scrolling</strong>.</div></div>
+        <div class="ann"><div class="ann-num">2</div><div><strong>Amber left border</strong> = currently auspicious. Flips red only when the current Choghadiya itself is inauspicious.</div></div>
+        <div class="ann"><div class="ann-num">3</div><div>When Rahu is &gt;30 min away the row 2 time shows a <strong>plain clock time</strong> (e.g. "1:30 PM") not the "in X min" urgency format.</div></div>
+      </div>
+    </div>
+
+
+    <!-- STATE B: Rahu active -->
+    <div class="screen">
+      <div class="screen-title">Screen 01 — B</div>
+      <div class="screen-name">Day View</div>
+      <div class="screen-desc">1:47 PM · Rahu Kaal active. Card border and both rows flip red. Next good window (Amrit) shown as the "escape route".</div>
+      <span class="screen-badge badge-new">rahu active state</span>
+
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="phone-screen">
+          <div class="dawn-sky"></div>
+          <div class="status-bar"><span>1:47 PM</span><span>●●● WiFi 🔋</span></div>
+          <div class="app-header">
+            <div class="icon">🏠</div>
+            <div class="app-title">TITHIKA</div>
+            <div class="nav-icons">
+              <div class="icon" style="font-size:14px">📅</div>
+              <div class="icon" style="font-size:14px">🗓</div>
+              <div class="icon" style="font-size:14px">☆</div>
+              <div class="icon" style="font-size:14px">⚙</div>
+            </div>
+          </div>
+          <div class="day-scroll">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
+              <button style="background:none;border:none;font-size:17px;color:var(--lm-ink-muted)">‹</button>
+              <div style="text-align:center">
+                <div style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--lm-ink-muted)">Thursday</div>
+                <div style="font-size:14px;font-weight:700;color:var(--lm-ink)">21 May 2026</div>
+                <div style="font-size:10px;font-weight:600;color:var(--lm-shukla);letter-spacing:0.05em;text-transform:uppercase">Vaishakha · Shukla</div>
+              </div>
+              <button style="background:none;border:none;font-size:17px;color:var(--lm-ink-muted)">›</button>
+            </div>
+            <div class="moon-wrap"><div class="moon-face"><div class="moon-shadow gibbous"></div></div></div>
+            <div class="tithi-card">
+              <div class="tithi-card-bar"></div>
+              <div class="tithi-label">Shukla · Vaishakha</div>
+              <div class="tithi-name">Trayodashi</div>
+              <div class="tithi-until">until <strong>8:42 PM</strong></div>
+            </div>
+            <div class="detail-row">
+              <div><div class="dlbl">Nakshatra</div><div class="dval">Uttara Phalguni <small>until 6:15 AM</small></div></div>
+            </div>
+            <div class="sun-moon-card">
+              <div class="smc"><div class="smc-label">☀ Sunrise</div><div class="smc-time">6:02 AM</div></div>
+              <div class="smc"><div class="smc-label">Sunset ☀</div><div class="smc-time">7:48 PM</div></div>
+              <div class="smc"><div class="smc-label">☽ Moonrise</div><div class="smc-time">10:24 PM</div></div>
+              <div class="smc"><div class="smc-label">Moonset ☽</div><div class="smc-time">9:58 AM</div></div>
+            </div>
+            <div class="hora-card">
+              <div class="hora-card-left">
+                <div class="hora-glyph">♂</div>
+                <div><div class="hora-planet">Mars Hora</div><div class="hora-sub">Hour 5 · Day</div></div>
+              </div>
+              <div style="display:flex;align-items:center"><div class="hora-until">until 3:22 PM</div><span class="chevron">›</span></div>
+            </div>
+
+            <!-- MUHURTA CARD — rahu active, row 2 = next good window -->
+            <div class="mu-card warn">
+              <div class="mu-card-hd">
+                <div class="mu-card-title">Muhurta</div>
+                <span class="mu-card-chev">›</span>
+              </div>
+              <div class="amb-row">
+                <div class="amb-bar red"></div>
+                <div class="amb-body">
+                  <div class="amb-name red">Rahu Kaal <span class="now-pill red">NOW</span></div>
+                  <div class="amb-sub">avoid new starts · ends 3:00 PM</div>
+                </div>
+                <div class="amb-right"><div class="amb-time red">1:30–3:00 PM</div></div>
+              </div>
+              <div class="amb-row">
+                <div class="amb-bar gold"></div>
+                <div class="amb-body">
+                  <div class="amb-name gold">Amrit Choghadiya next</div>
+                  <div class="amb-sub">excellent · after 3:22 PM</div>
+                </div>
+                <div class="amb-right"><div class="amb-time">3:22 PM</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="day-strip">
+            <div class="day-cell"><div class="day-wk">Wed</div><div class="day-greg">20</div><div class="day-tithi"><span class="pdot s"></span>12</div></div>
+            <div class="day-cell today"><div class="day-wk">Thu</div><div class="day-greg">21</div><div class="day-tithi"><span class="pdot s"></span>13</div></div>
+            <div class="day-cell"><div class="day-wk">Fri</div><div class="day-greg">22</div><div class="day-tithi"><span class="pdot s"></span>14</div></div>
+            <div class="day-cell"><div class="day-wk">Sat</div><div class="day-greg">23</div><div class="day-tithi"><span class="pdot s"></span>15</div><div class="fest-dot"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="annotations">
+        <div class="ann"><div class="ann-num">4</div><div>When Rahu is active row 1 becomes the Rahu warning and row 2 <strong>flips to show the next auspicious window</strong> — giving the user an "escape route."</div></div>
+        <div class="ann"><div class="ann-num">5</div><div>Card background tints red (6% opacity) and left border goes red — the card signals danger <strong>without being alarming</strong>.</div></div>
+      </div>
+    </div>
+
+  </div><!-- grid row 1 -->
+
+
+  <!-- ═══════════════════════════════════════════
+       ROW 2 — MUHURTA SCREEN
+  ═══════════════════════════════════════════ -->
+  <div class="section-header">
+    <h2>Muhurta screen — consistent top nav + page title</h2>
+    <p>The TITHIKA nav bar is identical to every other screen. "Muhurta" appears as a page title in the sub-header directly below the nav. Date strip below that.</p>
+  </div>
+
+  <div class="grid">
+
+    <!-- MUHURTA SCREEN: normal Thursday -->
+    <div class="screen">
+      <div class="screen-title">Screen 02 — A</div>
+      <div class="screen-name">Muhurta screen</div>
+      <div class="screen-desc">Thursday, 11:40 AM. Abhijit upcoming. Night Choghadiya collapsed. Day slots visible with active Labh highlighted.</div>
+      <span class="screen-badge badge-new">new screen · phase 3a</span>
+
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="phone-screen">
+          <div class="dawn-sky"></div>
+          <div class="status-bar"><span>11:40 AM</span><span>●●● WiFi 🔋</span></div>
+
+          <!-- Same nav as every other screen -->
+          <div class="app-header">
+            <div class="icon">🏠</div>
+            <div class="app-title">TITHIKA</div>
+            <div class="nav-icons">
+              <div class="icon" style="font-size:14px">📅</div>
+              <div class="icon" style="font-size:14px">🗓</div>
+              <div class="icon" style="font-size:14px">☆</div>
+              <div class="icon" style="font-size:14px">⚙</div>
+            </div>
+          </div>
+
+          <!-- Page title (below nav, above date) -->
+          <div class="page-title-bar">
+            <div class="page-title">Muhurta</div>
+            <div class="page-title-meta">New York</div>
+          </div>
+
+          <!-- Date nav -->
+          <div class="date-nav-strip">
+            <span class="dnav-btn">‹</span>
+            <div class="dnav-center">
+              <div class="dnav-dow">Thursday</div>
+              <div class="dnav-date">21 May 2026</div>
+            </div>
+            <span class="dnav-btn">›</span>
+          </div>
+
+          <div class="mu-scroll">
+            <div class="mu-sec-label">Auspicious</div>
+
+            <div class="mu-ausp-row past">
+              <div class="mu-ausp-icon">🌅</div>
+              <div style="flex:1"><div class="mu-ausp-name">Brahma Muhurta</div><div class="mu-ausp-sub">meditation &amp; prayer</div></div>
+              <div class="mu-ausp-time">4:26–5:14 AM</div>
+            </div>
+            <div class="mu-ausp-row">
+              <div class="mu-ausp-icon">✦</div>
+              <div style="flex:1"><div class="mu-ausp-name">Abhijit Muhurta</div><div class="mu-ausp-sub">most auspicious window</div></div>
+              <div class="mu-ausp-time">12:08–12:56 PM</div>
+            </div>
+
+            <div class="mu-sec-label">Inauspicious</div>
+            <div class="mu-inausp-block">
+              <div class="mu-inausp-row">
+                <div class="mu-warn-icon">⚠</div>
+                <div class="mu-inausp-name">Rahu Kaal</div>
+                <div class="mu-inausp-time">1:30–3:00 PM</div>
+              </div>
+              <div class="mu-inausp-row">
+                <div class="mu-warn-icon">⚠</div>
+                <div class="mu-inausp-name">Yamaganda</div>
+                <div class="mu-inausp-time">12:00–1:30 PM</div>
+              </div>
+              <div class="mu-inausp-row">
+                <div class="mu-warn-icon">⚠</div>
+                <div class="mu-inausp-name">Gulika</div>
+                <div class="mu-inausp-time">3:00–4:30 PM</div>
+              </div>
+            </div>
+
+            <div class="mu-sec-label">Day Choghadiya</div>
+            <div class="chog-list">
+              <div class="chog-row past"><div class="chog-dot" style="background:var(--chog-amrit)"></div><span class="chog-name">Amrit</span><span class="chog-quality">excellent</span><span class="chog-time">6:02–7:54 AM</span></div>
+              <div class="chog-row past"><div class="chog-dot" style="background:var(--chog-kaal)"></div><span class="chog-name">Kaal</span><span class="chog-quality">inauspicious</span><span class="chog-time">7:54–9:46 AM</span></div>
+              <div class="chog-row past"><div class="chog-dot" style="background:var(--chog-shubh)"></div><span class="chog-name">Shubh</span><span class="chog-quality">auspicious</span><span class="chog-time">9:46–11:38 AM</span></div>
+              <div class="chog-row active"><div class="chog-dot" style="background:var(--chog-labh)"></div><span class="chog-name active-amber">Labh <span class="chog-now amber">NOW</span></span><span class="chog-quality">profitable</span><span class="chog-time active-amber">until 1:30 PM</span></div>
+              <div class="chog-row"><div class="chog-dot" style="background:var(--chog-udveg)"></div><span class="chog-name">Udveg</span><span class="chog-quality">inauspicious</span><span class="chog-time">1:30–3:22 PM</span></div>
+              <div class="chog-row"><div class="chog-dot" style="background:var(--chog-amrit)"></div><span class="chog-name">Amrit</span><span class="chog-quality">excellent</span><span class="chog-time">3:22–5:14 PM</span></div>
+              <div class="chog-row"><div class="chog-dot" style="background:var(--chog-rog)"></div><span class="chog-name">Rog</span><span class="chog-quality">inauspicious</span><span class="chog-time">5:14–7:06 PM</span></div>
+              <div class="chog-row"><div class="chog-dot" style="background:var(--chog-kaal)"></div><span class="chog-name">Kaal</span><span class="chog-quality">inauspicious</span><span class="chog-time">7:06–7:48 PM</span></div>
+            </div>
+
+            <!-- Night Choghadiya — collapsed -->
+            <div class="night-chog-collapsed">
+              <div class="night-chog-label">
+                <span style="font-size:16px">🌙</span>
+                <div>
+                  <div class="night-chog-name">Night Choghadiya</div>
+                  <div class="night-chog-sub">8 slots · 7:48 PM – 6:02 AM</div>
+                </div>
+              </div>
+              <span class="night-chog-expand">▸ expand</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="annotations">
+        <div class="ann"><div class="ann-num">6</div><div><strong>TITHIKA nav identical</strong> to Day View, Month View, Festivals, Hora — no screen-specific nav bar anywhere.</div></div>
+        <div class="ann"><div class="ann-num">7</div><div><strong>"Muhurta"</strong> as a page title lives in a sub-header row below the nav. Location shown right-aligned in the same bar.</div></div>
+        <div class="ann"><div class="ann-num">8</div><div><strong>Night Choghadiya</strong> collapsed by default. Tapping expands inline — no navigation. The 8 night slots unfold directly below.</div></div>
+        <div class="ann"><div class="ann-num">9</div><div>Screen <strong>auto-scrolls to the active slot</strong> on open, matching Hora screen behaviour.</div></div>
+      </div>
+    </div>
+
+
+    <!-- MUHURTA SCREEN: Wednesday — Abhijit not observed -->
+    <div class="screen">
+      <div class="screen-title">Screen 02 — B</div>
+      <div class="screen-name">Muhurta screen</div>
+      <div class="screen-desc">Wednesday — Abhijit Muhurta is not observed per shastra. Row is greyed with an italic note rather than disappearing silently.</div>
+      <span class="screen-badge badge-new">wednesday state</span>
+
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="phone-screen">
+          <div class="dawn-sky"></div>
+          <div class="status-bar"><span>9:41 AM</span><span>●●● WiFi 🔋</span></div>
+
+          <div class="app-header">
+            <div class="icon">🏠</div>
+            <div class="app-title">TITHIKA</div>
+            <div class="nav-icons">
+              <div class="icon" style="font-size:14px">📅</div>
+              <div class="icon" style="font-size:14px">🗓</div>
+              <div class="icon" style="font-size:14px">☆</div>
+              <div class="icon" style="font-size:14px">⚙</div>
+            </div>
+          </div>
+
+          <div class="page-title-bar">
+            <div class="page-title">Muhurta</div>
+            <div class="page-title-meta">New York</div>
+          </div>
+
+          <div class="date-nav-strip">
+            <span class="dnav-btn">‹</span>
+            <div class="dnav-center">
+              <div class="dnav-dow">Wednesday</div>
+              <div class="dnav-date">20 May 2026</div>
+            </div>
+            <span class="dnav-btn">›</span>
+          </div>
+
+          <div class="mu-scroll">
+            <div class="mu-sec-label">Auspicious</div>
+
+            <div class="mu-ausp-row">
+              <div class="mu-ausp-icon">🌅</div>
+              <div style="flex:1"><div class="mu-ausp-name">Brahma Muhurta</div><div class="mu-ausp-sub">meditation &amp; prayer</div></div>
+              <div class="mu-ausp-time">4:27–5:15 AM</div>
+            </div>
+
+            <!-- Abhijit — not observed on Wednesday -->
+            <div class="mu-ausp-row dimmed">
+              <div class="mu-ausp-icon dim">✦</div>
+              <div style="flex:1">
+                <div class="mu-ausp-name" style="color:var(--lm-ink-muted)">Abhijit Muhurta</div>
+                <div class="mu-ausp-sub" style="font-style:italic">not observed on Wednesday</div>
+              </div>
+              <div class="mu-ausp-time dim">—</div>
+            </div>
+
+            <div class="mu-sec-label">Inauspicious</div>
+            <div class="mu-inausp-block">
+              <div class="mu-inausp-row">
+                <div class="mu-warn-icon">⚠</div>
+                <div class="mu-inausp-name">Rahu Kaal</div>
+                <div class="mu-inausp-time">12:00–1:30 PM</div>
+              </div>
+              <div class="mu-inausp-row">
+                <div class="mu-warn-icon">⚠</div>
+                <div class="mu-inausp-name">Yamaganda</div>
+                <div class="mu-inausp-time">7:30–9:00 AM</div>
+              </div>
+              <div class="mu-inausp-row">
+                <div class="mu-warn-icon">⚠</div>
+                <div class="mu-inausp-name">Gulika</div>
+                <div class="mu-inausp-time">10:30 AM–12:00 PM</div>
+              </div>
+            </div>
+
+            <div class="mu-sec-label">Day Choghadiya</div>
+            <div class="chog-list">
+              <div class="chog-row past"><div class="chog-dot" style="background:var(--chog-labh)"></div><span class="chog-name">Labh</span><span class="chog-quality">profitable</span><span class="chog-time">6:02–7:54 AM</span></div>
+              <div class="chog-row past"><div class="chog-dot" style="background:var(--chog-amrit)"></div><span class="chog-name">Amrit</span><span class="chog-quality">excellent</span><span class="chog-time">7:54–9:46 AM</span></div>
+              <div class="chog-row active"><div class="chog-dot" style="background:var(--chog-kaal)"></div><span class="chog-name active-warn">Kaal <span class="chog-now red">NOW</span></span><span class="chog-quality">inauspicious</span><span class="chog-time active-warn">until 11:38 AM</span></div>
+              <div class="chog-row"><div class="chog-dot" style="background:var(--chog-char)"></div><span class="chog-name">Char</span><span class="chog-quality">neutral</span><span class="chog-time">11:38 AM–1:30 PM</span></div>
+              <div class="chog-row"><div class="chog-dot" style="background:var(--chog-rog)"></div><span class="chog-name">Rog</span><span class="chog-quality">inauspicious</span><span class="chog-time">1:30–3:22 PM</span></div>
+              <div class="chog-row"><div class="chog-dot" style="background:var(--chog-kaal)"></div><span class="chog-name">Kaal</span><span class="chog-quality">inauspicious</span><span class="chog-time">3:22–5:14 PM</span></div>
+              <div class="chog-row"><div class="chog-dot" style="background:var(--chog-shubh)"></div><span class="chog-name">Shubh</span><span class="chog-quality">auspicious</span><span class="chog-time">5:14–7:06 PM</span></div>
+              <div class="chog-row"><div class="chog-dot" style="background:var(--chog-amrit)"></div><span class="chog-name">Amrit</span><span class="chog-quality">excellent</span><span class="chog-time">7:06–7:48 PM</span></div>
+            </div>
+
+            <div class="night-chog-collapsed">
+              <div class="night-chog-label">
+                <span style="font-size:16px">🌙</span>
+                <div>
+                  <div class="night-chog-name">Night Choghadiya</div>
+                  <div class="night-chog-sub">8 slots · 7:48 PM – 6:02 AM</div>
+                </div>
+              </div>
+              <span class="night-chog-expand">▸ expand</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="annotations">
+        <div class="ann"><div class="ann-num">10</div><div>Abhijit row stays in the list at 45% opacity with italic sub-label "not observed on Wednesday" — teaches the rule rather than silently omitting it.</div></div>
+        <div class="ann"><div class="ann-num">11</div><div>The dash "—" replaces the time so it's clear the row is informational only, not a clickable time window.</div></div>
+        <div class="ann"><div class="ann-num">12</div><div>Wednesday's Rahu slot shifts to midday (12:00–1:30 PM), Yamaganda to morning — the inauspicious block correctly reflects the weekday lookup table.</div></div>
+      </div>
+    </div>
+
+  </div><!-- grid row 2 -->
+
+
+  <!-- ═══════════════════════════════════════════
+       ROW 3 — FESTIVALS SCREEN (updated nav)
+  ═══════════════════════════════════════════ -->
+  <div class="section-header">
+    <h2>Festivals screen — same nav consistency update</h2>
+    <p>Previously the Festivals screen used a standalone page title in the nav area. Now aligned: TITHIKA nav on top, "Festivals" as a page title in the sub-header below. No date strip needed here.</p>
+  </div>
+
+  <div class="grid" style="max-width:800px">
+
+    <div class="screen">
+      <div class="screen-title">Screen 03</div>
+      <div class="screen-name">Festivals screen</div>
+      <div class="screen-desc">Before: "Festivals" was in the nav bar area. After: same TITHIKA nav on top, "Festivals" in the sub-header below — consistent with Muhurta and Hora screens.</div>
+      <span class="screen-badge badge-updated">nav updated</span>
+
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="phone-screen">
+          <div class="dawn-sky"></div>
+          <div class="status-bar"><span>9:41</span><span>●●● WiFi 🔋</span></div>
+
+          <!-- Identical nav bar -->
+          <div class="app-header">
+            <div class="icon">🏠</div>
+            <div class="app-title">TITHIKA</div>
+            <div class="nav-icons">
+              <div class="icon" style="font-size:14px">📅</div>
+              <div class="icon" style="font-size:14px">🗓</div>
+              <div class="icon" style="font-size:14px">☆</div>
+              <div class="icon" style="font-size:14px">⚙</div>
+            </div>
+          </div>
+
+          <!-- Page title — no date strip for Festivals -->
+          <div class="page-title-bar">
+            <div class="page-title">Festivals</div>
+            <div style="display:flex;gap:6px;align-items:center">
+              <div style="font-size:10px;color:var(--lm-ink-muted);font-weight:600">2026</div>
+            </div>
+          </div>
+
+          <div class="fest-scroll">
+            <div class="fest-month-label">May</div>
+            <div class="fest-card">
+              <div class="fest-card-name">Buddha Purnima</div>
+              <div class="fest-card-sub">Vaishakha Purnima · Full Moon</div>
+              <div class="fest-card-date">Sat 23 May · Vaishakha 15</div>
+            </div>
+            <div class="fest-month-label">June</div>
+            <div class="fest-card">
+              <div class="fest-card-name">Nirjala Ekadashi</div>
+              <div class="fest-card-sub">Jyeshtha Shukla Ekadashi</div>
+              <div class="fest-card-date">Mon 8 Jun · Jyeshtha 11</div>
+            </div>
+            <div class="fest-card">
+              <div class="fest-card-name">Vat Savitri</div>
+              <div class="fest-card-sub">Jyeshtha Amavasya</div>
+              <div class="fest-card-date">Sun 21 Jun · Jyeshtha 30</div>
+            </div>
+            <div class="fest-month-label">July</div>
+            <div class="fest-card">
+              <div class="fest-card-name">Rath Yatra</div>
+              <div class="fest-card-sub">Ashadha Shukla Dwitiya</div>
+              <div class="fest-card-date">Thu 2 Jul · Ashadha 2</div>
+            </div>
+            <div class="fest-card">
+              <div class="fest-card-name">Devshayani Ekadashi</div>
+              <div class="fest-card-sub">Ashadha Shukla Ekadashi</div>
+              <div class="fest-card-date">Mon 13 Jul · Ashadha 11</div>
+            </div>
+            <div class="fest-card">
+              <div class="fest-card-name">Guru Purnima</div>
+              <div class="fest-card-sub">Ashadha Purnima</div>
+              <div class="fest-card-date">Wed 15 Jul · Ashadha 15</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="annotations">
+        <div class="ann"><div class="ann-num">13</div><div><strong>Before:</strong> "FESTIVALS" appeared inside the nav bar area, pushing the TITHIKA logo aside.</div></div>
+        <div class="ann"><div class="ann-num">14</div><div><strong>After:</strong> TITHIKA nav stays fixed. "Festivals" sits in the sub-header below — the same pattern as Muhurta, Hora, and Settings.</div></div>
+        <div class="ann"><div class="ann-num">15</div><div>Year "2026" shown right-aligned in the page title bar — easy to add a year picker here in future without touching the nav.</div></div>
+      </div>
+    </div>
+
+  </div><!-- grid row 3 -->
+
+
+  <!-- ═══════════════════════════════════════════
+       LOCALIZATION PANEL
+  ═══════════════════════════════════════════ -->
+  <div class="section-header">
+    <h2>Localization requirements</h2>
+    <p>All new strings introduced by the Muhurta feature must be added to AppStrings and translated into all five supported languages before shipping Phase 3a.</p>
+  </div>
+
+  <div class="l10n-panel">
+    <h3>New strings — AppStrings additions</h3>
+    <p>English is the canonical key. Hindi Devanagari ships with Phase 3a. Tamil and Bengali can ship as a v1.5.1 patch if content dependency blocks the main release.</p>
+
+    <table class="l10n-table">
+      <thead>
+        <tr>
+          <th>String key</th>
+          <th>English</th>
+          <th>Hindi (Devanagari)</th>
+          <th>Tamil</th>
+          <th>Bengali</th>
+          <th>Tag</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>pageTitle.muhurta</td><td>Muhurta</td><td>मुहूर्त</td><td>முகூர்த்தம்</td><td>মুহূর্ত</td><td><span class="l10n-tag new">new</span></td></tr>
+        <tr><td>section.auspicious</td><td>Auspicious</td><td>शुभ</td><td>சுபம்</td><td>শুভ</td><td><span class="l10n-tag new">new</span></td></tr>
+        <tr><td>section.inauspicious</td><td>Inauspicious</td><td>अशुभ</td><td>அசுபம்</td><td>অশুভ</td><td><span class="l10n-tag new">new</span></td></tr>
+        <tr><td>muhurta.brahma</td><td>Brahma Muhurta</td><td>ब्रह्म मुहूर्त</td><td>பிரம்ம முகூர்த்தம்</td><td>ব্রহ্ম মুহূর্ত</td><td><span class="l10n-tag new">new</span></td></tr>
+        <tr><td>muhurta.abhijit</td><td>Abhijit Muhurta</td><td>अभिजित् मुहूर्त</td><td>அபிஜித் முகூர்த்தம்</td><td>অভিজিৎ মুহূর্ত</td><td><span class="l10n-tag new">new</span></td></tr>
+        <tr><td>muhurta.abhijit.notObserved</td><td>not observed on Wednesday</td><td>बुधवार को नहीं होता</td><td>புதன்கிழமை கொண்டாடப்படுவதில்லை</td><td>বুধবারে পালিত হয় না</td><td><span class="l10n-tag new">new</span></td></tr>
+        <tr><td>muhurta.rahuKaal</td><td>Rahu Kaal</td><td>राहु काल</td><td>ராகு காலம்</td><td>রাহু কাল</td><td><span class="l10n-tag new">new</span></td></tr>
+        <tr><td>muhurta.yamaganda</td><td>Yamaganda</td><td>यमगण्ड</td><td>யமகண்டம்</td><td>যমগণ্ড</td><td><span class="l10n-tag new">new</span></td></tr>
+        <tr><td>muhurta.gulika</td><td>Gulika</td><td>गुलिक</td><td>குலிகன்</td><td>গুলিক</td><td><span class="l10n-tag new">new</span></td></tr>
+        <tr><td>choghadiya.day</td><td>Day Choghadiya</td><td>दिन का चौघड़िया</td><td>பகல் சோகடியா</td><td>দিনের চৌঘড়িয়া</td><td><span class="l10n-tag new">new</span></td></tr>
+        <tr><td>choghadiya.night</td><td>Night Choghadiya</td><td>रात का चौघड़िया</td><td>இரவு சோகடியா</td><td>রাতের চৌঘড়িয়া</td><td><span class="l10n-tag new">new</span></td></tr>
+        <tr><td>choghadiya.night.expand</td><td>▸ expand</td><td>▸ विस्तार करें</td><td>▸ விரிவாக்கு</td><td>▸ বিস্তার করুন</td><td><span class="l10n-tag new">new</span></td></tr>
+        <tr><td>choghadiya.amrit</td><td>Amrit</td><td>अमृत</td><td>அமிர்தம்</td><td>অমৃত</td><td><span class="l10n-tag new">new</span></td></tr>
+        <tr><td>choghadiya.shubh</td><td>Shubh</td><td>शुभ</td><td>சுபம்</td><td>শুভ</td><td><span class="l10n-tag new">new</span></td></tr>
+        <tr><td>choghadiya.labh</td><td>Labh</td><td>लाभ</td><td>லாபம்</td><td>লাভ</td><td><span class="l10n-tag new">new</span></td></tr>
+        <tr><td>choghadiya.char</td><td>Char</td><td>चर</td><td>சரம்</td><td>চর</td><td><span class="l10n-tag new">new</span></td></tr>
+        <tr><td>choghadiya.udveg</td><td>Udveg</td><td>उद्वेग</td><td>உத்வேகம்</td><td>উদ্বেগ</td><td><span class="l10n-tag new">new</span></td></tr>
+        <tr><td>choghadiya.kaal</td><td>Kaal</td><td>काल</td><td>காலம்</td><td>কাল</td><td><span class="l10n-tag new">new</span></td></tr>
+        <tr><td>choghadiya.rog</td><td>Rog</td><td>रोग</td><td>ரோகம்</td><td>রোগ</td><td><span class="l10n-tag new">new</span></td></tr>
+        <tr><td>quality.excellent</td><td>excellent</td><td>सर्वश्रेष्ठ</td><td>சிறந்தது</td><td>চমৎকার</td><td><span class="l10n-tag new">new</span></td></tr>
+        <tr><td>quality.auspicious</td><td>auspicious</td><td>शुभ</td><td>சுபகரமான</td><td>শুভ</td><td><span class="l10n-tag new">new</span></td></tr>
+        <tr><td>quality.profitable</td><td>profitable</td><td>लाभदायक</td><td>இலாபகரமான</td><td>লাভজনক</td><td><span class="l10n-tag new">new</span></td></tr>
+        <tr><td>quality.neutral</td><td>neutral</td><td>सामान्य</td><td>நடுநிலை</td><td>নিরপেক্ষ</td><td><span class="l10n-tag new">new</span></td></tr>
+        <tr><td>quality.inauspicious</td><td>inauspicious</td><td>अशुभ</td><td>அசுபகரமான</td><td>অশুভ</td><td><span class="l10n-tag new">new</span></td></tr>
+        <tr><td>label.now</td><td>NOW</td><td>अभी</td><td>இப்போது</td><td>এখন</td><td><span class="l10n-tag updated">updated</span></td></tr>
+        <tr><td>muhurta.card.title</td><td>Muhurta</td><td>मुहूर्त</td><td>முகூர்த்தம்</td><td>মুহূর্ত</td><td><span class="l10n-tag new">new</span></td></tr>
+        <tr><td>muhurta.avoidNewStarts</td><td>avoid new starts</td><td>नए काम न करें</td><td>புதிய தொடக்கங்களை தவிர்க்கவும்</td><td>নতুন কাজ এড়িয়ে চলুন</td><td><span class="l10n-tag new">new</span></td></tr>
+        <tr><td>pageTitle.festivals</td><td>Festivals</td><td>त्योहार</td><td>விழாக்கள்</td><td>উৎসব</td><td><span class="l10n-tag updated">updated</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</main>
+</body>
+</html>

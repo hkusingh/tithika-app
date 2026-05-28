@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tithika — Navigation Redesign (Phase 3.3 · v5c)</title>
+<style>
+  :root {
+    --bg-page:         #0a0a14;
+    --bg-panel:        #11132a;
+    --line-page:       rgba(255,255,255,0.08);
+    --ink-page:        #f3eedf;
+    --ink-page-soft:   #aab0c5;
+    --ink-page-muted:  #6c7290;
+
+    --lm-bg:           #F5F0E8;
+    --lm-panel:        #EDE8D8;
+    --lm-card:         rgba(0,0,0,0.04);
+    --lm-ink:          #1A1F3C;
+    --lm-ink-soft:     #4A5070;
+    --lm-ink-muted:    #8890A8;
+    --lm-line:         rgba(0,0,0,0.08);
+    --lm-line-strong:  rgba(0,0,0,0.15);
+    --lm-shukla:       #C8922A;
+    --lm-shukla-bg:    rgba(200,146,42,0.08);
+    --lm-festival:     #D46A1E;
+    --lm-border-phone: #C4BBAB;
+
+    --mu-warn:         #B84040;
+    --mu-warn-bg:      rgba(184,64,64,0.06);
+    --mu-warn-light:   rgba(184,64,64,0.08);
+    --hora-accent:     #C8922A;
+    --hora-accent-bg:  rgba(200,146,42,0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg-page); color: var(--ink-page);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  header { padding: 40px 40px 16px; border-bottom: 1px solid var(--line-page); }
+  header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 6px; }
+  header .subtitle { color: var(--ink-page-soft); font-size: 15px; }
+  header .meta { color: var(--ink-page-muted); font-size: 13px; margin-top: 10px; }
+  main { padding: 32px 40px 80px; }
+
+  .section-header { margin: 0 0 24px; padding-bottom: 12px; border-bottom: 1px solid var(--line-page); }
+  .section-header h2 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .section-header p  { font-size: 13px; color: var(--ink-page-soft); line-height: 1.5; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 56px 40px; max-width: 1600px; margin: 0 auto 72px;
+  }
+  .grid-2col { grid-template-columns: repeat(2, 1fr); }
+  .grid-3col { grid-template-columns: repeat(3, 1fr); }
+
+  .screen { display: flex; flex-direction: column; align-items: center; }
+  .screen-title { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-page-muted); margin-bottom: 4px; }
+  .screen-name { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .screen-desc { font-size: 13px; color: var(--ink-page-soft); text-align: center; max-width: 295px; margin: 0 0 14px; line-height: 1.45; }
+  .screen-badge { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 8px; border-radius: 5px; margin-bottom: 14px; }
+  .badge-new     { background: rgba(200,146,42,0.18); color: #C8922A; }
+  .badge-warn    { background: rgba(184,64,64,0.18); color: #D46060; }
+  .badge-neutral { background: rgba(255,255,255,0.06); color: var(--ink-page-muted); }
+  .badge-change  { background: rgba(90,107,216,0.20); color: #8A9BE8; }
+
+  /* ── Phone frame ── */
+  .phone {
+    width: 320px; height: 690px;
+    background: var(--lm-bg);
+    border: 9px solid var(--lm-border-phone);
+    border-radius: 38px; position: relative; overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.55), 0 0 0 1px rgba(0,0,0,0.15);
+  }
+  .notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 110px; height: 22px; background: var(--lm-border-phone); border-radius: 0 0 14px 14px; z-index: 50; }
+  .phone-screen { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; }
+
+  .dawn-sky {
+    position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(180deg, #F0DFB8 0%, #F3E8CE 25%, #F5EEE2 55%, #F5F0E8 100%);
+  }
+
+  /* ── Shared chrome ── */
+  .status-bar { position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: flex-end; height: 32px; padding: 6px 22px 0; font-size: 11px; font-weight: 600; color: var(--lm-ink-soft); }
+
+  /* NEW nav bar: 🏠 left · TITHIKA center · icons right */
+  .app-header {
+    position: relative; z-index: 10;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 4px 14px 8px;
+    border-bottom: 1px solid var(--lm-line);
+    background: rgba(245,240,232,0.94);
+  }
+  .nav-home { width: 28px; height: 28px; display: grid; place-items: center; color: var(--lm-ink); font-size: 17px; }
+  .nav-title { font-weight: 700; color: var(--lm-ink); font-size: 13px; letter-spacing: 0.06em; position: absolute; left: 50%; transform: translateX(-50%); }
+  .nav-right { display: flex; align-items: center; gap: 2px; }
+  .nav-icon { width: 28px; height: 28px; display: grid; place-items: center; color: var(--lm-ink-soft); font-size: 15px; cursor: pointer; }
+  .nav-icon.active { color: var(--lm-shukla); }
+  .nav-hamburger { width: 28px; height: 28px; display: grid; place-items: center; color: var(--lm-ink); font-size: 17px; cursor: pointer; }
+
+  /* OLD nav bar for comparison */
+  .app-header-old {
+    position: relative; z-index: 2;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 4px 14px 8px;
+    border-bottom: 1px solid var(--lm-line);
+    background: rgba(245,240,232,0.94);
+  }
+  .nav-title-old { font-weight: 700; color: var(--lm-ink); font-size: 13px; letter-spacing: 0.06em; }
+
+  .page-title-bar { position: relative; z-index: 2; padding: 9px 14px 8px; border-bottom: 1px solid var(--lm-line); background: rgba(245,240,232,0.94); display: flex; align-items: baseline; justify-content: space-between; }
+  .page-title { font-size: 19px; font-weight: 700; color: var(--lm-ink); letter-spacing: -0.01em; }
+  .page-title-meta { font-size: 10px; color: var(--lm-ink-muted); }
+
+  .date-nav { position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; padding: 6px 14px; border-bottom: 1px solid var(--lm-line); background: var(--lm-panel); flex-shrink: 0; }
+  .dnav-btn  { background: none; border: none; color: var(--lm-ink-muted); font-size: 17px; cursor: pointer; }
+  .dnav-dow  { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--lm-ink-muted); text-align: center; }
+  .dnav-date { font-size: 13px; font-weight: 700; color: var(--lm-ink); text-align: center; }
+
+  /* ── Hamburger dropdown ── */
+  .hamburger-overlay {
+    position: absolute; top: 64px; right: 0; left: 0; z-index: 100;
+    background: rgba(245,240,232,0.98);
+    border-bottom: 1px solid var(--lm-line-strong);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+  }
+  .hmb-item {
+    display: flex; align-items: center; gap: 11px;
+    padding: 11px 18px;
+    border-bottom: 1px solid var(--lm-line);
+    cursor: pointer;
+    color: var(--lm-ink);
+  }
+  .hmb-item:last-child { border-bottom: none; }
+  .hmb-item:hover { background: var(--lm-shukla-bg); }
+  .hmb-icon { font-size: 16px; width: 20px; text-align: center; color: var(--lm-ink-soft); flex-shrink: 0; }
+  .hmb-label { font-size: 14px; font-weight: 600; color: var(--lm-ink); }
+  .hmb-sub { font-size: 10px; color: var(--lm-ink-muted); margin-top: 1px; }
+  .hmb-divider { height: 1px; background: var(--lm-line-strong); margin: 4px 0; }
+  .hmb-arrow { margin-left: auto; font-size: 12px; color: var(--lm-ink-muted); }
+
+  /* ── Day View cards ── */
+  .p-scroll { flex: 1; overflow: hidden; position: relative; z-index: 1; padding: 8px 10px 0; display: flex; flex-direction: column; gap: 6px; }
+
+  .day-card {
+    background: var(--lm-panel);
+    border: 1px solid var(--lm-line);
+    border-radius: 8px;
+    padding: 9px 12px 9px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Tithi card */
+  .tithi-name  { font-size: 13px; font-weight: 700; color: var(--lm-ink); }
+  .tithi-bar   { height: 2px; background: var(--lm-shukla); border-radius: 2px; margin: 5px 0 5px; width: 60%; }
+  .tithi-sub   { font-size: 10px; color: var(--lm-ink-muted); }
+  .tithi-until { font-size: 10px; color: var(--lm-ink-muted); margin-top: 1px; }
+  .tithi-moon  { position: absolute; top: 8px; right: 10px; font-size: 18px; }
+
+  /* Nakshatra / small cards */
+  .small-card { background: var(--lm-panel); border: 1px solid var(--lm-line); border-radius: 8px; padding: 8px 12px; }
+  .small-label { font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--lm-ink-muted); margin-bottom: 2px; }
+  .small-name  { font-size: 12px; font-weight: 700; color: var(--lm-ink); }
+  .small-until { font-size: 10px; color: var(--lm-ink-muted); }
+
+  /* Sun/moon grid */
+  .grid-2x2 { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--lm-line); border-radius: 8px; overflow: hidden; }
+  .grid-cell { padding: 7px 10px; }
+  .grid-cell:nth-child(1),
+  .grid-cell:nth-child(2) { border-bottom: 1px solid var(--lm-line); }
+  .grid-cell:nth-child(1),
+  .grid-cell:nth-child(3) { border-right: 1px solid var(--lm-line); }
+  .grid-cell-label { font-size: 9px; color: var(--lm-ink-muted); margin-bottom: 2px; }
+  .grid-cell-value { font-size: 12px; font-weight: 700; color: var(--lm-ink); }
+
+  /* ── Hora card (the star of Section 2) ── */
+  .hora-card {
+    border: 1px solid var(--lm-line);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .hora-main {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 12px;
+    position: relative;
+    background: var(--lm-panel);
+  }
+  .hora-main.hora-active { background: var(--hora-accent-bg); }
+  .hora-main.hora-active { border-left: 3px solid var(--hora-accent); }
+  .hora-planet { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+  .hora-label { flex: 1; }
+  .hora-name  { font-size: 13px; font-weight: 700; color: var(--lm-ink); }
+  .hora-until { font-size: 10px; color: var(--lm-ink-muted); margin-top: 1px; }
+  .hora-meta  { font-size: 10px; color: var(--lm-ink-soft); text-align: right; white-space: nowrap; }
+  .now-pill { display: inline-block; font-size: 8px; font-weight: 700; padding: 2px 5px; border-radius: 3px; vertical-align: middle; margin-left: 3px; }
+  .now-pill.amber { background: var(--lm-shukla); color: white; }
+  .now-pill.red   { background: var(--mu-warn); color: white; }
+
+  /* Rahu warning row below hora row */
+  .rahu-warn-row {
+    display: flex; align-items: center; gap: 7px;
+    padding: 7px 12px 7px 12px;
+    background: var(--mu-warn-light);
+    border-top: 1px solid rgba(184,64,64,0.15);
+  }
+  .rahu-icon { font-size: 12px; color: var(--mu-warn); flex-shrink: 0; }
+  .rahu-text { font-size: 10px; color: var(--mu-warn); font-weight: 600; flex: 1; }
+  .rahu-time { font-size: 10px; color: var(--mu-warn); font-weight: 700; white-space: nowrap; }
+
+  /* ── Annotations ── */
+  .annotations { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; max-width: 295px; }
+  .ann { display: flex; gap: 9px; align-items: flex-start; font-size: 12px; color: var(--ink-page-soft); line-height: 1.45; }
+  .ann-num { width: 18px; height: 18px; flex-shrink: 0; background: var(--bg-panel); border: 1px solid var(--line-page); border-radius: 50%; display: grid; place-items: center; font-size: 10px; font-weight: 700; color: var(--lm-shukla); }
+  .ann strong { color: var(--ink-page); }
+
+  /* ── Spec table ── */
+  .spec-table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 16px 0 32px; }
+  .spec-table th { text-align: left; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-page-muted); border-bottom: 1px solid var(--line-page); padding: 8px 14px; }
+  .spec-table td { padding: 9px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--ink-page-soft); vertical-align: top; }
+  .spec-table td:first-child { font-weight: 600; color: var(--ink-page); font-family: monospace; font-size: 12px; }
+  .spec-table code { background: rgba(255,255,255,0.06); padding: 1px 5px; border-radius: 3px; font-size: 11px; color: var(--lm-shukla); }
+  .changed { color: #8A9BE8; font-weight: 700; }
+  .removed { color: #D46060; text-decoration: line-through; opacity: 0.7; }
+  .new-item { color: #5ABD8A; font-weight: 700; }
+
+  /* ── Design notes panel ── */
+  .note-panel { background: var(--bg-panel); border: 1px solid var(--line-page); border-radius: 12px; padding: 24px 28px; margin-bottom: 72px; }
+  .note-panel h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .note-panel p  { font-size: 13px; color: var(--ink-page-soft); line-height: 1.6; margin-bottom: 12px; }
+  .note-panel p:last-child { margin-bottom: 0; }
+  .note-panel strong { color: var(--ink-page); }
+  .note-panel em { color: var(--lm-shukla); font-style: normal; }
+  .note-panel ul { margin: 8px 0 12px 20px; }
+  .note-panel li { font-size: 13px; color: var(--ink-page-soft); line-height: 1.6; margin-bottom: 4px; }
+  .note-panel li strong { color: var(--ink-page); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Tithika — Navigation Redesign</h1>
+  <p class="subtitle">Phase 3.3 · New Nav Bar + Hamburger Menu + Rahu Warning on Hora Card</p>
+  <p class="meta">v5c · 2026-05-25 · 🏠 Home left · TITHIKA center · 🗓 ⚙ ☰ right · Muhurta card removed from Day View</p>
+</header>
+
+<main>
+
+
+  <!-- ═══════════════════════════════════════════
+       SECTION 1 — New Nav Bar + Hamburger Dropdown
+       ═══════════════════════════════════════════ -->
+
+  <div class="section-header">
+    <h2>1 — Nav Bar Redesign &amp; Hamburger Menu</h2>
+    <p>Home icon moves to the left. TITHIKA is centered. Month + Settings + hamburger (☰) sit on the right. The hamburger opens an inline dropdown — not a full drawer — containing deep-dive screens.</p>
+  </div>
+
+  <div class="grid grid-3col">
+
+    <!-- 1A: New nav bar, hamburger closed -->
+    <div class="screen">
+      <div class="screen-title">State 1A</div>
+      <div class="screen-name">Day View — new nav</div>
+      <div class="screen-desc">Normal state. Hamburger at far right. Month calendar and Settings remain direct tap targets.</div>
+      <span class="screen-badge badge-change">CHANGED</span>
+
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="dawn-sky"></div>
+        <div class="phone-screen">
+          <div class="status-bar">
+            <span>9:41</span><span>●●●</span>
+          </div>
+
+          <!-- NEW nav bar -->
+          <div class="app-header">
+            <div class="nav-home">🏠</div>
+            <div class="nav-title">TITHIKA</div>
+            <div class="nav-right">
+              <div class="nav-icon">🗓</div>
+              <div class="nav-icon">⚙️</div>
+              <div class="nav-hamburger">☰</div>
+            </div>
+          </div>
+
+          <!-- Date nav -->
+          <div class="date-nav">
+            <button class="dnav-btn">‹</button>
+            <div style="text-align:center">
+              <div class="dnav-dow">THURSDAY</div>
+              <div class="dnav-date">May 21, 2026 · Vaishakha</div>
+            </div>
+            <button class="dnav-btn">›</button>
+          </div>
+
+          <!-- Day content -->
+          <div class="p-scroll">
+            <!-- Tithi -->
+            <div class="day-card">
+              <div class="tithi-moon">◐</div>
+              <div class="tithi-name">SHUKLA TRAYODASHI</div>
+              <div class="tithi-bar"></div>
+              <div class="tithi-sub">Shukla · Vaishakha 13</div>
+              <div class="tithi-until" style="font-size:10px;color:var(--lm-ink-muted);margin-top:2px">until 8:42 PM</div>
+            </div>
+            <!-- Nakshatra -->
+            <div class="small-card">
+              <div class="small-label">Nakshatra</div>
+              <div class="small-name">Uttara Phalguni</div>
+              <div class="small-until">until 6:15 AM</div>
+            </div>
+            <!-- Sun/moon grid -->
+            <div class="grid-2x2" style="background:var(--lm-panel)">
+              <div class="grid-cell">
+                <div class="grid-cell-label">☀ Sunrise</div>
+                <div class="grid-cell-value">6:02 AM</div>
+              </div>
+              <div class="grid-cell" style="text-align:right">
+                <div class="grid-cell-label">Sunset ☀</div>
+                <div class="grid-cell-value">7:48 PM</div>
+              </div>
+              <div class="grid-cell">
+                <div class="grid-cell-label">☽ Moonrise</div>
+                <div class="grid-cell-value">10:24 PM</div>
+              </div>
+              <div class="grid-cell" style="text-align:right">
+                <div class="grid-cell-label">Moonset ☽</div>
+                <div class="grid-cell-value">9:58 AM</div>
+              </div>
+            </div>
+            <!-- Hora card (normal) -->
+            <div class="hora-card">
+              <div class="hora-main hora-active">
+                <div class="hora-planet" style="color:#C8922A">☉</div>
+                <div class="hora-label">
+                  <div class="hora-name">Sun Hora <span class="now-pill amber">NOW</span></div>
+                  <div class="hora-until">until 8:44 AM · Hour 3 · Day</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="annotations">
+        <div class="ann"><div class="ann-num">1</div><div><strong>No Muhurta card</strong> — removed from Day View. Accessible via ☰ → Muhurta.</div></div>
+        <div class="ann"><div class="ann-num">2</div><div>Hora card is the <strong>last card</strong> on Day View; no Rahu warning because Rahu is not active now.</div></div>
+      </div>
+    </div>
+
+    <!-- 1B: Hamburger dropdown open -->
+    <div class="screen">
+      <div class="screen-title">State 1B</div>
+      <div class="screen-name">Hamburger open</div>
+      <div class="screen-desc">Tapping ☰ opens an inline dropdown below the nav bar. Hora, Muhurta, Panchanga, then Festivals after a divider. Tap outside or tap ✕ to close.</div>
+      <span class="screen-badge badge-new">NEW</span>
+
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="dawn-sky"></div>
+        <div class="phone-screen">
+          <div class="status-bar">
+            <span>9:41</span><span>●●●</span>
+          </div>
+
+          <!-- NEW nav bar (hamburger active) -->
+          <div class="app-header">
+            <div class="nav-home">🏠</div>
+            <div class="nav-title">TITHIKA</div>
+            <div class="nav-right">
+              <div class="nav-icon">🗓</div>
+              <div class="nav-icon">⚙️</div>
+              <div class="nav-hamburger" style="color:var(--lm-shukla)">✕</div>
+            </div>
+          </div>
+
+          <!-- Hamburger dropdown -->
+          <div class="hamburger-overlay">
+            <div class="hmb-item">
+              <div class="hmb-icon">⏱</div>
+              <div>
+                <div class="hmb-label">Hora</div>
+                <div class="hmb-sub">Planetary hours · day &amp; night</div>
+              </div>
+              <div class="hmb-arrow">›</div>
+            </div>
+            <div class="hmb-item">
+              <div class="hmb-icon">🔆</div>
+              <div>
+                <div class="hmb-label">Muhurta</div>
+                <div class="hmb-sub">Rahu Kaal · Choghadiya · auspicious times</div>
+              </div>
+              <div class="hmb-arrow">›</div>
+            </div>
+            <div class="hmb-item">
+              <div class="hmb-icon">📖</div>
+              <div>
+                <div class="hmb-label">Panchanga</div>
+                <div class="hmb-sub">Yoga · Karana · all five elements</div>
+              </div>
+              <div class="hmb-arrow">›</div>
+            </div>
+            <div class="hmb-divider"></div>
+            <div class="hmb-item">
+              <div class="hmb-icon">🎉</div>
+              <div>
+                <div class="hmb-label">Festivals</div>
+                <div class="hmb-sub">Hindu festivals · 2026</div>
+              </div>
+              <div class="hmb-arrow">›</div>
+            </div>
+          </div>
+
+          <!-- Day content dimmed behind overlay -->
+          <div class="p-scroll" style="opacity:0.28">
+            <div class="day-card">
+              <div class="tithi-moon">◐</div>
+              <div class="tithi-name">SHUKLA TRAYODASHI</div>
+              <div class="tithi-bar"></div>
+              <div class="tithi-sub">Shukla · Vaishakha 13</div>
+            </div>
+            <div class="small-card">
+              <div class="small-label">Nakshatra</div>
+              <div class="small-name">Uttara Phalguni</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="annotations">
+        <div class="ann"><div class="ann-num">3</div><div><strong>Dropdown not a drawer</strong> — lightweight; appears below nav, content behind is dimmed but visible. Dismiss by tapping outside.</div></div>
+        <div class="ann"><div class="ann-num">4</div><div>Divider separates the <strong>astronomical screens</strong> (Hora · Muhurta · Panchanga) from the <strong>calendar screen</strong> (Festivals).</div></div>
+        <div class="ann"><div class="ann-num">5</div><div>☰ becomes <strong>✕</strong> while open — tapping closes the menu.</div></div>
+      </div>
+    </div>
+
+    <!-- 1C: Before vs After nav bar comparison -->
+    <div class="screen">
+      <div class="screen-title">Reference</div>
+      <div class="screen-name">Nav bar before / after</div>
+      <div class="screen-desc">Layout shift: TITHIKA moves from left to center. Home icon moves to the left. Hamburger replaces the old star/bookmark icon slot.</div>
+      <span class="screen-badge badge-neutral">BEFORE / AFTER</span>
+
+      <!-- Before phone -->
+      <div class="phone" style="height:auto;min-height:auto;border-radius:16px;margin-bottom:20px">
+        <div class="phone-screen" style="position:relative">
+          <div class="status-bar" style="background:var(--lm-panel);border-bottom:1px solid var(--lm-line)">
+            <span style="font-size:10px;font-weight:700;letter-spacing:0.04em;color:var(--lm-ink-muted)">BEFORE</span>
+          </div>
+          <div class="app-header-old">
+            <div class="nav-title-old">TITHIKA</div>
+            <div style="display:flex;gap:1px">
+              <div class="nav-icon">🏠</div>
+              <div class="nav-icon">🗓</div>
+              <div class="nav-icon">⭐</div>
+              <div class="nav-icon">⚙️</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-size:22px;color:var(--lm-shukla);margin-bottom:12px">↓</div>
+
+      <!-- After phone -->
+      <div class="phone" style="height:auto;min-height:auto;border-radius:16px">
+        <div class="phone-screen" style="position:relative">
+          <div class="status-bar" style="background:var(--lm-panel);border-bottom:1px solid var(--lm-line)">
+            <span style="font-size:10px;font-weight:700;letter-spacing:0.04em;color:#5ABD8A">AFTER</span>
+          </div>
+          <div class="app-header">
+            <div class="nav-home">🏠</div>
+            <div class="nav-title">TITHIKA</div>
+            <div class="nav-right">
+              <div class="nav-icon">🗓</div>
+              <div class="nav-icon">⚙️</div>
+              <div class="nav-hamburger">☰</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="annotations" style="margin-top:24px">
+        <div class="ann"><div class="ann-num">6</div><div><strong>⭐ (Favourites)</strong> icon removed — not yet implemented, so not needed in nav.</div></div>
+        <div class="ann"><div class="ann-num">7</div><div><strong>Hora</strong> moved from a direct nav icon into the hamburger menu (it was never in the nav before — now explicitly accessible via ☰).</div></div>
+        <div class="ann"><div class="ann-num">8</div><div>Nav items remaining direct: <strong>🏠 Home · 🗓 Month · ⚙ Settings</strong> — all frequently accessed from any screen.</div></div>
+      </div>
+    </div>
+
+  </div><!-- /grid -->
+
+
+  <!-- ═══════════════════════════════════════════
+       SECTION 2 — Hora Card with Rahu Warning
+       ═══════════════════════════════════════════ -->
+
+  <div class="section-header">
+    <h2>2 — Hora Card: Rahu Kaal Warning States</h2>
+    <p>Muhurta card removed from Day View. The Hora card grows a second row when Rahu Kaal is active or approaching (≤30 min). No separate Muhurta card needed on Day View — the warning is inline.</p>
+  </div>
+
+  <div class="grid grid-3col">
+
+    <!-- 2A: Normal Hora card -->
+    <div class="screen">
+      <div class="screen-title">State 2A</div>
+      <div class="screen-name">Hora card — no warning</div>
+      <div class="screen-desc">Rahu Kaal is not active and not approaching. Single-row card with amber left bar.</div>
+      <span class="screen-badge badge-neutral">NORMAL</span>
+
+      <div class="phone" style="height:320px;border-radius:22px">
+        <div class="dawn-sky"></div>
+        <div class="phone-screen" style="padding:12px 10px 0">
+
+          <div style="font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--lm-ink-muted);margin-bottom:6px">HORA</div>
+
+          <!-- Normal hora card -->
+          <div class="hora-card">
+            <div class="hora-main hora-active" style="padding-left:15px">
+              <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--hora-accent);border-radius:0"></div>
+              <div class="hora-planet" style="color:#C8922A">☉</div>
+              <div class="hora-label">
+                <div class="hora-name">Sun Hora <span class="now-pill amber">NOW</span></div>
+                <div class="hora-until">until 8:44 AM · Hour 3 · Day</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:20px;font-size:9px;color:var(--lm-ink-muted);line-height:1.6">
+            <strong style="color:var(--lm-ink-soft)">Rahu Kaal today:</strong> 1:54 PM – 3:28 PM<br>
+            (not approaching — no warning shown)
+          </div>
+        </div>
+      </div>
+
+      <div class="annotations">
+        <div class="ann"><div class="ann-num">1</div><div>Standard single-row Hora card. <strong>Amber left bar</strong> = current hora is Sun (or any planet).</div></div>
+        <div class="ann"><div class="ann-num">2</div><div>No Rahu row appears until Rahu Kaal is ≤30 min away or active.</div></div>
+      </div>
+    </div>
+
+    <!-- 2B: Rahu approaching (≤30 min) -->
+    <div class="screen">
+      <div class="screen-title">State 2B</div>
+      <div class="screen-name">Rahu Kaal approaching</div>
+      <div class="screen-desc">Rahu Kaal starts in ≤30 minutes. Red warning row appended below Hora. Card grows taller — no layout shift in the card above.</div>
+      <span class="screen-badge badge-warn">WARNING</span>
+
+      <div class="phone" style="height:320px;border-radius:22px">
+        <div class="dawn-sky"></div>
+        <div class="phone-screen" style="padding:12px 10px 0">
+
+          <div style="font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--lm-ink-muted);margin-bottom:6px">HORA</div>
+
+          <!-- Hora card + approaching Rahu warning -->
+          <div class="hora-card">
+            <div class="hora-main hora-active" style="padding-left:15px">
+              <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--hora-accent);border-radius:0"></div>
+              <div class="hora-planet" style="color:#C8922A">☉</div>
+              <div class="hora-label">
+                <div class="hora-name">Sun Hora <span class="now-pill amber">NOW</span></div>
+                <div class="hora-until">until 1:24 PM · Hour 9 · Day</div>
+              </div>
+            </div>
+            <!-- Rahu approaching row -->
+            <div class="rahu-warn-row">
+              <div class="rahu-icon">⚠</div>
+              <div class="rahu-text">Rahu Kaal in 28 min — avoid new starts</div>
+              <div class="rahu-time">1:54 PM</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="annotations">
+        <div class="ann"><div class="ann-num">3</div><div><strong>Red row</strong> appears when Rahu Kaal is ≤30 min away. Shows countdown "in X min" and start time.</div></div>
+        <div class="ann"><div class="ann-num">4</div><div>Hora row itself stays amber — the hora period and the Rahu warning are separate concepts.</div></div>
+      </div>
+    </div>
+
+    <!-- 2C: Rahu active NOW -->
+    <div class="screen">
+      <div class="screen-title">State 2C</div>
+      <div class="screen-name">Rahu Kaal active</div>
+      <div class="screen-desc">Rahu Kaal is active right now. Red warning row shows "NOW" pill and when it ends. Hora bar stays amber (the hora period is unchanged).</div>
+      <span class="screen-badge badge-warn">RAHU ACTIVE</span>
+
+      <div class="phone" style="height:320px;border-radius:22px">
+        <div class="dawn-sky"></div>
+        <div class="phone-screen" style="padding:12px 10px 0">
+
+          <div style="font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--lm-ink-muted);margin-bottom:6px">HORA</div>
+
+          <!-- Hora card + active Rahu warning -->
+          <div class="hora-card">
+            <div class="hora-main hora-active" style="padding-left:15px">
+              <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--hora-accent);border-radius:0"></div>
+              <div class="hora-planet" style="color:#7D8DF0">♄</div>
+              <div class="hora-label">
+                <div class="hora-name">Saturn Hora <span class="now-pill amber">NOW</span></div>
+                <div class="hora-until">until 3:28 PM · Hour 10 · Day</div>
+              </div>
+            </div>
+            <!-- Rahu active row -->
+            <div class="rahu-warn-row">
+              <div class="rahu-icon">🚫</div>
+              <div class="rahu-text">Rahu Kaal <span class="now-pill red">NOW</span> — avoid new starts</div>
+              <div class="rahu-time">ends 3:28 PM</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="annotations">
+        <div class="ann"><div class="ann-num">5</div><div><strong>🚫 icon</strong> (instead of ⚠) signals active vs approaching. Red NOW pill mirrors Hora card's amber NOW pill pattern.</div></div>
+        <div class="ann"><div class="ann-num">6</div><div>Rahu Kaal often overlaps a hora period (as here: Saturn hora AND Rahu Kaal both active). Showing both is <strong>correct</strong> — they are independent.</div></div>
+        <div class="ann"><div class="ann-num">7</div><div>"ends 3:28 PM" rather than a countdown — countdowns require live timers; a clock time is readable at a glance and doesn't need rebuilds.</div></div>
+      </div>
+    </div>
+
+  </div><!-- /grid -->
+
+
+  <!-- ═══════════════════════════════════════════
+       SECTION 3 — Day View full layout comparison
+       ═══════════════════════════════════════════ -->
+
+  <div class="section-header">
+    <h2>3 — Day View: Before vs After (card inventory)</h2>
+    <p>Removing the Muhurta card and the Panchanga card from Day View leaves a clean, focused screen. The full Panchanga and Muhurta detail remain reachable via ☰.</p>
+  </div>
+
+  <div class="grid grid-2col" style="max-width:800px">
+
+    <!-- Before: Day View with Muhurta card -->
+    <div class="screen">
+      <div class="screen-title">BEFORE — Phase 3a</div>
+      <div class="screen-name">Day View (crowded)</div>
+      <div class="screen-desc">Muhurta card added in Phase 3a sat below Hora, making Day View feel dense.</div>
+      <span class="screen-badge badge-neutral">BEFORE</span>
+
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="dawn-sky"></div>
+        <div class="phone-screen">
+          <div class="status-bar"><span>9:41</span><span>●●●</span></div>
+          <div class="app-header-old">
+            <div class="nav-title-old">TITHIKA</div>
+            <div style="display:flex;gap:1px">
+              <div class="nav-icon">🏠</div>
+              <div class="nav-icon">🗓</div>
+              <div class="nav-icon">⭐</div>
+              <div class="nav-icon">⚙️</div>
+            </div>
+          </div>
+          <div class="date-nav">
+            <button class="dnav-btn">‹</button>
+            <div style="text-align:center"><div class="dnav-dow">THURSDAY</div><div class="dnav-date">May 21, 2026</div></div>
+            <button class="dnav-btn">›</button>
+          </div>
+          <div class="p-scroll">
+            <div class="day-card">
+              <div class="tithi-moon">◐</div>
+              <div class="tithi-name">SHUKLA TRAYODASHI</div>
+              <div class="tithi-bar"></div>
+              <div class="tithi-sub">Shukla · Vaishakha 13 · until 8:42 PM</div>
+            </div>
+            <div class="small-card">
+              <div class="small-label">Nakshatra</div>
+              <div class="small-name">Uttara Phalguni · until 6:15 AM</div>
+            </div>
+            <div class="grid-2x2" style="background:var(--lm-panel)">
+              <div class="grid-cell"><div class="grid-cell-label">☀ Sunrise</div><div class="grid-cell-value">6:02 AM</div></div>
+              <div class="grid-cell" style="text-align:right"><div class="grid-cell-label">Sunset ☀</div><div class="grid-cell-value">7:48 PM</div></div>
+              <div class="grid-cell"><div class="grid-cell-label">☽ Moonrise</div><div class="grid-cell-value">10:24 PM</div></div>
+              <div class="grid-cell" style="text-align:right"><div class="grid-cell-label">Moonset ☽</div><div class="grid-cell-value">9:58 AM</div></div>
+            </div>
+            <div class="hora-card">
+              <div class="hora-main hora-active" style="padding-left:15px">
+                <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--hora-accent)"></div>
+                <div class="hora-planet" style="color:#C8922A">☉</div>
+                <div class="hora-label">
+                  <div class="hora-name">Sun Hora <span class="now-pill amber">NOW</span></div>
+                  <div class="hora-until">until 8:44 AM · Hour 3 · Day</div>
+                </div>
+              </div>
+            </div>
+            <!-- Muhurta card (soon to be removed) -->
+            <div class="hora-card" style="border-color:rgba(200,146,42,0.3)">
+              <div class="hora-main" style="padding-left:15px;background:rgba(200,146,42,0.05)">
+                <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--lm-shukla)"></div>
+                <div class="hora-label">
+                  <div class="hora-name" style="font-size:11px">Labh Choghadiya <span style="font-size:9px;color:var(--lm-ink-muted);font-weight:400">until 9:27 AM</span></div>
+                  <div class="hora-until">Next inauspicious: Udveg at 10:45 AM</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- After: Day View without Muhurta card, with new nav -->
+    <div class="screen">
+      <div class="screen-title">AFTER — Phase 3.3</div>
+      <div class="screen-name">Day View (clean)</div>
+      <div class="screen-desc">Muhurta card removed. New nav bar. Hora card can grow a Rahu row. Day View is back to its essential purpose.</div>
+      <span class="screen-badge badge-new">AFTER</span>
+
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="dawn-sky"></div>
+        <div class="phone-screen">
+          <div class="status-bar"><span>9:41</span><span>●●●</span></div>
+          <!-- NEW nav -->
+          <div class="app-header">
+            <div class="nav-home">🏠</div>
+            <div class="nav-title">TITHIKA</div>
+            <div class="nav-right">
+              <div class="nav-icon">🗓</div>
+              <div class="nav-icon">⚙️</div>
+              <div class="nav-hamburger">☰</div>
+            </div>
+          </div>
+          <div class="date-nav">
+            <button class="dnav-btn">‹</button>
+            <div style="text-align:center"><div class="dnav-dow">THURSDAY</div><div class="dnav-date">May 21, 2026</div></div>
+            <button class="dnav-btn">›</button>
+          </div>
+          <div class="p-scroll">
+            <div class="day-card">
+              <div class="tithi-moon">◐</div>
+              <div class="tithi-name">SHUKLA TRAYODASHI</div>
+              <div class="tithi-bar"></div>
+              <div class="tithi-sub">Shukla · Vaishakha 13 · until 8:42 PM</div>
+            </div>
+            <div class="small-card">
+              <div class="small-label">Nakshatra</div>
+              <div class="small-name">Uttara Phalguni · until 6:15 AM</div>
+            </div>
+            <div class="grid-2x2" style="background:var(--lm-panel)">
+              <div class="grid-cell"><div class="grid-cell-label">☀ Sunrise</div><div class="grid-cell-value">6:02 AM</div></div>
+              <div class="grid-cell" style="text-align:right"><div class="grid-cell-label">Sunset ☀</div><div class="grid-cell-value">7:48 PM</div></div>
+              <div class="grid-cell"><div class="grid-cell-label">☽ Moonrise</div><div class="grid-cell-value">10:24 PM</div></div>
+              <div class="grid-cell" style="text-align:right"><div class="grid-cell-label">Moonset ☽</div><div class="grid-cell-value">9:58 AM</div></div>
+            </div>
+            <!-- Clean Hora card -->
+            <div class="hora-card">
+              <div class="hora-main hora-active" style="padding-left:15px">
+                <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--hora-accent)"></div>
+                <div class="hora-planet" style="color:#C8922A">☉</div>
+                <div class="hora-label">
+                  <div class="hora-name">Sun Hora <span class="now-pill amber">NOW</span></div>
+                  <div class="hora-until">until 8:44 AM · Hour 3 · Day</div>
+                </div>
+              </div>
+            </div>
+            <!-- Breathing room -->
+            <div style="flex:1"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /grid -->
+
+
+  <!-- ═══════════════════════════════════════════
+       SECTION 4 — Implementation reference
+       ═══════════════════════════════════════════ -->
+
+  <div class="section-header">
+    <h2>4 — Implementation Reference</h2>
+    <p>Files to change for Phase 3.3 navigation work, separate from Yoga/Karana calculation work.</p>
+  </div>
+
+  <table class="spec-table">
+    <thead>
+      <tr>
+        <th>File</th>
+        <th>Change</th>
+        <th>Details</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>tithika_nav_bar.dart</td>
+        <td><span class="changed">CHANGED</span></td>
+        <td>Restructure layout: home icon left, title centered (absolute-positioned), right group = Month + Settings + Hamburger. Add <code>onHamburgerTap</code> callback or manage dropdown state internally.</td>
+      </tr>
+      <tr>
+        <td>day_view_screen.dart</td>
+        <td><span class="changed">CHANGED</span></td>
+        <td>Remove <code>_MuhurtaCard</code> widget. Pass Rahu state to <code>_HoraCard</code>. <code>_HoraCard</code> gains optional <code>rahuKaal</code> parameter → shows warning row when approaching/active.</td>
+      </tr>
+      <tr>
+        <td>day_view_screen.dart</td>
+        <td><span class="new-item">NEW (inline)</span></td>
+        <td>Add <code>_RahuWarnRow</code> widget inside <code>_HoraCard</code>. Reads <code>muhurtaProvider</code> and <code>DateTime.now()</code> to compute state: none / approaching / active.</td>
+      </tr>
+      <tr>
+        <td>router.dart</td>
+        <td><span class="new-item">NEW routes</span></td>
+        <td>Add <code>/panchanga</code> route. Hamburger items navigate to <code>/hora</code>, <code>/muhurta</code>, <code>/panchanga</code>, <code>/festivals</code> — all already exist except panchanga.</td>
+      </tr>
+      <tr>
+        <td>day_view_screen.dart</td>
+        <td><span class="removed">_MuhurtaCard removed</span></td>
+        <td>Delete <code>_MuhurtaCard</code> widget (added Phase 3a). Its data (<code>muhurtaProvider</code>) stays — still needed for the Rahu warning row and the full Muhurta screen.</td>
+      </tr>
+      <tr>
+        <td>app_strings.dart</td>
+        <td><span class="new-item">NEW strings</span></td>
+        <td>Add <code>rahuKaalNow(lang)</code>, <code>rahuKaalIn(lang, minutes)</code>, <code>avoidNewStarts(lang)</code> — may already exist from Phase 3a, check first.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="note-panel">
+    <h3>Design decisions captured</h3>
+    <p><strong>Why dropdown, not drawer?</strong> A full-screen drawer feels heavy for four items. The dropdown appears inline below the nav and keeps the Day View context visible behind it (dimmed). It dismisses with a tap anywhere outside — familiar iOS/Android pattern.</p>
+    <p><strong>Why keep Muhurta card off Day View?</strong> Day View's job is "what is today" — Tithi, Nakshatra, sunrise/sunset, current Hora. Choghadiya requires explaining 8 time slots; that belongs on the Muhurta screen. The Rahu row on the Hora card gives the one actionable warning without importing the full Choghadiya UI into Day View.</p>
+    <p><strong>Why "ends HH:MM" not countdown for active Rahu?</strong> A clock time is stable — the user can read it, put the phone down, and refer back. A countdown (<em>34 min left</em>) requires a live rebuild every minute and is confusing if the screen isn't refreshed. Clock time wins for a warning that lasts 90 minutes.</p>
+    <p><strong>Hamburger icon choice.</strong> ☰ (trigram / three horizontal lines) is universally understood as "more menu". Alternatives like ⊕ or ● were considered but ☰ has the strongest affordance for navigation expansion on mobile.</p>
+  </div>
+
+</main>
+</body>
+</html>

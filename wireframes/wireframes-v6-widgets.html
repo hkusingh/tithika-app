@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tithika — Home-Screen Widgets (Phase 3.2)</title>
+<style>
+  :root {
+    /* ── Dark (navy) palette ── */
+    --dk-bg:           #0B0F1E;
+    --dk-panel:        #141829;
+    --dk-ink:          #F3EEDF;
+    --dk-ink-soft:     #AAB0C5;
+    --dk-ink-muted:    #6C7290;
+    --dk-line:         rgba(255,255,255,0.07);
+    --dk-line-strong:  rgba(255,255,255,0.13);
+    --dk-shukla:       #E6B85C;
+    --dk-krishna:      #7B8EE8;
+    --dk-muWarn:       #D46060;
+    --dk-muWarn-bg:    rgba(212,96,96,0.18);
+    --dk-festival:     #E07840;
+
+    /* ── Light (parchment) palette ── */
+    --lm-bg:           #F5F0E8;
+    --lm-panel:        #EDE8D8;
+    --lm-ink:          #1A1F3C;
+    --lm-ink-soft:     #4A5070;
+    --lm-ink-muted:    #8890A8;
+    --lm-line:         rgba(0,0,0,0.08);
+    --lm-line-strong:  rgba(0,0,0,0.16);
+    --lm-shukla:       #C8922A;
+    --lm-krishna:      #5A6BD8;
+    --lm-muWarn:       #B84040;
+    --lm-muWarn-bg:    rgba(184,64,64,0.14);
+    --lm-festival:     #C05A1A;
+
+    /* ── Page chrome ── */
+    --page-bg:    #07090F;
+    --page-ink:   #F3EEDF;
+    --page-soft:  #AAB0C5;
+    --page-muted: #6C7290;
+    --page-line:  rgba(255,255,255,0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--page-bg); color: var(--page-ink);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  header { padding: 40px 44px 20px; border-bottom: 1px solid var(--page-line); }
+  header h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 6px; }
+  header .subtitle { color: var(--page-soft); font-size: 15px; }
+  header .meta { color: var(--page-muted); font-size: 12px; margin-top: 8px; }
+
+  main { padding: 40px 44px 100px; max-width: 1700px; }
+
+  /* ── Section headers ── */
+  .sec-header { margin: 56px 0 28px; padding-bottom: 14px; border-bottom: 1px solid var(--page-line); }
+  .sec-header:first-child { margin-top: 0; }
+  .sec-header h2 { font-size: 19px; font-weight: 700; margin-bottom: 4px; }
+  .sec-header p  { font-size: 13px; color: var(--page-soft); line-height: 1.5; max-width: 700px; }
+
+  /* ── Grid layouts ── */
+  .widget-grid {
+    display: flex; flex-wrap: wrap; gap: 40px 48px; align-items: flex-start;
+  }
+  .widget-col { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .widget-label { font-size: 10px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase;
+                  color: var(--page-muted); text-align: center; }
+  .widget-state { font-size: 11px; color: var(--page-soft); margin-bottom: 2px; text-align: center; }
+  .theme-group { display: flex; flex-direction: column; gap: 14px; align-items: center; }
+  .theme-tag { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+               color: var(--page-muted); }
+
+  /* ════════════════════════════════════════════
+     SMALL WIDGET  155 × 155
+  ════════════════════════════════════════════ */
+  .widget-small {
+    width: 155px; height: 155px;
+    border-radius: 22px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 0; position: relative; overflow: hidden;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.55);
+  }
+  .ws-moon { position: relative; display: flex; align-items: center; justify-content: center;
+             width: 70px; height: 70px; flex-shrink: 0; }
+  .ws-moon canvas { display: block; }
+  .ws-tithi { font-size: 12px; font-weight: 700; text-align: center; margin-top: 9px;
+              line-height: 1.25; padding: 0 12px; }
+  .ws-brand { position: absolute; bottom: 11px; left: 0; right: 0; text-align: center;
+              font-size: 8px; font-weight: 700; letter-spacing: 0.1em; }
+  .ws-festival-dot {
+    position: absolute; bottom: 13px; right: 13px;
+    width: 6px; height: 6px; border-radius: 50%;
+  }
+
+  /* dark small */
+  .ws-dk { background: var(--dk-bg); }
+  .ws-dk .ws-brand   { color: var(--dk-ink-muted); }
+  .ws-dk .ws-shukla  { color: var(--dk-shukla); }
+  .ws-dk .ws-krishna { color: var(--dk-krishna); }
+  .ws-dk .ws-festival-dot { background: var(--dk-festival); }
+
+  /* light small */
+  .ws-lm { background: var(--lm-bg); }
+  .ws-lm .ws-brand   { color: var(--lm-ink-muted); }
+  .ws-lm .ws-shukla  { color: var(--lm-shukla); }
+  .ws-lm .ws-krishna { color: var(--lm-krishna); }
+  .ws-lm .ws-festival-dot { background: var(--lm-festival); }
+
+  /* ════════════════════════════════════════════
+     MEDIUM WIDGET  329 × 155
+  ════════════════════════════════════════════ */
+  .widget-medium {
+    width: 329px; height: 155px;
+    border-radius: 22px; overflow: hidden; position: relative;
+    display: flex; flex-direction: column;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.55);
+  }
+  .widget-medium.rahu-active {
+    box-shadow: 0 8px 28px rgba(0,0,0,0.55), 0 0 0 2px var(--dk-muWarn);
+  }
+  .widget-medium.rahu-active-lm {
+    box-shadow: 0 8px 28px rgba(0,0,0,0.55), 0 0 0 2px var(--lm-muWarn);
+  }
+
+  .wm-top {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 14px 14px 10px; flex: 1;
+  }
+  .wm-moon { width: 54px; height: 54px; flex-shrink: 0; }
+  .wm-moon canvas { display: block; }
+  .wm-info { flex: 1; min-width: 0; }
+  .wm-tithi   { font-size: 15px; font-weight: 700; line-height: 1.2; }
+  .wm-month   { font-size: 10px; margin-top: 2px; }
+  .wm-festival{ font-size: 10px; margin-top: 3px; font-weight: 600; }
+
+  .wm-divider { height: 1px; margin: 0 14px; flex-shrink: 0; }
+
+  .wm-rows { display: flex; flex-direction: column; padding: 6px 14px 0; gap: 3px; }
+  .wm-row { display: flex; align-items: center; gap: 6px; }
+  .wm-row-icon { font-size: 11px; width: 14px; text-align: center; flex-shrink: 0; }
+  .wm-row-label { font-size: 10px; flex: 1; }
+  .wm-row-value { font-size: 10px; font-weight: 600; text-align: right; white-space: nowrap; }
+
+  /* Rahu bar */
+  .wm-rahu-section { padding: 5px 14px 10px; }
+  .wm-rahu-label-row { display: flex; align-items: center; gap: 5px; margin-bottom: 4px; }
+  .wm-rahu-icon  { font-size: 10px; }
+  .wm-rahu-label { font-size: 10px; flex: 1; }
+  .wm-rahu-time  { font-size: 9px; }
+  .wm-rahu-now-pill {
+    font-size: 8px; font-weight: 800; letter-spacing: 0.09em;
+    padding: 1px 5px; border-radius: 4px;
+    background: var(--dk-muWarn); color: #fff;
+  }
+  .wm-rahu-now-pill-lm { background: var(--lm-muWarn); }
+
+  .rahu-bar-track {
+    height: 6px; border-radius: 3px; position: relative; overflow: visible;
+  }
+  .rahu-bar-fill {
+    position: absolute; top: 0; height: 100%; border-radius: 3px;
+  }
+  .rahu-now-tick {
+    position: absolute; top: -4px; bottom: -4px; width: 2px; border-radius: 1px;
+  }
+
+  /* dark medium palette helpers */
+  .wm-dk { background: var(--dk-bg); }
+  .wm-dk .wm-tithi   { color: var(--dk-ink); }
+  .wm-dk .wm-month   { color: var(--dk-ink-soft); }
+  .wm-dk .wm-festival { color: var(--dk-festival); }
+  .wm-dk .wm-divider  { background: var(--dk-line-strong); }
+  .wm-dk .wm-row-icon  { color: var(--dk-ink-muted); }
+  .wm-dk .wm-row-label { color: var(--dk-ink-soft); }
+  .wm-dk .wm-row-value { color: var(--dk-ink); }
+  .wm-dk .wm-shukla   { color: var(--dk-shukla); }
+  .wm-dk .wm-krishna  { color: var(--dk-krishna); }
+  .wm-dk .wm-rahu-label { color: var(--dk-ink-soft); }
+  .wm-dk .wm-rahu-time  { color: var(--dk-ink-muted); }
+  .wm-dk .rahu-bar-track { background: var(--dk-line-strong); }
+  .wm-dk .rahu-bar-fill  { background: var(--dk-muWarn-bg); }
+  .wm-dk .rahu-bar-fill.active { background: var(--dk-muWarn); }
+  .wm-dk .rahu-now-tick { background: var(--dk-muWarn); }
+
+  /* light medium palette helpers */
+  .wm-lm { background: var(--lm-bg); }
+  .wm-lm .wm-tithi    { color: var(--lm-ink); }
+  .wm-lm .wm-month    { color: var(--lm-ink-soft); }
+  .wm-lm .wm-festival { color: var(--lm-festival); }
+  .wm-lm .wm-divider  { background: var(--lm-line-strong); }
+  .wm-lm .wm-row-icon  { color: var(--lm-ink-muted); }
+  .wm-lm .wm-row-label { color: var(--lm-ink-soft); }
+  .wm-lm .wm-row-value { color: var(--lm-ink); }
+  .wm-lm .wm-shukla   { color: var(--lm-shukla); }
+  .wm-lm .wm-krishna  { color: var(--lm-krishna); }
+  .wm-lm .wm-rahu-label { color: var(--lm-ink-soft); }
+  .wm-lm .wm-rahu-time  { color: var(--lm-ink-muted); }
+  .wm-lm .rahu-bar-track { background: var(--lm-line-strong); }
+  .wm-lm .rahu-bar-fill  { background: var(--lm-muWarn-bg); }
+  .wm-lm .rahu-bar-fill.active { background: var(--lm-muWarn); }
+  .wm-lm .rahu-now-tick { background: var(--lm-muWarn); }
+
+  /* ════════════════════════════════════════════
+     iOS LOCK SCREEN — clock-crop mockup
+     Shows just the clock + widget row area.
+     No full phone frame; keeps focus on widget.
+  ════════════════════════════════════════════ */
+  .lock-crop {
+    width: 260px;
+    border-radius: 24px; overflow: hidden;
+    border: 6px solid #1c1c1e;
+    box-shadow: 0 10px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(0,0,0,0.35);
+    display: flex; flex-direction: column; align-items: center;
+    padding: 28px 20px 22px;
+    gap: 16px;
+  }
+  .lock-crop-dark  { background: linear-gradient(170deg, #0e1526 0%, #0a0f1c 60%, #131c38 100%); }
+  .lock-crop-light { background: linear-gradient(170deg, #c5d6ee 0%, #d4e4f6 60%, #bdd0ea 100%); }
+
+  /* Clock */
+  .lc-time { text-align: center; }
+  .lc-hm   { font-size: 56px; font-weight: 200; letter-spacing: -0.03em; line-height: 1; }
+  .lc-date { font-size: 14px; font-weight: 400; margin-top: 4px; letter-spacing: 0.01em; }
+  .lock-crop-dark  .lc-hm,
+  .lock-crop-dark  .lc-date  { color: rgba(255,255,255,0.88); }
+  .lock-crop-light .lc-hm,
+  .lock-crop-light .lc-date  { color: rgba(15,25,60,0.88); }
+
+  /* Widget slot row */
+  .lc-widget-row {
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+  }
+
+  /* ── Circular accessory widget — 56px in wireframe, actual 44pt ── */
+  .acc-circular {
+    width: 56px; height: 56px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    position: relative; flex-shrink: 0; overflow: hidden;
+  }
+  .acc-circular canvas { display: block; position: relative; z-index: 1; }
+  .acc-tithi-num {
+    position: absolute; bottom: 9px; right: 8px;
+    font-size: 15px; font-weight: 800; line-height: 1; z-index: 2;
+    padding: 2px 5px; border-radius: 5px;
+  }
+  .vibrancy-dk .acc-tithi-num {
+    background: rgba(0,0,0,0.45); color: rgba(255,255,255,0.95);
+  }
+  .vibrancy-lm .acc-tithi-num {
+    background: rgba(255,255,255,0.55); color: rgba(15,25,60,0.92);
+  }
+  .acc-circular-note {
+    font-size: 9px; color: var(--page-muted); margin-top: 4px; text-align: center;
+  }
+
+  /* ── Rectangular accessory widget 171×54 ── */
+  .acc-rect {
+    width: 171px; height: 54px; border-radius: 12px;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 0 12px; flex-shrink: 0;
+  }
+  .acc-rect-tithi { font-size: 13px; font-weight: 700; line-height: 1.25; }
+  .acc-rect-sub   { font-size: 10px; margin-top: 2px; }
+
+  /* ── Vibrancy (dark wallpaper) ── */
+  .vibrancy-dk {
+    background: rgba(255,255,255,0.13);
+    border: 1px solid rgba(255,255,255,0.22);
+  }
+  .vibrancy-dk .acc-tithi-num    { color: rgba(255,255,255,0.9); }
+  .vibrancy-dk .acc-rect-tithi   { color: rgba(255,255,255,0.92); }
+  .vibrancy-dk .acc-rect-sub     { color: rgba(255,255,255,0.52); }
+
+  /* ── Vibrancy (light wallpaper) ── */
+  .vibrancy-lm {
+    background: rgba(255,255,255,0.45);
+    border: 1px solid rgba(255,255,255,0.65);
+  }
+  .vibrancy-lm .acc-tithi-num    { color: rgba(15,25,60,0.88); }
+  .vibrancy-lm .acc-rect-tithi   { color: rgba(15,25,60,0.92); }
+  .vibrancy-lm .acc-rect-sub     { color: rgba(15,25,60,0.52); }
+
+  /* ── Design notes section ── */
+  .notes-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 8px; }
+  .note-card {
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px; padding: 18px 20px;
+  }
+  .note-card h4 { font-size: 13px; font-weight: 700; margin-bottom: 10px; color: var(--page-ink); }
+  .note-card ul { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .note-card li { font-size: 12px; color: var(--page-soft); line-height: 1.5; padding-left: 14px; position: relative; }
+  .note-card li::before { content: '·'; position: absolute; left: 4px; color: var(--page-muted); }
+  .note-card code { font-family: "SF Mono", "Fira Code", monospace; font-size: 11px; background: rgba(255,255,255,0.06); padding: 1px 4px; border-radius: 3px; color: var(--dk-shukla); }
+
+  /* subsection label */
+  .subsec-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase;
+    color: var(--page-soft); margin: 0 0 16px;
+  }
+
+  /* spacer */
+  .spacer-sm { height: 16px; }
+  .spacer-md { height: 32px; }
+
+  /* state labels row */
+  .states-row { display: flex; gap: 48px; flex-wrap: wrap; align-items: flex-start; }
+  .state-block { display: flex; flex-direction: column; gap: 8px; align-items: center; }
+  .state-tag { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--page-muted); margin-bottom: 4px; text-align: center; }
+
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Tithika — Home-Screen Widgets</h1>
+  <p class="subtitle">Phase 3.2 · Design Wireframe</p>
+  <p class="meta">v6 · 2026-05-26 · Three sizes: Small (2×2) · Medium (4×2) · iOS Lock Screen</p>
+</header>
+
+<main>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SECTION 1 — SMALL WIDGET (2×2)
+═══════════════════════════════════════════════════════════════ -->
+<div class="sec-header">
+  <h2>1 — Small Widget (2×2)</h2>
+  <p>Moon phase + tithi name. Tap opens app to Day View. Festival dot appears bottom-right when a festival falls today.</p>
+</div>
+
+<div class="states-row">
+
+  <!-- State A: Normal Shukla -->
+  <div class="state-block">
+    <div class="state-tag">A · Shukla (normal)</div>
+    <div class="theme-group">
+      <div class="theme-tag">Dark</div>
+      <div class="widget-small ws-dk">
+        <div class="ws-moon"><canvas data-moon="2" data-mode="dark" width="70" height="70"></canvas></div>
+        <div class="ws-tithi ws-shukla">Shukla Dvitiya</div>
+        <div class="ws-brand">TITHIKA</div>
+      </div>
+      <div class="theme-tag">Light</div>
+      <div class="widget-small ws-lm">
+        <div class="ws-moon"><canvas data-moon="2" data-mode="light" width="70" height="70"></canvas></div>
+        <div class="ws-tithi ws-shukla">Shukla Dvitiya</div>
+        <div class="ws-brand">TITHIKA</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- State B: Krishna paksha -->
+  <div class="state-block">
+    <div class="state-tag">B · Krishna paksha</div>
+    <div class="theme-group">
+      <div class="theme-tag">Dark</div>
+      <div class="widget-small ws-dk">
+        <div class="ws-moon"><canvas data-moon="18" data-mode="dark" width="70" height="70"></canvas></div>
+        <div class="ws-tithi ws-krishna">Krishna Tritiya</div>
+        <div class="ws-brand">TITHIKA</div>
+      </div>
+      <div class="theme-tag">Light</div>
+      <div class="widget-small ws-lm">
+        <div class="ws-moon"><canvas data-moon="18" data-mode="light" width="70" height="70"></canvas></div>
+        <div class="ws-tithi ws-krishna">Krishna Tritiya</div>
+        <div class="ws-brand">TITHIKA</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- State C: Festival day -->
+  <div class="state-block">
+    <div class="state-tag">C · Festival day</div>
+    <div class="theme-group">
+      <div class="theme-tag">Dark</div>
+      <div class="widget-small ws-dk">
+        <div class="ws-moon"><canvas data-moon="3" data-mode="dark" width="70" height="70"></canvas></div>
+        <div class="ws-tithi ws-shukla">Shukla Tritiya</div>
+        <div class="ws-brand">TITHIKA</div>
+        <div class="ws-festival-dot"></div>
+      </div>
+      <div class="theme-tag">Light</div>
+      <div class="widget-small ws-lm">
+        <div class="ws-moon"><canvas data-moon="3" data-mode="light" width="70" height="70"></canvas></div>
+        <div class="ws-tithi ws-shukla">Shukla Tritiya</div>
+        <div class="ws-brand">TITHIKA</div>
+        <div class="ws-festival-dot"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- State D: Full moon -->
+  <div class="state-block">
+    <div class="state-tag">D · Purnima</div>
+    <div class="theme-group">
+      <div class="theme-tag">Dark</div>
+      <div class="widget-small ws-dk">
+        <div class="ws-moon"><canvas data-moon="15" data-mode="dark" width="70" height="70"></canvas></div>
+        <div class="ws-tithi ws-shukla">Purnima</div>
+        <div class="ws-brand">TITHIKA</div>
+      </div>
+      <div class="theme-tag">Light</div>
+      <div class="widget-small ws-lm">
+        <div class="ws-moon"><canvas data-moon="15" data-mode="light" width="70" height="70"></canvas></div>
+        <div class="ws-tithi ws-shukla">Purnima</div>
+        <div class="ws-brand">TITHIKA</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- State E: Amavasya -->
+  <div class="state-block">
+    <div class="state-tag">E · Amavasya</div>
+    <div class="theme-group">
+      <div class="theme-tag">Dark</div>
+      <div class="widget-small ws-dk">
+        <div class="ws-moon"><canvas data-moon="30" data-mode="dark" width="70" height="70"></canvas></div>
+        <div class="ws-tithi ws-krishna">Amavasya</div>
+        <div class="ws-brand">TITHIKA</div>
+      </div>
+      <div class="theme-tag">Light</div>
+      <div class="widget-small ws-lm">
+        <div class="ws-moon"><canvas data-moon="30" data-mode="light" width="70" height="70"></canvas></div>
+        <div class="ws-tithi ws-krishna">Amavasya</div>
+        <div class="ws-brand">TITHIKA</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /states-row -->
+
+<div class="spacer-md"></div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     SECTION 2 — MEDIUM WIDGET (4×2)
+═══════════════════════════════════════════════════════════════ -->
+<div class="sec-header">
+  <h2>2 — Medium Widget (4×2)</h2>
+  <p>Tithi, nakshatra, sunrise, Rahu Kaal bar, optional festival name. Tap opens Day View. Active Rahu highlighted in red with NOW badge and red widget border.</p>
+</div>
+
+<div class="states-row">
+
+  <!-- State 1: Normal -->
+  <div class="state-block">
+    <div class="state-tag">1 · Normal day</div>
+
+    <div class="theme-tag">Dark</div>
+    <div class="widget-medium wm-dk">
+      <div class="wm-top">
+        <div class="wm-moon"><canvas data-moon-m="2" data-mode="dark" width="54" height="54"></canvas></div>
+        <div class="wm-info">
+          <div class="wm-tithi wm-shukla">Shukla Dvitiya</div>
+          <div class="wm-month">Vaishakha · Shukla 2</div>
+        </div>
+      </div>
+      <div class="wm-divider"></div>
+      <div class="wm-rows">
+        <div class="wm-row">
+          <span class="wm-row-icon">✦</span>
+          <span class="wm-row-label">Mrigashira</span>
+          <span class="wm-row-value">until 11:42 PM</span>
+        </div>
+        <div class="wm-row">
+          <span class="wm-row-icon">☀</span>
+          <span class="wm-row-label">Sunrise</span>
+          <span class="wm-row-value">6:02 AM</span>
+        </div>
+      </div>
+      <div class="wm-rahu-section">
+        <div class="wm-rahu-label-row">
+          <span class="wm-rahu-icon">⚠</span>
+          <span class="wm-rahu-label">Rahu Kaal</span>
+          <span class="wm-rahu-time">7:30 – 9:00 AM</span>
+        </div>
+        <div class="rahu-bar-track">
+          <div class="rahu-bar-fill" style="left: 22%; width: 11%;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="spacer-sm"></div>
+    <div class="theme-tag">Light</div>
+    <div class="widget-medium wm-lm">
+      <div class="wm-top">
+        <div class="wm-moon"><canvas data-moon-m="2" data-mode="light" width="54" height="54"></canvas></div>
+        <div class="wm-info">
+          <div class="wm-tithi wm-shukla">Shukla Dvitiya</div>
+          <div class="wm-month">Vaishakha · Shukla 2</div>
+        </div>
+      </div>
+      <div class="wm-divider"></div>
+      <div class="wm-rows">
+        <div class="wm-row">
+          <span class="wm-row-icon">✦</span>
+          <span class="wm-row-label">Mrigashira</span>
+          <span class="wm-row-value">until 11:42 PM</span>
+        </div>
+        <div class="wm-row">
+          <span class="wm-row-icon">☀</span>
+          <span class="wm-row-label">Sunrise</span>
+          <span class="wm-row-value">6:02 AM</span>
+        </div>
+      </div>
+      <div class="wm-rahu-section">
+        <div class="wm-rahu-label-row">
+          <span class="wm-rahu-icon">⚠</span>
+          <span class="wm-rahu-label">Rahu Kaal</span>
+          <span class="wm-rahu-time">7:30 – 9:00 AM</span>
+        </div>
+        <div class="rahu-bar-track">
+          <div class="rahu-bar-fill" style="left: 22%; width: 11%;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- State 2: Rahu Kaal active -->
+  <div class="state-block">
+    <div class="state-tag">2 · Rahu Kaal active NOW</div>
+
+    <div class="theme-tag">Dark</div>
+    <div class="widget-medium wm-dk rahu-active">
+      <div class="wm-top">
+        <div class="wm-moon"><canvas data-moon-m="2" data-mode="dark" width="54" height="54"></canvas></div>
+        <div class="wm-info">
+          <div class="wm-tithi wm-shukla">Shukla Dvitiya</div>
+          <div class="wm-month">Vaishakha · Shukla 2</div>
+        </div>
+      </div>
+      <div class="wm-divider"></div>
+      <div class="wm-rows">
+        <div class="wm-row">
+          <span class="wm-row-icon">✦</span>
+          <span class="wm-row-label">Mrigashira</span>
+          <span class="wm-row-value">until 11:42 PM</span>
+        </div>
+        <div class="wm-row">
+          <span class="wm-row-icon">☀</span>
+          <span class="wm-row-label">Sunrise</span>
+          <span class="wm-row-value">6:02 AM</span>
+        </div>
+      </div>
+      <div class="wm-rahu-section">
+        <div class="wm-rahu-label-row">
+          <span class="wm-rahu-icon">⚠</span>
+          <span class="wm-rahu-label">Rahu Kaal</span>
+          <span class="wm-rahu-now-pill">NOW</span>
+          <span class="wm-rahu-time" style="margin-left:4px">until 9:00 AM</span>
+        </div>
+        <div class="rahu-bar-track">
+          <div class="rahu-bar-fill active" style="left: 22%; width: 11%;"></div>
+          <div class="rahu-now-tick" style="left: 28%;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="spacer-sm"></div>
+    <div class="theme-tag">Light</div>
+    <div class="widget-medium wm-lm rahu-active-lm">
+      <div class="wm-top">
+        <div class="wm-moon"><canvas data-moon-m="2" data-mode="light" width="54" height="54"></canvas></div>
+        <div class="wm-info">
+          <div class="wm-tithi wm-shukla">Shukla Dvitiya</div>
+          <div class="wm-month">Vaishakha · Shukla 2</div>
+        </div>
+      </div>
+      <div class="wm-divider"></div>
+      <div class="wm-rows">
+        <div class="wm-row">
+          <span class="wm-row-icon">✦</span>
+          <span class="wm-row-label">Mrigashira</span>
+          <span class="wm-row-value">until 11:42 PM</span>
+        </div>
+        <div class="wm-row">
+          <span class="wm-row-icon">☀</span>
+          <span class="wm-row-label">Sunrise</span>
+          <span class="wm-row-value">6:02 AM</span>
+        </div>
+      </div>
+      <div class="wm-rahu-section">
+        <div class="wm-rahu-label-row">
+          <span class="wm-rahu-icon">⚠</span>
+          <span class="wm-rahu-label">Rahu Kaal</span>
+          <span class="wm-rahu-now-pill wm-rahu-now-pill-lm">NOW</span>
+          <span class="wm-rahu-time" style="margin-left:4px">until 9:00 AM</span>
+        </div>
+        <div class="rahu-bar-track">
+          <div class="rahu-bar-fill active" style="left: 22%; width: 11%;"></div>
+          <div class="rahu-now-tick" style="left: 28%;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- State 3: Festival day -->
+  <div class="state-block">
+    <div class="state-tag">3 · Festival day</div>
+
+    <div class="theme-tag">Dark</div>
+    <div class="widget-medium wm-dk">
+      <div class="wm-top">
+        <div class="wm-moon"><canvas data-moon-m="3" data-mode="dark" width="54" height="54"></canvas></div>
+        <div class="wm-info">
+          <div class="wm-tithi wm-shukla">Shukla Tritiya</div>
+          <div class="wm-month">Vaishakha · Shukla 3</div>
+          <div class="wm-festival">🎉 Akshaya Tritiya</div>
+        </div>
+      </div>
+      <div class="wm-divider"></div>
+      <div class="wm-rows">
+        <div class="wm-row">
+          <span class="wm-row-icon">✦</span>
+          <span class="wm-row-label">Rohini</span>
+          <span class="wm-row-value">until 2:15 PM</span>
+        </div>
+        <div class="wm-row">
+          <span class="wm-row-icon">☀</span>
+          <span class="wm-row-label">Sunrise</span>
+          <span class="wm-row-value">6:00 AM</span>
+        </div>
+      </div>
+      <div class="wm-rahu-section">
+        <div class="wm-rahu-label-row">
+          <span class="wm-rahu-icon">⚠</span>
+          <span class="wm-rahu-label">Rahu Kaal</span>
+          <span class="wm-rahu-time">4:30 – 6:00 PM</span>
+        </div>
+        <div class="rahu-bar-track">
+          <div class="rahu-bar-fill" style="left: 69%; width: 11%;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="spacer-sm"></div>
+    <div class="theme-tag">Light</div>
+    <div class="widget-medium wm-lm">
+      <div class="wm-top">
+        <div class="wm-moon"><canvas data-moon-m="3" data-mode="light" width="54" height="54"></canvas></div>
+        <div class="wm-info">
+          <div class="wm-tithi wm-shukla">Shukla Tritiya</div>
+          <div class="wm-month">Vaishakha · Shukla 3</div>
+          <div class="wm-festival">🎉 Akshaya Tritiya</div>
+        </div>
+      </div>
+      <div class="wm-divider"></div>
+      <div class="wm-rows">
+        <div class="wm-row">
+          <span class="wm-row-icon">✦</span>
+          <span class="wm-row-label">Rohini</span>
+          <span class="wm-row-value">until 2:15 PM</span>
+        </div>
+        <div class="wm-row">
+          <span class="wm-row-icon">☀</span>
+          <span class="wm-row-label">Sunrise</span>
+          <span class="wm-row-value">6:00 AM</span>
+        </div>
+      </div>
+      <div class="wm-rahu-section">
+        <div class="wm-rahu-label-row">
+          <span class="wm-rahu-icon">⚠</span>
+          <span class="wm-rahu-label">Rahu Kaal</span>
+          <span class="wm-rahu-time">4:30 – 6:00 PM</span>
+        </div>
+        <div class="rahu-bar-track">
+          <div class="rahu-bar-fill" style="left: 69%; width: 11%;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /states-row -->
+
+<div class="spacer-md"></div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     SECTION 3 — iOS LOCK SCREEN
+═══════════════════════════════════════════════════════════════ -->
+<div class="sec-header">
+  <h2>3 — iOS Lock Screen Widgets</h2>
+  <p>Two separate widget types — user picks one or the other. System vibrancy only; no app color palette. Each mockup shows a clock-crop (time + widget row) so the widget is the focus.</p>
+</div>
+
+<!-- 3A: Circular -->
+<div class="subsec-label">3A — Circular (.accessoryCircular) · moon phase + tithi number</div>
+<div class="states-row" style="margin-bottom: 48px;">
+
+  <div class="state-block">
+    <div class="state-tag">Dark · Shukla Dvitiya (2)</div>
+    <div class="lock-crop lock-crop-dark">
+      <div class="lc-time">
+        <div class="lc-hm">8:47</div>
+        <div class="lc-date">Monday, 26 May</div>
+      </div>
+      <div class="lc-widget-row">
+        <div class="acc-circular vibrancy-dk">
+          <canvas data-moon-lock="2" data-mode="lock-dark" width="56" height="56"></canvas>
+          <div class="acc-tithi-num">2</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="state-block">
+    <div class="state-tag">Light · Shukla Dvitiya (2)</div>
+    <div class="lock-crop lock-crop-light">
+      <div class="lc-time">
+        <div class="lc-hm">8:47</div>
+        <div class="lc-date">Monday, 26 May</div>
+      </div>
+      <div class="lc-widget-row">
+        <div class="acc-circular vibrancy-lm">
+          <canvas data-moon-lock="2" data-mode="lock-light" width="56" height="56"></canvas>
+          <div class="acc-tithi-num">2</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="state-block">
+    <div class="state-tag">Dark · Krishna Tritiya (18)</div>
+    <div class="lock-crop lock-crop-dark">
+      <div class="lc-time">
+        <div class="lc-hm">9:15</div>
+        <div class="lc-date">Wednesday, 10 Jun</div>
+      </div>
+      <div class="lc-widget-row">
+        <div class="acc-circular vibrancy-dk">
+          <canvas data-moon-lock="18" data-mode="lock-dark" width="56" height="56"></canvas>
+          <div class="acc-tithi-num">18</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="state-block">
+    <div class="state-tag">Light · Krishna Tritiya (18)</div>
+    <div class="lock-crop lock-crop-light">
+      <div class="lc-time">
+        <div class="lc-hm">9:15</div>
+        <div class="lc-date">Wednesday, 10 Jun</div>
+      </div>
+      <div class="lc-widget-row">
+        <div class="acc-circular vibrancy-lm">
+          <canvas data-moon-lock="18" data-mode="lock-light" width="56" height="56"></canvas>
+          <div class="acc-tithi-num">18</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /states-row 3A -->
+
+<!-- 3B: Rectangular -->
+<div class="subsec-label">3B — Rectangular (.accessoryRectangular) · tithi name + nakshatra · sunrise</div>
+<div class="states-row">
+
+  <div class="state-block">
+    <div class="state-tag">Dark · Shukla Dvitiya</div>
+    <div class="lock-crop lock-crop-dark">
+      <div class="lc-time">
+        <div class="lc-hm">8:47</div>
+        <div class="lc-date">Monday, 26 May</div>
+      </div>
+      <div class="lc-widget-row">
+        <div class="acc-rect vibrancy-dk">
+          <div class="acc-rect-tithi">Shukla Dvitiya</div>
+          <div class="acc-rect-sub">✦ Mrigashira · ☀ 6:02 AM</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="state-block">
+    <div class="state-tag">Light · Shukla Dvitiya</div>
+    <div class="lock-crop lock-crop-light">
+      <div class="lc-time">
+        <div class="lc-hm">8:47</div>
+        <div class="lc-date">Monday, 26 May</div>
+      </div>
+      <div class="lc-widget-row">
+        <div class="acc-rect vibrancy-lm">
+          <div class="acc-rect-tithi">Shukla Dvitiya</div>
+          <div class="acc-rect-sub">✦ Mrigashira · ☀ 6:02 AM</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="state-block">
+    <div class="state-tag">Dark · Krishna Tritiya</div>
+    <div class="lock-crop lock-crop-dark">
+      <div class="lc-time">
+        <div class="lc-hm">9:15</div>
+        <div class="lc-date">Wednesday, 10 Jun</div>
+      </div>
+      <div class="lc-widget-row">
+        <div class="acc-rect vibrancy-dk">
+          <div class="acc-rect-tithi">Krishna Tritiya</div>
+          <div class="acc-rect-sub">✦ Uttara Phalguni · ☀ 6:08 AM</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="state-block">
+    <div class="state-tag">Light · Krishna Tritiya</div>
+    <div class="lock-crop lock-crop-light">
+      <div class="lc-time">
+        <div class="lc-hm">9:15</div>
+        <div class="lc-date">Wednesday, 10 Jun</div>
+      </div>
+      <div class="lc-widget-row">
+        <div class="acc-rect vibrancy-lm">
+          <div class="acc-rect-tithi">Krishna Tritiya</div>
+          <div class="acc-rect-sub">✦ Uttara Phalguni · ☀ 6:08 AM</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /states-row 3B -->
+
+<div class="spacer-md"></div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     SECTION 4 — DESIGN NOTES
+═══════════════════════════════════════════════════════════════ -->
+<div class="sec-header">
+  <h2>4 — Design Notes</h2>
+  <p>Constraints, rendering approach, and data strategy for native implementation.</p>
+</div>
+
+<div class="notes-grid">
+
+  <div class="note-card">
+    <h4>Moon Phase Rendering</h4>
+    <ul>
+      <li>Terminator ellipse algorithm: <code>terminatorRx = r · cos(litFraction · π)</code></li>
+      <li>Shukla (1–15): right side lit; Krishna (16–30): left side lit</li>
+      <li>Positive <code>terminatorRx</code> → crescent (dark ellipse overlaid on lit semicircle)</li>
+      <li>Negative <code>terminatorRx</code> → gibbous (lit ellipse extends into dark semicircle)</li>
+      <li>iOS: replicate painter in SwiftUI Canvas or UIBezierPath in widget extension</li>
+      <li>Android: Glance Canvas or custom RemoteViews with Bitmap pre-rendered by app</li>
+    </ul>
+  </div>
+
+  <div class="note-card">
+    <h4>Data Bridge Strategy</h4>
+    <ul>
+      <li>App writes a JSON snapshot to shared App Group storage on every open and notification schedule</li>
+      <li>JSON keys: <code>tithi</code>, <code>tithiNum</code>, <code>paksha</code>, <code>nakshatra</code>, <code>sunriseUtc</code>, <code>sunsetUtc</code>, <code>rahuStart</code>, <code>rahuEnd</code>, <code>festival</code>, <code>tzId</code>, <code>generatedAt</code></li>
+      <li>Widget extensions read JSON — no ephemeris calls from widget target</li>
+      <li>If JSON is stale (>26 h), widget shows last-known data with faded opacity</li>
+    </ul>
+  </div>
+
+  <div class="note-card">
+    <h4>Rahu Kaal Bar Math</h4>
+    <ul>
+      <li>Bar represents sunrise→sunset window (100% width)</li>
+      <li>Bar fill <code>left</code> = <code>(rahuStart − sunrise) / (sunset − sunrise)</code></li>
+      <li>Bar fill <code>width</code> = <code>(rahuEnd − rahuStart) / (sunset − sunrise)</code> ≈ 1/8 ≈ 12.5%</li>
+      <li>Active state: current time within [rahuStart, rahuEnd]; tick at <code>(now − sunrise) / (sunset − sunrise)</code></li>
+      <li>Active: border turns red, fill goes solid, NOW badge shown</li>
+    </ul>
+  </div>
+
+  <div class="note-card">
+    <h4>Update Cadence</h4>
+    <ul>
+      <li>iOS WidgetKit: hourly <code>TimelineEntry</code> slots, midnight boundary for next-day refresh</li>
+      <li>iOS Timeline invalidated on app open via <code>WidgetCenter.shared.reloadAllTimelines()</code></li>
+      <li>Android Glance: <code>WorkManager</code> periodic task every 30 min; also refresh on app open</li>
+      <li>Active Rahu window: OS may not reload mid-hour; widget shows "active" based on system time at render</li>
+    </ul>
+  </div>
+
+  <div class="note-card">
+    <h4>Tap Targets</h4>
+    <ul>
+      <li>Small widget: entire widget taps to Day View (<code>Routes.dayView</code> via App Intent)</li>
+      <li>Medium widget: tap anywhere opens Day View; no sub-element routing in v1</li>
+      <li>Lock screen widgets: tap opens app at Day View (standard accessory widget behavior)</li>
+      <li>Android: single <code>Intent</code> deep-link to Day View activity</li>
+    </ul>
+  </div>
+
+  <div class="note-card">
+    <h4>Lock Screen Vibrancy</h4>
+    <ul>
+      <li>iOS accessory widgets use system vibrancy — no custom color palette</li>
+      <li>In SwiftUI: apply <code>.widgetAccentable()</code> to accent-colored elements</li>
+      <li>Moon phase in circular widget: white fill on dark, dark fill on light — system handles tint</li>
+      <li>Text always uses system primary label color; secondary uses <code>.secondary</code> foreground style</li>
+    </ul>
+  </div>
+
+  <div class="note-card">
+    <h4>Implementation Packages</h4>
+    <ul>
+      <li>iOS: native WidgetKit extension (Swift + SwiftUI) — <code>home_widget</code> does not support WidgetKit</li>
+      <li>Android: <code>home_widget: ^4.x</code> with Glance <code>AppWidgetReceiver</code> (Kotlin)</li>
+      <li>Shared App Group: <code>group.com.tithika.app</code> (iOS) / shared <code>SharedPreferences</code> (Android)</li>
+      <li>Moon phase Bitmap for Android: pre-rendered by Flutter layer into shared storage, read by widget</li>
+    </ul>
+  </div>
+
+  <div class="note-card">
+    <h4>Color Tokens (exact hex)</h4>
+    <ul>
+      <li>Dark bg: <code>#0B0F1E</code> · Shukla gold: <code>#E6B85C</code> · Krishna blue: <code>#7B8EE8</code></li>
+      <li>Light bg: <code>#F5F0E8</code> · Shukla gold: <code>#C8922A</code> · Krishna blue: <code>#5A6BD8</code></li>
+      <li>Rahu warn dark: <code>#D46060</code> · light: <code>#B84040</code></li>
+      <li>Festival orange dark: <code>#E07840</code> · light: <code>#C05A1A</code></li>
+    </ul>
+  </div>
+
+</div><!-- /notes-grid -->
+
+</main>
+
+<script>
+/* ──────────────────────────────────────────────────────────────
+   Moon phase canvas renderer
+   tithiNumber: 1–30 (1=Shukla 1, 15=Purnima, 16=Krishna 1, 30=Amavasya)
+   mode: "dark" | "light" | "lock-dark" | "lock-light"
+────────────────────────────────────────────────────────────── */
+function drawMoon(canvas, tithiNumber, mode) {
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  const r = Math.min(w, h) / 2 - 2;
+  const cx = w / 2, cy = h / 2;
+
+  ctx.clearRect(0, 0, w, h);
+
+  const isLock = mode.startsWith('lock');
+  const isDark = mode === 'dark' || mode === 'lock-dark';
+
+  // Palette
+  const litColor  = isDark ? '#F3EEDF' : '#1A1F3C';
+  const darkColor = isDark ? '#0B0F1E' : '#8890A8';
+  const shadowColor = isDark ? 'rgba(0,0,0,0.55)' : 'rgba(0,0,0,0.15)';
+
+  // Lock screen: use vibrancy-like white/dark
+  const lockLit  = isDark ? 'rgba(255,255,255,0.9)' : 'rgba(20,30,70,0.85)';
+  const lockDark = isDark ? 'rgba(0,0,10,0.7)'      : 'rgba(150,160,190,0.5)';
+
+  const fillLit  = isLock ? lockLit  : litColor;
+  const fillDark = isLock ? lockDark : darkColor;
+
+  // Determine which side is lit
+  // tithiNumber 1–15 = Shukla (right side lit, waxing)
+  // tithiNumber 16–30 = Krishna (left side lit, waning)
+  // Treat tithiNumber 30 as Amavasya (new moon, ~dark)
+  // Treat tithiNumber 15 as Purnima (full moon, all lit)
+
+  let litFraction;
+  let isShukla;
+
+  if (tithiNumber <= 15) {
+    isShukla = true;
+    litFraction = tithiNumber / 15; // 0→1
+  } else {
+    isShukla = false;
+    litFraction = (30 - tithiNumber) / 15; // 1→0
+  }
+
+  // Clamp
+  litFraction = Math.max(0, Math.min(1, litFraction));
+
+  // Draw shadow circle first (background)
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.fillStyle = fillDark;
+  ctx.fill();
+
+  if (litFraction < 0.01) {
+    // New moon — just the dark disk, done
+    return;
+  }
+
+  // Clip to the correct half
+  ctx.save();
+  ctx.beginPath();
+  if (isShukla) {
+    // Right half lit
+    ctx.rect(cx, cy - r - 1, r + 2, r * 2 + 2);
+  } else {
+    // Left half lit
+    ctx.rect(cx - r - 2, cy - r - 1, r + 2, r * 2 + 2);
+  }
+  ctx.clip();
+
+  // Draw the lit semicircle
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.fillStyle = fillLit;
+  ctx.fill();
+
+  ctx.restore();
+
+  // Now draw the terminator ellipse
+  // terminatorRx = r * cos(litFraction * π)
+  // When litFraction=0: terminatorRx=r (full flat — crescent starts)
+  // When litFraction=0.5: terminatorRx=0 (half moon — straight terminator)
+  // When litFraction=1: terminatorRx=-r (gibbous, nearly full)
+
+  const terminatorRx = r * Math.cos(litFraction * Math.PI);
+  const terminatorAbsRx = Math.abs(terminatorRx);
+
+  if (terminatorAbsRx > 0.5) {
+    ctx.save();
+
+    if (terminatorRx > 0) {
+      // Crescent: dark ellipse overlaid on the lit half
+      // For Shukla: dark ellipse on right (same side as lit), terminator is concave inward
+      // For Krishna: dark ellipse on left (same side as lit)
+      if (isShukla) {
+        ctx.beginPath();
+        ctx.rect(cx, cy - r - 1, r + 2, r * 2 + 2);
+        ctx.clip();
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, terminatorAbsRx, r, 0, 0, Math.PI * 2);
+        ctx.fillStyle = fillDark;
+        ctx.fill();
+      } else {
+        ctx.beginPath();
+        ctx.rect(cx - r - 2, cy - r - 1, r + 2, r * 2 + 2);
+        ctx.clip();
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, terminatorAbsRx, r, 0, 0, Math.PI * 2);
+        ctx.fillStyle = fillDark;
+        ctx.fill();
+      }
+    } else {
+      // Gibbous: lit ellipse extends into the dark half
+      if (isShukla) {
+        // Extend lit into left half
+        ctx.beginPath();
+        ctx.rect(cx - r - 2, cy - r - 1, r + 2, r * 2 + 2);
+        ctx.clip();
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, terminatorAbsRx, r, 0, 0, Math.PI * 2);
+        ctx.fillStyle = fillLit;
+        ctx.fill();
+      } else {
+        // Extend lit into right half
+        ctx.beginPath();
+        ctx.rect(cx, cy - r - 1, r + 2, r * 2 + 2);
+        ctx.clip();
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, terminatorAbsRx, r, 0, 0, Math.PI * 2);
+        ctx.fillStyle = fillLit;
+        ctx.fill();
+      }
+    }
+
+    ctx.restore();
+  }
+
+  // Subtle outer glow / stroke
+  if (!isLock) {
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.10)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+}
+
+// Render all small widget moons
+document.querySelectorAll('canvas[data-moon]').forEach(canvas => {
+  const tithi = parseInt(canvas.dataset.moon, 10);
+  const mode  = canvas.dataset.mode || 'dark';
+  drawMoon(canvas, tithi, mode);
+});
+
+// Render all medium widget moons
+document.querySelectorAll('canvas[data-moon-m]').forEach(canvas => {
+  const tithi = parseInt(canvas.dataset.moonM, 10);
+  const mode  = canvas.dataset.mode || 'dark';
+  drawMoon(canvas, tithi, mode);
+});
+
+// Render lock screen moons
+document.querySelectorAll('canvas[data-moon-lock]').forEach(canvas => {
+  const tithi = parseInt(canvas.dataset.moonLock, 10);
+  const mode  = canvas.dataset.mode || 'lock-dark';
+  drawMoon(canvas, tithi, mode);
+});
+</script>
+
+</body>
+</html>

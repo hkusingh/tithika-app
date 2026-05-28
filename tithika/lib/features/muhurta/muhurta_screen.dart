@@ -24,6 +24,16 @@ class _MuhurtaScreenState extends ConsumerState<MuhurtaScreen> {
   bool _nightExpanded = false;
 
   @override
+  void initState() {
+    super.initState();
+    Future(() {
+      final now = DateTime.now();
+      ref.read(selectedDateProvider.notifier).state =
+          DateTime(now.year, now.month, now.day);
+    });
+  }
+
+  @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();

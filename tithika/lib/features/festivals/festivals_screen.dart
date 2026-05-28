@@ -43,12 +43,17 @@ class _FestivalsScreenState extends ConsumerState<FestivalsScreen> {
   void _scrollToCurrentMonth() {
     if (_scrolledToMonth) return;
     _scrolledToMonth = true;
+    // Two post-frame callbacks: the first waits for the ListView to build,
+    // the second waits for it to complete layout so off-screen items have
+    // valid render objects and Scrollable.ensureVisible can find them.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      final ctx = _currentMonthKey.currentContext;
-      if (ctx != null) {
-        Scrollable.ensureVisible(ctx, alignment: 0.0, duration: Duration.zero);
-      }
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        final ctx = _currentMonthKey.currentContext;
+        if (ctx != null) {
+          Scrollable.ensureVisible(ctx, alignment: 0.0, duration: Duration.zero);
+        }
+      });
     });
   }
 
@@ -158,6 +163,7 @@ class _FestivalsScreenState extends ConsumerState<FestivalsScreen> {
 
                       return ListView(
                         controller: _scrollController,
+                        cacheExtent: 4000,
                         padding: const EdgeInsets.only(bottom: 32),
                         children: items,
                       );

@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tithika — Wireframes v5 (Full Panchanga · Phase 3.3)</title>
+<style>
+  :root {
+    --bg-page:   #0a0a14;
+    --bg-panel:  #11132a;
+    --line-page: rgba(255,255,255,0.08);
+    --ink-page:  #f3eedf;
+    --ink-page-soft: #aab0c5;
+    --ink-page-muted: #6c7290;
+
+    --lm-bg:          #F5F0E8;
+    --lm-panel:       #EDE8D8;
+    --lm-ink:         #1A1F3C;
+    --lm-ink-soft:    #4A5070;
+    --lm-ink-muted:   #8890A8;
+    --lm-line:        rgba(0,0,0,0.08);
+    --lm-line-strong: rgba(0,0,0,0.15);
+    --lm-shukla:      #C8922A;
+    --lm-shukla-bg:   rgba(200,146,42,0.08);
+    --lm-krishna:     #5A6BD8;
+    --lm-festival:    #D46A1E;
+    --lm-moon-light:  #F7F2DC;
+    --lm-moon-dark:   #1C2147;
+    --lm-border-phone:#C4BBAB;
+
+    --mu-warn:        #B84040;
+    --mu-warn-bg:     rgba(184,64,64,0.06);
+
+    --yoga-ausp:      #2A8A5A;
+    --yoga-ausp-bg:   rgba(42,138,90,0.07);
+    --yoga-excel:     #C8922A;
+    --yoga-excel-bg:  rgba(200,146,42,0.07);
+    --yoga-inausp:    #B84040;
+    --yoga-inausp-bg: rgba(184,64,64,0.06);
+    --yoga-neutral:   #8890A8;
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg-page); color: var(--ink-page);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  header { padding: 40px 40px 16px; border-bottom: 1px solid var(--line-page); }
+  header h1 { margin: 0 0 6px; font-size: 28px; font-weight: 700; letter-spacing: -0.02em; }
+  header .subtitle { color: var(--ink-page-soft); font-size: 15px; margin: 0; }
+  header .meta { color: var(--ink-page-muted); font-size: 13px; margin-top: 10px; }
+  main { padding: 32px 40px 80px; }
+
+  .legend {
+    display: flex; gap: 20px; flex-wrap: wrap;
+    padding: 14px 18px; background: var(--bg-panel);
+    border: 1px solid var(--line-page); border-radius: 10px; margin-bottom: 48px;
+    font-size: 13px; color: var(--ink-page-soft);
+  }
+  .legend-item { display: flex; align-items: center; gap: 7px; }
+  .legend-swatch { width: 14px; height: 14px; border-radius: 3px; }
+
+  .section-header { margin: 0 0 24px; padding-bottom: 12px; border-bottom: 1px solid var(--line-page); }
+  .section-header h2 { margin: 0 0 4px; font-size: 20px; font-weight: 700; }
+  .section-header p { margin: 0; font-size: 13px; color: var(--ink-page-soft); line-height: 1.5; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 56px 40px; max-width: 1600px; margin: 0 auto 72px;
+  }
+
+  .screen { display: flex; flex-direction: column; align-items: center; }
+  .screen-title { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-page-muted); margin-bottom: 4px; }
+  .screen-name { font-size: 20px; font-weight: 700; margin: 0 0 4px; }
+  .screen-desc { font-size: 13px; color: var(--ink-page-soft); text-align: center; max-width: 295px; margin: 0 0 14px; line-height: 1.45; }
+  .screen-badge { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 8px; border-radius: 5px; margin-bottom: 14px; }
+  .badge-new      { background: rgba(200,146,42,0.18); color: #C8922A; }
+  .badge-existing { background: rgba(255,255,255,0.06); color: var(--ink-page-muted); }
+  .badge-updated  { background: rgba(90,107,216,0.18); color: #8A9AE8; }
+
+  /* Phone frame */
+  .phone {
+    width: 320px; height: 690px;
+    background: var(--lm-bg);
+    border: 9px solid var(--lm-border-phone);
+    border-radius: 38px; position: relative; overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.55), 0 0 0 1px rgba(0,0,0,0.15);
+  }
+  .notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 110px; height: 22px; background: var(--lm-border-phone); border-radius: 0 0 14px 14px; z-index: 50; }
+  .phone-screen { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; }
+
+  /* Dawn sky */
+  .dawn-sky {
+    position: absolute; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse 120px 40px at 20% 18%, rgba(255,200,120,0.12), transparent 70%),
+      radial-gradient(ellipse 80px 30px at 75% 12%, rgba(255,180,100,0.10), transparent 70%),
+      linear-gradient(180deg, #F0DFB8 0%, #F3E8CE 25%, #F5EEE2 55%, #F5F0E8 100%);
+  }
+
+  /* Nav bar */
+  .app-header {
+    position: relative; z-index: 2;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 4px 14px 8px;
+    border-bottom: 1px solid var(--lm-line);
+    background: rgba(245,240,232,0.94);
+  }
+  .app-header .icon { width: 28px; height: 28px; display: grid; place-items: center; color: var(--lm-ink-soft); font-size: 16px; cursor: pointer; }
+  .app-header .app-title { font-weight: 700; color: var(--lm-ink); font-size: 13px; letter-spacing: 0.06em; }
+  .app-header .nav-icons { display: flex; gap: 2px; }
+
+  .status-bar {
+    position: relative; z-index: 2;
+    display: flex; justify-content: space-between; align-items: flex-end;
+    height: 32px; padding: 6px 22px 0;
+    font-size: 11px; font-weight: 600; color: var(--lm-ink-soft);
+  }
+
+  /* Day view scroll */
+  .day-scroll { flex: 1; overflow: hidden; position: relative; z-index: 1; padding: 8px 12px; display: flex; flex-direction: column; gap: 5px; }
+
+  .moon-wrap { display: flex; justify-content: center; margin: 2px 0 4px; }
+  .moon-face { width: 60px; height: 60px; border-radius: 50%; background: var(--lm-moon-light); position: relative; overflow: hidden; box-shadow: 0 0 0 1px rgba(0,0,0,0.10), 0 0 14px rgba(200,146,42,0.20); }
+  .moon-shadow { position: absolute; top: 0; right: 0; width: 50%; height: 100%; background: var(--lm-moon-dark); border-radius: 0 30px 30px 0; }
+  .moon-shadow.gibbous { width: 20%; }
+  .moon-shadow.crescent { width: 72%; border-radius: 0 30px 30px 0; }
+  .moon-shadow.quarter  { width: 50%; }
+
+  .tithi-card { background: var(--lm-panel); border: 1px solid var(--lm-line); border-radius: 10px; padding: 8px 12px 6px; position: relative; }
+  .tithi-card-bar { position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: 10px 10px 0 0; background: var(--lm-shukla); }
+  .tithi-label { font-size: 9px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase; color: var(--lm-shukla); margin-bottom: 2px; }
+  .tithi-name { font-size: 14px; font-weight: 700; color: var(--lm-ink); }
+  .tithi-until { font-size: 10px; color: var(--lm-ink-soft); margin-top: 1px; }
+  .tithi-until strong { color: var(--lm-ink); font-weight: 600; }
+
+  .detail-row { background: var(--lm-panel); border: 1px solid var(--lm-line); border-radius: 8px; padding: 6px 10px; display: flex; align-items: center; justify-content: space-between; }
+  .dlbl { font-size: 9px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--lm-ink-muted); }
+  .dval { font-size: 11px; font-weight: 600; color: var(--lm-ink); }
+  .dval small { color: var(--lm-ink-soft); font-weight: 500; font-size: 10px; }
+
+  .sun-moon-card { background: var(--lm-panel); border: 1px solid var(--lm-line); border-radius: 8px; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; overflow: hidden; }
+  .smc { padding: 6px 10px; }
+  .smc:nth-child(odd)  { border-right: 1px solid var(--lm-line); }
+  .smc:nth-child(3), .smc:nth-child(4) { border-top: 1px solid var(--lm-line); }
+  .smc-label { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--lm-ink-muted); }
+  .smc-time  { font-size: 11px; font-weight: 700; color: var(--lm-ink); }
+
+  .hora-card { background: var(--lm-panel); border: 1px solid var(--lm-line); border-left: 3px solid #E8A030; border-radius: 8px; padding: 6px 10px; display: flex; align-items: center; justify-content: space-between; }
+  .hora-card-left { display: flex; align-items: center; gap: 8px; }
+  .hora-glyph { font-size: 16px; color: var(--lm-shukla); }
+  .hora-planet { font-size: 11px; font-weight: 700; color: var(--lm-ink); }
+  .hora-sub { font-size: 10px; color: var(--lm-ink-muted); }
+  .hora-until { font-size: 10px; color: var(--lm-ink-soft); }
+  .chevron { font-size: 12px; color: var(--lm-ink-muted); margin-left: 4px; }
+
+  .mu-card { background: var(--lm-panel); border: 1px solid var(--lm-line); border-left: 3px solid var(--lm-shukla); border-radius: 8px; padding: 6px 10px 7px; }
+  .mu-card-hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
+  .mu-card-title { font-size: 9px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase; color: var(--lm-ink-muted); }
+  .mu-card-chev  { font-size: 12px; color: var(--lm-ink-muted); }
+  .amb-row { display: flex; align-items: center; gap: 8px; padding: 3px 0; }
+  .amb-row + .amb-row { border-top: 1px solid var(--lm-line); margin-top: 4px; padding-top: 7px; }
+  .amb-bar { width: 3px; border-radius: 2px; flex-shrink: 0; align-self: stretch; min-height: 24px; }
+  .amb-bar.gold { background: var(--lm-shukla); }
+  .amb-bar.red  { background: var(--mu-warn); }
+  .amb-body { flex: 1; }
+  .amb-name { font-size: 11px; font-weight: 700; color: var(--lm-ink); }
+  .amb-name.gold { color: var(--lm-shukla); }
+  .amb-name.red  { color: var(--mu-warn); }
+  .amb-sub  { font-size: 9px; color: var(--lm-ink-muted); margin-top: 1px; }
+  .amb-time { font-size: 10px; color: var(--lm-ink-soft); white-space: nowrap; }
+
+  /* 4-day strip */
+  .day-strip { border-top: 1px solid var(--lm-line); display: grid; grid-template-columns: repeat(4, 1fr); background: var(--lm-panel); position: relative; z-index: 2; flex-shrink: 0; }
+  .day-cell { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 6px 4px; border-right: 1px solid var(--lm-line); }
+  .day-cell:last-child { border-right: none; }
+  .day-cell.today { background: var(--lm-shukla-bg); box-shadow: inset 0 3px 0 var(--lm-shukla); }
+  .day-wk   { font-size: 9px; color: var(--lm-ink-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+  .day-greg { font-size: 14px; font-weight: 700; color: var(--lm-ink); }
+  .day-cell.today .day-greg { color: var(--lm-shukla); }
+  .day-tithi { font-size: 9px; color: var(--lm-ink-soft); display: flex; align-items: center; gap: 3px; }
+  .pdot { width: 5px; height: 5px; border-radius: 50%; }
+  .pdot.s { background: var(--lm-shukla); } .pdot.k { background: var(--lm-krishna); }
+  .fest-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--lm-festival); margin-top: 1px; }
+
+  /* ══════════════════════════════════════════
+     PANCHANGA CARD — new in Phase 3.3
+  ══════════════════════════════════════════ */
+
+  /* Collapsed state: shows Yoga + Karana summary */
+  .pancha-card {
+    background: var(--lm-panel);
+    border: 1px solid var(--lm-line);
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .pancha-card.vishti {
+    border-left: 3px solid var(--yoga-inausp);
+  }
+
+  .pancha-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 10px 5px;
+  }
+  .pancha-title {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.10em;
+    text-transform: uppercase; color: var(--lm-ink-muted);
+  }
+  .pancha-chev { font-size: 11px; color: var(--lm-ink-muted); }
+
+  /* Yoga + Karana rows in collapsed card */
+  .pancha-summary-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 4px 10px 5px;
+  }
+  .pancha-summary-row + .pancha-summary-row {
+    border-top: 1px solid var(--lm-line);
+    padding-top: 5px; margin-top: 0;
+  }
+  .psrow-bar { width: 3px; border-radius: 2px; min-height: 22px; flex-shrink: 0; align-self: stretch; }
+  .psrow-bar.green  { background: var(--yoga-ausp); }
+  .psrow-bar.amber  { background: var(--yoga-excel); }
+  .psrow-bar.red    { background: var(--yoga-inausp); }
+  .psrow-bar.muted  { background: var(--yoga-neutral); }
+  .psrow-body { flex: 1; }
+  .psrow-label { font-size: 8px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--lm-ink-muted); }
+  .psrow-name { font-size: 11px; font-weight: 700; color: var(--lm-ink); margin-top: 1px; }
+  .psrow-name.green  { color: var(--yoga-ausp); }
+  .psrow-name.amber  { color: var(--yoga-excel); }
+  .psrow-name.red    { color: var(--yoga-inausp); }
+  .psrow-right { text-align: right; flex-shrink: 0; }
+  .psrow-quality { font-size: 9px; color: var(--lm-ink-muted); }
+  .psrow-time { font-size: 10px; color: var(--lm-ink-soft); white-space: nowrap; margin-top: 1px; }
+  .psrow-time.red { color: var(--yoga-inausp); font-weight: 600; }
+
+  /* Expanded card */
+  .pancha-expanded {
+    background: var(--lm-panel);
+    border: 1px solid var(--lm-line);
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  .pancha-exp-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 10px 5px;
+    border-bottom: 1px solid var(--lm-line);
+  }
+  .pancha-exp-title {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.10em;
+    text-transform: uppercase; color: var(--lm-ink-muted);
+  }
+  .pancha-collapse-lbl { font-size: 10px; color: var(--lm-ink-muted); }
+
+  /* Each panchanga element row (in expanded view) */
+  .pancha-el-row {
+    display: flex; align-items: flex-start; gap: 8px;
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--lm-line);
+  }
+  .pancha-el-row:last-child { border-bottom: none; }
+  .pancha-el-row.yoga-ausp  { background: var(--yoga-ausp-bg); }
+  .pancha-el-row.yoga-excel { background: var(--yoga-excel-bg); }
+  .pancha-el-row.yoga-inausp { background: var(--yoga-inausp-bg); }
+
+  .pel-icon { font-size: 13px; width: 18px; text-align: center; flex-shrink: 0; color: var(--lm-ink-muted); margin-top: 1px; }
+  .pel-label { font-size: 8px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--lm-ink-muted); width: 62px; flex-shrink: 0; padding-top: 2px; line-height: 1.3; }
+  .pel-body { flex: 1; }
+  .pel-name { font-size: 11px; font-weight: 700; color: var(--lm-ink); }
+  .pel-sub  { font-size: 9px; color: var(--lm-ink-muted); margin-top: 1px; }
+  .pel-quality {
+    display: inline-flex; align-items: center; gap: 4px;
+    margin-top: 2px;
+  }
+  .pel-qdot {
+    width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0;
+  }
+  .pel-qdot.green  { background: var(--yoga-ausp); }
+  .pel-qdot.amber  { background: var(--yoga-excel); }
+  .pel-qdot.red    { background: var(--yoga-inausp); }
+  .pel-qdot.muted  { background: var(--yoga-neutral); }
+  .pel-qtext { font-size: 9px; }
+  .pel-qtext.green  { color: var(--yoga-ausp); }
+  .pel-qtext.amber  { color: var(--yoga-excel); }
+  .pel-qtext.red    { color: var(--yoga-inausp); }
+  .pel-qtext.muted  { color: var(--yoga-neutral); }
+  .pel-time { font-size: 10px; color: var(--lm-ink-soft); text-align: right; white-space: nowrap; flex-shrink: 0; padding-top: 2px; }
+
+  /* Vishti warning pill in panchanga card */
+  .vishti-pill {
+    display: inline-block; font-size: 8px; font-weight: 700;
+    letter-spacing: 0.04em; padding: 1px 5px; border-radius: 3px;
+    background: var(--yoga-inausp); color: white; margin-left: 5px;
+    vertical-align: middle;
+  }
+
+  /* ── Annotations ── */
+  .annotations { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; max-width: 295px; }
+  .ann { display: flex; gap: 9px; align-items: flex-start; font-size: 12px; color: var(--ink-page-soft); line-height: 1.45; }
+  .ann-num { width: 18px; height: 18px; flex-shrink: 0; background: var(--bg-panel); border: 1px solid var(--line-page); border-radius: 50%; display: grid; place-items: center; font-size: 10px; font-weight: 700; color: var(--lm-shukla); }
+  .ann strong { color: var(--ink-page); }
+
+  /* ── Yoga quality reference panel ── */
+  .quality-panel {
+    background: var(--bg-panel); border: 1px solid var(--line-page);
+    border-radius: 12px; padding: 24px 28px; margin-bottom: 72px;
+  }
+  .quality-panel h3 { margin: 0 0 6px; font-size: 16px; font-weight: 700; color: var(--ink-page); }
+  .quality-panel p  { margin: 0 0 20px; font-size: 13px; color: var(--ink-page-soft); line-height: 1.5; }
+  .quality-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .quality-table th { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-page-muted); padding: 0 16px 8px 0; text-align: left; border-bottom: 1px solid var(--line-page); }
+  .quality-table td { padding: 8px 16px 8px 0; color: var(--ink-page-soft); border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: top; }
+  .quality-table td:first-child { width: 12px; }
+  .qdot-ref { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .quality-table .names { color: var(--ink-page); font-weight: 600; line-height: 1.6; }
+  .tier-label { font-size: 10px; font-weight: 700; letter-spacing: 0.06em; }
+
+  /* l10n table */
+  .l10n-panel { background: var(--bg-panel); border: 1px solid var(--line-page); border-radius: 12px; padding: 24px 28px; margin-bottom: 72px; }
+  .l10n-panel h3 { margin: 0 0 6px; font-size: 16px; font-weight: 700; color: var(--ink-page); }
+  .l10n-panel p  { margin: 0 0 20px; font-size: 13px; color: var(--ink-page-soft); line-height: 1.5; }
+  .l10n-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .l10n-table th { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-page-muted); padding: 0 12px 8px 0; text-align: left; border-bottom: 1px solid var(--line-page); }
+  .l10n-table td { padding: 8px 12px 8px 0; color: var(--ink-page-soft); border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: top; line-height: 1.5; }
+  .l10n-table td:first-child { color: var(--ink-page); font-weight: 600; white-space: nowrap; }
+  .l10n-tag { display: inline-block; font-size: 9px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; margin-bottom: 4px; }
+  .l10n-tag.new     { background: rgba(200,146,42,0.18); color: #C8922A; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Tithika — Phase 3.3 Full Panchanga</h1>
+  <p class="subtitle">Wireframes v5 · Yoga &amp; Karana · Collapsible Panchanga card on Day View</p>
+  <p class="meta">v5.0 · 2026-05-25 · No new screen — collapsbile card added below Muhurta card on Day View · Collapsed shows Yoga + Karana · Expanded shows all 5 elements · Vishti Karana gets red accent treatment</p>
+</header>
+
+<main>
+
+  <div class="legend">
+    <div class="legend-item"><span class="legend-swatch" style="background:#F5F0E8;border:1px solid rgba(0,0,0,0.15)"></span> Background</div>
+    <div class="legend-item"><span class="legend-swatch" style="background:#EDE8D8;border:1px solid rgba(0,0,0,0.12)"></span> Panel</div>
+    <div class="legend-item"><span class="legend-swatch" style="background:#1A1F3C"></span> Ink</div>
+    <div class="legend-item"><span class="legend-swatch" style="background:#C8922A"></span> Amber · Excellent yoga</div>
+    <div class="legend-item"><span class="legend-swatch" style="background:#2A8A5A"></span> Green · Auspicious</div>
+    <div class="legend-item"><span class="legend-swatch" style="background:#5A6BD8"></span> Blue (Krishna)</div>
+    <div class="legend-item"><span class="legend-swatch" style="background:#B84040"></span> Red · Inauspicious (Vishti / bad yoga)</div>
+    <div class="legend-item"><span class="legend-swatch" style="background:#8890A8"></span> Gray · Neutral</div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════
+       SECTION 1 — Day View: Panchanga card collapsed (default)
+  ═══════════════════════════════════════════ -->
+  <div class="section-header">
+    <h2>Section 1 — Day View with Panchanga card</h2>
+    <p>The Panchanga card sits below the Muhurta card. Default state is <strong>collapsed</strong>, showing Yoga + Karana (the two new elements). Tapping the card header expands to show all 5 panchanga elements.</p>
+  </div>
+
+  <div class="grid">
+
+    <!-- STATE A: Collapsed, auspicious Yoga + Karana -->
+    <div class="screen">
+      <div class="screen-title">Screen 01 — A</div>
+      <div class="screen-name">Day View</div>
+      <div class="screen-desc">Panchanga card collapsed (default). Yoga = Shubha (auspicious · green). Karana = Bava (auspicious). Both rows visible without expanding.</div>
+      <span class="screen-badge badge-new">new card · collapsed</span>
+
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="phone-screen">
+          <div class="dawn-sky"></div>
+          <div class="status-bar"><span>10:20 AM</span><span>●●● WiFi 🔋</span></div>
+          <div class="app-header">
+            <div class="icon">🏠</div>
+            <div class="app-title">TITHIKA</div>
+            <div class="nav-icons">
+              <div class="icon" style="font-size:14px">📅</div>
+              <div class="icon" style="font-size:14px">🗓</div>
+              <div class="icon" style="font-size:14px">☆</div>
+              <div class="icon" style="font-size:14px">⚙</div>
+            </div>
+          </div>
+
+          <div class="day-scroll">
+            <div style="text-align:center;margin-bottom:2px">
+              <div style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--lm-ink-muted)">Thursday</div>
+              <div style="font-size:13px;font-weight:700;color:var(--lm-ink)">May 28, 2026</div>
+              <div style="font-size:9px;font-weight:600;color:var(--lm-shukla);letter-spacing:0.05em;text-transform:uppercase">Jyeshtha · Shukla</div>
+            </div>
+            <div class="moon-wrap"><div class="moon-face"><div class="moon-shadow crescent"></div></div></div>
+            <div class="tithi-card">
+              <div class="tithi-card-bar"></div>
+              <div class="tithi-label">Shukla · Jyeshtha</div>
+              <div class="tithi-name">Dvitiya</div>
+              <div class="tithi-until">until <strong>9:18 PM</strong></div>
+            </div>
+            <div class="detail-row">
+              <div><div class="dlbl">Nakshatra</div><div class="dval">Mrigashira <small>until 11:42 PM</small></div></div>
+            </div>
+            <div class="sun-moon-card">
+              <div class="smc"><div class="smc-label">☀ Sunrise</div><div class="smc-time">5:58 AM</div></div>
+              <div class="smc"><div class="smc-label">Sunset ☀</div><div class="smc-time">7:52 PM</div></div>
+              <div class="smc"><div class="smc-label">☽ Moonrise</div><div class="smc-time">7:14 AM</div></div>
+              <div class="smc"><div class="smc-label">Moonset ☽</div><div class="smc-time">8:46 PM</div></div>
+            </div>
+            <div class="hora-card">
+              <div class="hora-card-left">
+                <div class="hora-glyph">♃</div>
+                <div><div class="hora-planet">Jupiter Hora</div><div class="hora-sub">Hour 1 · Day</div></div>
+              </div>
+              <div style="display:flex;align-items:center"><div class="hora-until">until 11:08 AM</div><span class="chevron">›</span></div>
+            </div>
+            <div class="mu-card">
+              <div class="mu-card-hd">
+                <div class="mu-card-title">Muhurta</div>
+                <span class="mu-card-chev">›</span>
+              </div>
+              <div class="amb-row">
+                <div class="amb-bar gold"></div>
+                <div class="amb-body">
+                  <div class="amb-name gold">Amrit Choghadiya</div>
+                  <div class="amb-sub">excellent · day 1 of 8</div>
+                </div>
+                <div class="amb-right"><div class="amb-time">until 11:08 AM</div></div>
+              </div>
+            </div>
+
+            <!-- PANCHANGA CARD — collapsed -->
+            <div class="pancha-card">
+              <div class="pancha-header">
+                <div class="pancha-title">Panchanga</div>
+                <div class="pancha-chev">▿ expand</div>
+              </div>
+              <div class="pancha-summary-row">
+                <div class="psrow-bar green"></div>
+                <div class="psrow-body">
+                  <div class="psrow-label">Yoga</div>
+                  <div class="psrow-name green">Shubha</div>
+                </div>
+                <div class="psrow-right">
+                  <div class="psrow-quality">auspicious</div>
+                  <div class="psrow-time">until 3:22 PM</div>
+                </div>
+              </div>
+              <div class="pancha-summary-row">
+                <div class="psrow-bar green"></div>
+                <div class="psrow-body">
+                  <div class="psrow-label">Karana</div>
+                  <div class="psrow-name">Bava</div>
+                </div>
+                <div class="psrow-right">
+                  <div class="psrow-quality">auspicious</div>
+                  <div class="psrow-time">until 9:18 PM</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="day-strip">
+            <div class="day-cell"><div class="day-wk">Tue</div><div class="day-greg">26</div><div class="day-tithi"><span class="pdot k"></span>30</div></div>
+            <div class="day-cell"><div class="day-wk">Wed</div><div class="day-greg">27</div><div class="day-tithi"><span class="pdot s"></span>1</div></div>
+            <div class="day-cell today"><div class="day-wk">Thu</div><div class="day-greg">28</div><div class="day-tithi"><span class="pdot s"></span>2</div></div>
+            <div class="day-cell"><div class="day-wk">Fri</div><div class="day-greg">29</div><div class="day-tithi"><span class="pdot s"></span>3</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="annotations">
+        <div class="ann"><div class="ann-num">1</div><div>Card sits directly below Muhurta — both are tappable rows in the same scroll area. Collapsed height ≈ same as Muhurta card.</div></div>
+        <div class="ann"><div class="ann-num">2</div><div>Left bar color = quality of the <strong>active</strong> Yoga. Green = auspicious. If the active Yoga is inauspicious (Vyatipata etc.), the bar turns red and the name is red.</div></div>
+        <div class="ann"><div class="ann-num">3</div><div>Karana bar is green for most karanas. Turns red only for <strong>Vishti (Bhadra)</strong>.</div></div>
+      </div>
+    </div>
+
+
+    <!-- STATE B: Vishti Karana active — card turns red -->
+    <div class="screen">
+      <div class="screen-title">Screen 01 — B</div>
+      <div class="screen-name">Day View</div>
+      <div class="screen-desc">Vishti (Bhadra) Karana is active. Card gets a red left border. Karana row name and time render in red — same visual language as Rahu Kaal in the Muhurta card.</div>
+      <span class="screen-badge badge-new">vishti karana active</span>
+
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="phone-screen">
+          <div class="dawn-sky"></div>
+          <div class="status-bar"><span>2:15 PM</span><span>●●● WiFi 🔋</span></div>
+          <div class="app-header">
+            <div class="icon">🏠</div>
+            <div class="app-title">TITHIKA</div>
+            <div class="nav-icons">
+              <div class="icon" style="font-size:14px">📅</div>
+              <div class="icon" style="font-size:14px">🗓</div>
+              <div class="icon" style="font-size:14px">☆</div>
+              <div class="icon" style="font-size:14px">⚙</div>
+            </div>
+          </div>
+
+          <div class="day-scroll">
+            <div style="text-align:center;margin-bottom:2px">
+              <div style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--lm-ink-muted)">Friday</div>
+              <div style="font-size:13px;font-weight:700;color:var(--lm-ink)">May 29, 2026</div>
+              <div style="font-size:9px;font-weight:600;color:var(--lm-shukla);letter-spacing:0.05em;text-transform:uppercase">Jyeshtha · Shukla</div>
+            </div>
+            <div class="moon-wrap"><div class="moon-face"><div class="moon-shadow crescent" style="width:60%"></div></div></div>
+            <div class="tithi-card">
+              <div class="tithi-card-bar"></div>
+              <div class="tithi-label">Shukla · Jyeshtha</div>
+              <div class="tithi-name">Tritiya</div>
+              <div class="tithi-until">until <strong>10:04 PM</strong></div>
+            </div>
+            <div class="detail-row">
+              <div><div class="dlbl">Nakshatra</div><div class="dval">Ardra <small>until 1:14 AM +1</small></div></div>
+            </div>
+            <div class="sun-moon-card">
+              <div class="smc"><div class="smc-label">☀ Sunrise</div><div class="smc-time">5:58 AM</div></div>
+              <div class="smc"><div class="smc-label">Sunset ☀</div><div class="smc-time">7:52 PM</div></div>
+              <div class="smc"><div class="smc-label">☽ Moonrise</div><div class="smc-time">8:02 AM</div></div>
+              <div class="smc"><div class="smc-label">Moonset ☽</div><div class="smc-time">9:52 PM</div></div>
+            </div>
+            <div class="hora-card">
+              <div class="hora-card-left">
+                <div class="hora-glyph">♀</div>
+                <div><div class="hora-planet">Venus Hora</div><div class="hora-sub">Hour 5 · Day</div></div>
+              </div>
+              <div style="display:flex;align-items:center"><div class="hora-until">until 3:42 PM</div><span class="chevron">›</span></div>
+            </div>
+            <div class="mu-card">
+              <div class="mu-card-hd">
+                <div class="mu-card-title">Muhurta</div>
+                <span class="mu-card-chev">›</span>
+              </div>
+              <div class="amb-row">
+                <div class="amb-bar gold"></div>
+                <div class="amb-body">
+                  <div class="amb-name gold">Char Choghadiya</div>
+                  <div class="amb-sub">neutral · day 5 of 8</div>
+                </div>
+                <div class="amb-right"><div class="amb-time">until 3:42 PM</div></div>
+              </div>
+            </div>
+
+            <!-- PANCHANGA CARD — Vishti Karana active -->
+            <div class="pancha-card vishti">
+              <div class="pancha-header">
+                <div class="pancha-title">Panchanga</div>
+                <div class="pancha-chev">▿ expand</div>
+              </div>
+              <div class="pancha-summary-row">
+                <div class="psrow-bar amber"></div>
+                <div class="psrow-body">
+                  <div class="psrow-label">Yoga</div>
+                  <div class="psrow-name amber">Saubhagya</div>
+                </div>
+                <div class="psrow-right">
+                  <div class="psrow-quality">excellent</div>
+                  <div class="psrow-time">until 4:08 PM</div>
+                </div>
+              </div>
+              <div class="pancha-summary-row" style="background:var(--yoga-inausp-bg)">
+                <div class="psrow-bar red"></div>
+                <div class="psrow-body">
+                  <div class="psrow-label">Karana</div>
+                  <div class="psrow-name red">Vishti (Bhadra)</div>
+                </div>
+                <div class="psrow-right">
+                  <div class="psrow-quality" style="color:var(--yoga-inausp)">inauspicious</div>
+                  <div class="psrow-time red">until 10:04 PM</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="day-strip">
+            <div class="day-cell"><div class="day-wk">Wed</div><div class="day-greg">27</div><div class="day-tithi"><span class="pdot s"></span>1</div></div>
+            <div class="day-cell"><div class="day-wk">Thu</div><div class="day-greg">28</div><div class="day-tithi"><span class="pdot s"></span>2</div></div>
+            <div class="day-cell today"><div class="day-wk">Fri</div><div class="day-greg">29</div><div class="day-tithi"><span class="pdot s"></span>3</div></div>
+            <div class="day-cell"><div class="day-wk">Sat</div><div class="day-greg">30</div><div class="day-tithi"><span class="pdot s"></span>4</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="annotations">
+        <div class="ann"><div class="ann-num">1</div><div><strong>Red left border</strong> on the card (3px) signals Vishti is active — same visual language as Muhurta card during Rahu Kaal.</div></div>
+        <div class="ann"><div class="ann-num">2</div><div>The Vishti row gets a faint red background tint. Name and time render in <strong style="color:#D46060">red</strong> (#B84040 light / #D46060 dark).</div></div>
+        <div class="ann"><div class="ann-num">3</div><div>The Yoga row above it still shows normally (amber = excellent) — the two rows are visually independent.</div></div>
+      </div>
+    </div>
+
+
+    <!-- STATE C: Inauspicious Yoga (Vyatipata / Vaidhriti) -->
+    <div class="screen">
+      <div class="screen-title">Screen 01 — C</div>
+      <div class="screen-name">Day View</div>
+      <div class="screen-desc">Vyatipata Yoga active — one of the 3 most inauspicious yogas. Card border turns red. Yoga row renders in red. Karana (Kaulava) is neutral — no change to that row.</div>
+      <span class="screen-badge badge-new">inauspicious yoga</span>
+
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="phone-screen">
+          <div class="dawn-sky"></div>
+          <div class="status-bar"><span>9:45 AM</span><span>●●● WiFi 🔋</span></div>
+          <div class="app-header">
+            <div class="icon">🏠</div>
+            <div class="app-title">TITHIKA</div>
+            <div class="nav-icons">
+              <div class="icon" style="font-size:14px">📅</div>
+              <div class="icon" style="font-size:14px">🗓</div>
+              <div class="icon" style="font-size:14px">☆</div>
+              <div class="icon" style="font-size:14px">⚙</div>
+            </div>
+          </div>
+
+          <div class="day-scroll">
+            <div style="text-align:center;margin-bottom:2px">
+              <div style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--lm-ink-muted)">Monday</div>
+              <div style="font-size:13px;font-weight:700;color:var(--lm-ink)">Jun 8, 2026</div>
+              <div style="font-size:9px;font-weight:600;color:var(--lm-shukla);letter-spacing:0.05em;text-transform:uppercase">Jyeshtha · Shukla</div>
+            </div>
+            <div class="moon-wrap"><div class="moon-face"><div class="moon-shadow gibbous"></div></div></div>
+            <div class="tithi-card">
+              <div class="tithi-card-bar"></div>
+              <div class="tithi-label">Shukla · Jyeshtha</div>
+              <div class="tithi-name">Chaturdashi</div>
+              <div class="tithi-until">until <strong>7:55 AM +1</strong></div>
+            </div>
+            <div class="detail-row">
+              <div><div class="dlbl">Nakshatra</div><div class="dval">Anuradha <small>until 8:22 PM</small></div></div>
+            </div>
+            <div class="sun-moon-card">
+              <div class="smc"><div class="smc-label">☀ Sunrise</div><div class="smc-time">5:56 AM</div></div>
+              <div class="smc"><div class="smc-label">Sunset ☀</div><div class="smc-time">7:55 PM</div></div>
+              <div class="smc"><div class="smc-label">☽ Moonrise</div><div class="smc-time">5:32 PM</div></div>
+              <div class="smc"><div class="smc-label">Moonset ☽</div><div class="smc-time">4:48 AM</div></div>
+            </div>
+            <div class="hora-card">
+              <div class="hora-card-left">
+                <div class="hora-glyph">☽</div>
+                <div><div class="hora-planet">Moon Hora</div><div class="hora-sub">Hour 1 · Day</div></div>
+              </div>
+              <div style="display:flex;align-items:center"><div class="hora-until">until 11:04 AM</div><span class="chevron">›</span></div>
+            </div>
+            <div class="mu-card">
+              <div class="mu-card-hd">
+                <div class="mu-card-title">Muhurta</div>
+                <span class="mu-card-chev">›</span>
+              </div>
+              <div class="amb-row">
+                <div class="amb-bar gold"></div>
+                <div class="amb-body">
+                  <div class="amb-name gold">Amrit Choghadiya</div>
+                  <div class="amb-sub">excellent · day 1 of 8</div>
+                </div>
+                <div class="amb-right"><div class="amb-time">until 11:04 AM</div></div>
+              </div>
+            </div>
+
+            <!-- PANCHANGA CARD — Vyatipata Yoga active -->
+            <div class="pancha-card vishti">
+              <div class="pancha-header">
+                <div class="pancha-title">Panchanga</div>
+                <div class="pancha-chev">▿ expand</div>
+              </div>
+              <div class="pancha-summary-row" style="background:var(--yoga-inausp-bg)">
+                <div class="psrow-bar red"></div>
+                <div class="psrow-body">
+                  <div class="psrow-label">Yoga</div>
+                  <div class="psrow-name red">Vyatipata</div>
+                </div>
+                <div class="psrow-right">
+                  <div class="psrow-quality" style="color:var(--yoga-inausp)">inauspicious</div>
+                  <div class="psrow-time red">until 2:14 PM</div>
+                </div>
+              </div>
+              <div class="pancha-summary-row">
+                <div class="psrow-bar muted"></div>
+                <div class="psrow-body">
+                  <div class="psrow-label">Karana</div>
+                  <div class="psrow-name">Kaulava</div>
+                </div>
+                <div class="psrow-right">
+                  <div class="psrow-quality">neutral</div>
+                  <div class="psrow-time">until 7:55 AM</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="day-strip">
+            <div class="day-cell"><div class="day-wk">Sat</div><div class="day-greg">6</div><div class="day-tithi"><span class="pdot s"></span>12</div></div>
+            <div class="day-cell"><div class="day-wk">Sun</div><div class="day-greg">7</div><div class="day-tithi"><span class="pdot s"></span>13</div></div>
+            <div class="day-cell today"><div class="day-wk">Mon</div><div class="day-greg">8</div><div class="day-tithi"><span class="pdot s"></span>14</div></div>
+            <div class="day-cell"><div class="day-wk">Tue</div><div class="day-greg">9</div><div class="day-tithi"><span class="pdot k"></span>1</div><div class="fest-dot"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="annotations">
+        <div class="ann"><div class="ann-num">1</div><div>Card-level red border fires for <strong>any</strong> inauspicious yoga (Vishkambha, Atiganda, Shula, Ganda, Vyaghata, Vajra, Vyatipata, Parigha, Vaidhriti).</div></div>
+        <div class="ann"><div class="ann-num">2</div><div>Karana row here is gray/muted — Kaulava is a neutral moveable karana. Only Vishti turns red.</div></div>
+      </div>
+    </div>
+
+  </div><!-- /grid section 1 -->
+
+
+  <!-- ═══════════════════════════════════════════
+       SECTION 2 — Panchanga card expanded (all 5 elements)
+  ═══════════════════════════════════════════ -->
+  <div class="section-header">
+    <h2>Section 2 — Panchanga card expanded</h2>
+    <p>Tapping the card header expands inline to show all 5 traditional panchanga elements. Tithi and Nakshatra are repeated here for completeness — they are the same data already shown above, but presented in the unified panchanga table context.</p>
+  </div>
+
+  <div class="grid">
+
+    <!-- EXPANDED — normal auspicious day -->
+    <div class="screen">
+      <div class="screen-title">Screen 02 — A</div>
+      <div class="screen-name">Day View · Expanded</div>
+      <div class="screen-desc">Panchanga card fully expanded. All 5 limbs visible. Yoga (Shubha) and Karana (Bava) are the new elements; Vara, Tithi, Nakshatra shown for traditional completeness.</div>
+      <span class="screen-badge badge-new">expanded · all 5 elements</span>
+
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="phone-screen">
+          <div class="dawn-sky"></div>
+          <div class="status-bar"><span>10:20 AM</span><span>●●● WiFi 🔋</span></div>
+          <div class="app-header">
+            <div class="icon">🏠</div>
+            <div class="app-title">TITHIKA</div>
+            <div class="nav-icons">
+              <div class="icon" style="font-size:14px">📅</div>
+              <div class="icon" style="font-size:14px">🗓</div>
+              <div class="icon" style="font-size:14px">☆</div>
+              <div class="icon" style="font-size:14px">⚙</div>
+            </div>
+          </div>
+
+          <div class="day-scroll">
+            <div style="text-align:center;margin-bottom:2px">
+              <div style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--lm-ink-muted)">Thursday</div>
+              <div style="font-size:13px;font-weight:700;color:var(--lm-ink)">May 28, 2026</div>
+              <div style="font-size:9px;font-weight:600;color:var(--lm-shukla);letter-spacing:0.05em;text-transform:uppercase">Jyeshtha · Shukla</div>
+            </div>
+            <div class="hora-card" style="margin-bottom:0">
+              <div class="hora-card-left">
+                <div class="hora-glyph">♃</div>
+                <div><div class="hora-planet">Jupiter Hora</div><div class="hora-sub">Hour 1 · Day</div></div>
+              </div>
+              <div style="display:flex;align-items:center"><div class="hora-until">until 11:08 AM</div><span class="chevron">›</span></div>
+            </div>
+            <div class="mu-card">
+              <div class="mu-card-hd">
+                <div class="mu-card-title">Muhurta</div>
+                <span class="mu-card-chev">›</span>
+              </div>
+              <div class="amb-row">
+                <div class="amb-bar gold"></div>
+                <div class="amb-body">
+                  <div class="amb-name gold">Amrit Choghadiya</div>
+                  <div class="amb-sub">excellent · day 1 of 8</div>
+                </div>
+                <div class="amb-right"><div class="amb-time">until 11:08 AM</div></div>
+              </div>
+            </div>
+
+            <!-- PANCHANGA CARD — expanded -->
+            <div class="pancha-expanded">
+              <div class="pancha-exp-header">
+                <div class="pancha-exp-title">Full Panchanga</div>
+                <div class="pancha-collapse-lbl">△ collapse</div>
+              </div>
+              <!-- Vara -->
+              <div class="pancha-el-row">
+                <div class="pel-icon">☼</div>
+                <div class="pel-label">Vara</div>
+                <div class="pel-body">
+                  <div class="pel-name">Thursday</div>
+                  <div class="pel-sub">Guruvara · ruled by Jupiter</div>
+                </div>
+                <div class="pel-time">—</div>
+              </div>
+              <!-- Tithi -->
+              <div class="pancha-el-row">
+                <div class="pel-icon">◐</div>
+                <div class="pel-label">Tithi</div>
+                <div class="pel-body">
+                  <div class="pel-name">Shukla Dvitiya</div>
+                </div>
+                <div class="pel-time">9:18 PM</div>
+              </div>
+              <!-- Nakshatra -->
+              <div class="pancha-el-row">
+                <div class="pel-icon">✦</div>
+                <div class="pel-label">Nakshatra</div>
+                <div class="pel-body">
+                  <div class="pel-name">Mrigashira</div>
+                </div>
+                <div class="pel-time">11:42 PM</div>
+              </div>
+              <!-- Yoga — auspicious -->
+              <div class="pancha-el-row yoga-ausp">
+                <div class="pel-icon" style="color:var(--yoga-ausp)">⊕</div>
+                <div class="pel-label">Yoga</div>
+                <div class="pel-body">
+                  <div class="pel-name" style="color:var(--yoga-ausp)">Shubha</div>
+                  <div class="pel-quality">
+                    <span class="pel-qdot green"></span>
+                    <span class="pel-qtext green">auspicious</span>
+                  </div>
+                </div>
+                <div class="pel-time">3:22 PM</div>
+              </div>
+              <!-- Karana — auspicious -->
+              <div class="pancha-el-row yoga-ausp">
+                <div class="pel-icon" style="color:var(--yoga-ausp)">◑</div>
+                <div class="pel-label">Karana</div>
+                <div class="pel-body">
+                  <div class="pel-name" style="color:var(--yoga-ausp)">Bava</div>
+                  <div class="pel-quality">
+                    <span class="pel-qdot green"></span>
+                    <span class="pel-qtext green">auspicious</span>
+                  </div>
+                </div>
+                <div class="pel-time">9:18 PM</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="day-strip">
+            <div class="day-cell"><div class="day-wk">Tue</div><div class="day-greg">26</div><div class="day-tithi"><span class="pdot k"></span>30</div></div>
+            <div class="day-cell"><div class="day-wk">Wed</div><div class="day-greg">27</div><div class="day-tithi"><span class="pdot s"></span>1</div></div>
+            <div class="day-cell today"><div class="day-wk">Thu</div><div class="day-greg">28</div><div class="day-tithi"><span class="pdot s"></span>2</div></div>
+            <div class="day-cell"><div class="day-wk">Fri</div><div class="day-greg">29</div><div class="day-tithi"><span class="pdot s"></span>3</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="annotations">
+        <div class="ann"><div class="ann-num">1</div><div>Vara row always shows "—" for time — the weekday doesn't change. Ruling planet (Jupiter, Shukra, etc.) shown as the sub-label.</div></div>
+        <div class="ann"><div class="ann-num">2</div><div>Tithi and Nakshatra show <strong>end time only</strong> (no sub-label) — the user already saw the full name + progress above. Here it just anchors the panchanga table.</div></div>
+        <div class="ann"><div class="ann-num">3</div><div>Yoga + Karana rows get a faint colored background tint. The ⊕ and ◑ icons help distinguish the two new elements from the three existing ones.</div></div>
+      </div>
+    </div>
+
+
+    <!-- EXPANDED — Vishti Karana -->
+    <div class="screen">
+      <div class="screen-title">Screen 02 — B</div>
+      <div class="screen-name">Day View · Expanded</div>
+      <div class="screen-desc">Expanded view showing Vishti (Bhadra) Karana active. Red row tint + warning sub-label "avoid new beginnings". Yoga (Priti) is auspicious — green row above.</div>
+      <span class="screen-badge badge-new">expanded · vishti active</span>
+
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="phone-screen">
+          <div class="dawn-sky"></div>
+          <div class="status-bar"><span>2:15 PM</span><span>●●● WiFi 🔋</span></div>
+          <div class="app-header">
+            <div class="icon">🏠</div>
+            <div class="app-title">TITHIKA</div>
+            <div class="nav-icons">
+              <div class="icon" style="font-size:14px">📅</div>
+              <div class="icon" style="font-size:14px">🗓</div>
+              <div class="icon" style="font-size:14px">☆</div>
+              <div class="icon" style="font-size:14px">⚙</div>
+            </div>
+          </div>
+
+          <div class="day-scroll">
+            <div style="text-align:center;margin-bottom:2px">
+              <div style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--lm-ink-muted)">Friday</div>
+              <div style="font-size:13px;font-weight:700;color:var(--lm-ink)">May 29, 2026</div>
+              <div style="font-size:9px;font-weight:600;color:var(--lm-shukla);letter-spacing:0.05em;text-transform:uppercase">Jyeshtha · Shukla</div>
+            </div>
+            <div class="hora-card" style="margin-bottom:0">
+              <div class="hora-card-left">
+                <div class="hora-glyph">♀</div>
+                <div><div class="hora-planet">Venus Hora</div><div class="hora-sub">Hour 5 · Day</div></div>
+              </div>
+              <div style="display:flex;align-items:center"><div class="hora-until">until 3:42 PM</div><span class="chevron">›</span></div>
+            </div>
+            <div class="mu-card">
+              <div class="mu-card-hd">
+                <div class="mu-card-title">Muhurta</div>
+                <span class="mu-card-chev">›</span>
+              </div>
+              <div class="amb-row">
+                <div class="amb-bar gold"></div>
+                <div class="amb-body">
+                  <div class="amb-name gold">Char Choghadiya</div>
+                  <div class="amb-sub">neutral · day 5 of 8</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- PANCHANGA CARD — expanded, vishti active -->
+            <div class="pancha-expanded" style="border-left:3px solid var(--yoga-inausp)">
+              <div class="pancha-exp-header">
+                <div class="pancha-exp-title">Full Panchanga</div>
+                <div class="pancha-collapse-lbl">△ collapse</div>
+              </div>
+              <div class="pancha-el-row">
+                <div class="pel-icon">☼</div>
+                <div class="pel-label">Vara</div>
+                <div class="pel-body"><div class="pel-name">Friday</div><div class="pel-sub">Shukravara · ruled by Venus</div></div>
+                <div class="pel-time">—</div>
+              </div>
+              <div class="pancha-el-row">
+                <div class="pel-icon">◐</div>
+                <div class="pel-label">Tithi</div>
+                <div class="pel-body"><div class="pel-name">Shukla Tritiya</div></div>
+                <div class="pel-time">10:04 PM</div>
+              </div>
+              <div class="pancha-el-row">
+                <div class="pel-icon">✦</div>
+                <div class="pel-label">Nakshatra</div>
+                <div class="pel-body"><div class="pel-name">Ardra</div></div>
+                <div class="pel-time">1:14 AM +1</div>
+              </div>
+              <!-- Yoga — auspicious -->
+              <div class="pancha-el-row yoga-ausp">
+                <div class="pel-icon" style="color:var(--yoga-ausp)">⊕</div>
+                <div class="pel-label">Yoga</div>
+                <div class="pel-body">
+                  <div class="pel-name" style="color:var(--yoga-ausp)">Priti</div>
+                  <div class="pel-quality">
+                    <span class="pel-qdot green"></span>
+                    <span class="pel-qtext green">auspicious</span>
+                  </div>
+                </div>
+                <div class="pel-time">4:08 PM</div>
+              </div>
+              <!-- Karana — Vishti (inauspicious) -->
+              <div class="pancha-el-row yoga-inausp">
+                <div class="pel-icon" style="color:var(--yoga-inausp)">◑</div>
+                <div class="pel-label">Karana</div>
+                <div class="pel-body">
+                  <div class="pel-name" style="color:var(--yoga-inausp)">Vishti (Bhadra)</div>
+                  <div class="pel-quality">
+                    <span class="pel-qdot red"></span>
+                    <span class="pel-qtext red">avoid new beginnings</span>
+                  </div>
+                </div>
+                <div class="pel-time" style="color:var(--yoga-inausp);font-weight:600">10:04 PM</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="day-strip">
+            <div class="day-cell"><div class="day-wk">Wed</div><div class="day-greg">27</div><div class="day-tithi"><span class="pdot s"></span>1</div></div>
+            <div class="day-cell"><div class="day-wk">Thu</div><div class="day-greg">28</div><div class="day-tithi"><span class="pdot s"></span>2</div></div>
+            <div class="day-cell today"><div class="day-wk">Fri</div><div class="day-greg">29</div><div class="day-tithi"><span class="pdot s"></span>3</div></div>
+            <div class="day-cell"><div class="day-wk">Sat</div><div class="day-greg">30</div><div class="day-tithi"><span class="pdot s"></span>4</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="annotations">
+        <div class="ann"><div class="ann-num">1</div><div>Vishti row sub-label is <strong>"avoid new beginnings"</strong> (not just "inauspicious") — specific actionable guidance for users.</div></div>
+        <div class="ann"><div class="ann-num">2</div><div>Card's left border turns red when any active row is inauspicious — Yoga OR Karana. Normal (1px) border on other three sides unchanged.</div></div>
+      </div>
+    </div>
+
+  </div><!-- /grid section 2 -->
+
+
+  <!-- ═══════════════════════════════════════════
+       SECTION 3 — Yoga quality reference
+  ═══════════════════════════════════════════ -->
+  <div class="section-header">
+    <h2>Section 3 — Yoga quality tiers</h2>
+    <p>27 Yogas grouped into 4 quality tiers. The tier determines the left bar color, name color, and background tint in both the collapsed card and the expanded table.</p>
+  </div>
+
+  <div class="quality-panel">
+    <h3>Yoga quality tiers (27 total)</h3>
+    <p>Quality tiers control bar color, name color, and row background tint. Only the <em>active</em> yoga fires the warning state; past/future yogas are always shown at 38% opacity.</p>
+    <table class="quality-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Tier</th>
+          <th>Color</th>
+          <th>Yogas</th>
+          <th>Card behavior</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="qdot-ref" style="background:#C8922A"></span></td>
+          <td><span class="tier-label" style="color:#C8922A">Excellent</span></td>
+          <td style="color:var(--ink-page-muted)">#C8922A amber</td>
+          <td class="names">Brahma, Indra, Siddha, Siddhi, Amrit (if applicable)</td>
+          <td style="color:var(--ink-page-soft)">Amber bar + name; faint amber bg tint</td>
+        </tr>
+        <tr>
+          <td><span class="qdot-ref" style="background:#2A8A5A"></span></td>
+          <td><span class="tier-label" style="color:#2A8A5A">Auspicious</span></td>
+          <td style="color:var(--ink-page-muted)">#2A8A5A green</td>
+          <td class="names">Priti, Ayushman, Saubhagya, Shobhana, Sukarman, Dhriti, Vriddhi, Dhruva, Harshana, Vriddhi, Variyana, Shiva, Sadhya, Shubha, Shukla</td>
+          <td style="color:var(--ink-page-soft)">Green bar + name; faint green bg tint</td>
+        </tr>
+        <tr>
+          <td><span class="qdot-ref" style="background:#8890A8"></span></td>
+          <td><span class="tier-label" style="color:#8890A8">Neutral</span></td>
+          <td style="color:var(--ink-page-muted)">#8890A8 gray</td>
+          <td class="names">Atiganda, Shula, Ganda, Vyaghata, Vajra</td>
+          <td style="color:var(--ink-page-soft)">Gray bar; name in default ink color; no tint</td>
+        </tr>
+        <tr>
+          <td><span class="qdot-ref" style="background:#B84040"></span></td>
+          <td><span class="tier-label" style="color:#B84040">Inauspicious</span></td>
+          <td style="color:var(--ink-page-muted)">#B84040 red</td>
+          <td class="names">Vishkambha, Vyatipata, Parigha, Vaidhriti</td>
+          <td style="color:var(--ink-page-soft)">Red bar + name + red bg tint; card border turns red</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="quality-panel" style="margin-top:-48px">
+    <h3>Karana types (11 types, ~60 per lunar month)</h3>
+    <p>Karanas cycle through types twice per tithi (half-tithi each). Of the 11 types, only <strong>Vishti (Bhadra)</strong> is inauspicious. The other 10 are auspicious or neutral.</p>
+    <table class="quality-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Tier</th>
+          <th>Karanas</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="qdot-ref" style="background:#2A8A5A"></span></td>
+          <td><span class="tier-label" style="color:#2A8A5A">Auspicious</span></td>
+          <td class="names">Bava, Balava, Kaulava, Taitila, Garaja, Vanija</td>
+          <td style="color:var(--ink-page-soft)">6 moveable karanas (most common)</td>
+        </tr>
+        <tr>
+          <td><span class="qdot-ref" style="background:#B84040"></span></td>
+          <td><span class="tier-label" style="color:#B84040">Inauspicious</span></td>
+          <td class="names">Vishti (Bhadra)</td>
+          <td style="color:var(--ink-page-soft)">7th moveable karana. <em>Bhadra Kaal</em> — card turns red, same treatment as Rahu Kaal</td>
+        </tr>
+        <tr>
+          <td><span class="qdot-ref" style="background:#8890A8"></span></td>
+          <td><span class="tier-label" style="color:#8890A8">Neutral</span></td>
+          <td class="names">Shakuni, Chatushpada, Naga, Kimstughna</td>
+          <td style="color:var(--ink-page-soft)">4 fixed karanas; occur only on Amavasya period</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════
+       SECTION 4 — Localization
+  ═══════════════════════════════════════════ -->
+  <div class="section-header">
+    <h2>Section 4 — New strings (AppStrings additions)</h2>
+    <p>All strings follow the existing switch-on-AppLanguage pattern. English + Hindi Devanagari ship with Phase 3.3; Tamil + Bengali as v1.6.1 patch if needed.</p>
+  </div>
+
+  <div class="l10n-panel">
+    <h3>New AppStrings methods</h3>
+    <p>In addition to the 27 yoga names and 11 karana names, the following UI strings are needed.</p>
+    <table class="l10n-table">
+      <thead>
+        <tr>
+          <th>Method</th>
+          <th>English</th>
+          <th>Hindi (Devanagari)</th>
+          <th>Tamil</th>
+          <th>Bengali</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="l10n-tag new">new</span><br>panchaCardTitle</td>
+          <td>Panchanga</td>
+          <td>पञ्चाङ्ग</td>
+          <td>பஞ்சாங்கம்</td>
+          <td>পঞ্চাঙ্গ</td>
+        </tr>
+        <tr>
+          <td><span class="l10n-tag new">new</span><br>panchaFull</td>
+          <td>Full Panchanga</td>
+          <td>पूर्ण पञ्चाङ्ग</td>
+          <td>முழு பஞ்சாங்கம்</td>
+          <td>পূর্ণ পঞ্চাঙ্গ</td>
+        </tr>
+        <tr>
+          <td><span class="l10n-tag new">new</span><br>panchaVara</td>
+          <td>Vara</td>
+          <td>वार</td>
+          <td>வாரம்</td>
+          <td>বার</td>
+        </tr>
+        <tr>
+          <td><span class="l10n-tag new">new</span><br>panchaYoga</td>
+          <td>Yoga</td>
+          <td>योग</td>
+          <td>யோகம்</td>
+          <td>যোগ</td>
+        </tr>
+        <tr>
+          <td><span class="l10n-tag new">new</span><br>panchaKarana</td>
+          <td>Karana</td>
+          <td>करण</td>
+          <td>கரணம்</td>
+          <td>করণ</td>
+        </tr>
+        <tr>
+          <td><span class="l10n-tag new">new</span><br>vishtiWarning</td>
+          <td>avoid new beginnings</td>
+          <td>नया कार्य न करें</td>
+          <td>புதிய தொடக்கங்களை தவிர்க்கவும்</td>
+          <td>নতুন কাজ শুরু করবেন না</td>
+        </tr>
+        <tr>
+          <td><span class="l10n-tag new">new</span><br>yogaQuality(YogaQuality, lang)</td>
+          <td>excellent / auspicious / neutral / inauspicious</td>
+          <td>उत्तम / शुभ / सामान्य / अशुभ</td>
+          <td>சிறந்தது / சுபம் / சாதாரண / அசுபம்</td>
+          <td>চমৎকার / শুভ / সাধারণ / অশুভ</td>
+        </tr>
+        <tr>
+          <td><span class="l10n-tag new">new</span><br>varaName(int weekday, lang)<br><em>7 weekday values</em></td>
+          <td>Sunday … Saturday</td>
+          <td>रविवार … शनिवार</td>
+          <td>ஞாயிறு … சனி</td>
+          <td>রবিবার … শনিবার</td>
+        </tr>
+        <tr>
+          <td><span class="l10n-tag new">new</span><br>varaRuler(int weekday, lang)<br><em>ruling planet sub-label</em></td>
+          <td>Sun / Moon / Mars / Mercury / Jupiter / Venus / Saturn</td>
+          <td>सूर्य / चन्द्र / मंगल / बुध / गुरु / शुक्र / शनि</td>
+          <td>சூரியன் / சந்திரன் / செவ்வாய் / புதன் / குரு / சுக்கிரன் / சனி</td>
+          <td>সূর্য / চন্দ্র / মঙ্গল / বুধ / গুরু / শুক্র / শনি</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════
+       SECTION 5 — Open questions
+  ═══════════════════════════════════════════ -->
+  <div class="section-header">
+    <h2>Section 5 — Open design questions</h2>
+    <p>Items requiring a decision before implementation begins.</p>
+  </div>
+
+  <div class="quality-panel">
+    <h3>Q1 — Vara sub-label: ruling planet name or full vara name?</h3>
+    <p>In the expanded Vara row, the sub-label shows "Guruvara · ruled by Jupiter" (English) or "गुरुवार" (Hindi). <br><strong>Option A</strong>: Show the Sanskrit vara name as the sub-label ("Guruvara", "Shukravara", etc.) — culturally precise, familiar to Jyotish practitioners.<br><strong>Option B</strong>: Just show the ruling planet ("ruled by Jupiter") — more accessible to casual users.</p>
+
+    <h3 style="margin-top:20px">Q2 — Tithi and Nakshatra in expanded view: redundant or necessary?</h3>
+    <p>The expanded panchanga table repeats Tithi and Nakshatra data already shown prominently above the cards. <br><strong>Option A</strong>: Include all 5 for traditional completeness — users expect panchanga to have exactly 5 elements.<br><strong>Option B</strong>: Show only Yoga + Karana (the new elements) in the expanded view; label the card "Yoga &amp; Karana" not "Full Panchanga". Simpler, no visual redundancy.</p>
+
+    <h3 style="margin-top:20px">Q3 — Collapse persistence</h3>
+    <p>Should the expanded/collapsed state be <strong>persisted</strong> across app restarts (via SharedPreferences), or always reset to collapsed on launch? <br>Recommendation: <strong>always reset to collapsed</strong> — keeps the day view compact by default, matching the Muhurta screen's night choghadiya pattern.</p>
+  </div>
+
+</main>
+</body>
+</html>

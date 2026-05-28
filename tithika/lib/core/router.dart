@@ -72,9 +72,9 @@ GoRouter buildRouter(WidgetRef ref) {
         ],
       ),
     ],
-    errorBuilder: (_, state) => Scaffold(
-      body: Center(child: Text('Route not found: ${state.uri}')),
-    ),
+    // Glance widget taps arrive as glance-action:/CALLBACK?... deep links.
+    // Any unrecognised URI falls back to day view rather than crashing.
+    errorBuilder: (_, __) => const DayViewScreen(),
   );
 }
 

@@ -140,7 +140,7 @@ class _DayViewScreenState extends ConsumerState<DayViewScreen> {
                       : null,
                 ),
                 Expanded(
-                  flex: 85,
+                  flex: 87,
                   child: PageView.builder(
                     controller: _controller,
                     onPageChanged: (page) {
@@ -153,7 +153,7 @@ class _DayViewScreenState extends ConsumerState<DayViewScreen> {
                         _DayPageContent(date: _pageToDate(page)),
                   ),
                 ),
-                const Expanded(flex: 15, child: _DayStrip()),
+                const Expanded(flex: 13, child: _DayStrip()),
               ],
             ),
           ),
@@ -281,21 +281,26 @@ class _DayContent extends ConsumerWidget {
             style: scriptStyle(language, Theme.of(context).textTheme.displayLarge, fontSize: 24),
           ),
           const SizedBox(height: 4),
-          Text(
-            lunarMonthLabel,
-            style: scriptStyle(
-              language,
-              Theme.of(context).textTheme.labelSmall,
-              color: pakshaColor,
-              fontSize: 15,
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              lunarMonthLabel,
+              maxLines: 1,
+              softWrap: false,
+              style: scriptStyle(
+                language,
+                Theme.of(context).textTheme.labelSmall,
+                color: pakshaColor,
+                fontSize: 15,
+              ),
             ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 10),
           MoonPhaseWidget(
             tithiNumber: data.tithi.number,
             glowColor: glowColor,
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 10),
           Text(tithiFullName, style: tithiNameStyle),
           if (data.festivalName != null) ...[
             const SizedBox(height: 6),
@@ -332,7 +337,7 @@ class _DayContent extends ConsumerWidget {
               ),
             ),
           ],
-          const SizedBox(height: 10),
+          const SizedBox(height: 6),
           _DetailCard(
             label: nakshatraLabel,
             value: nakshatraName,
@@ -855,6 +860,9 @@ class _DayStrip extends ConsumerWidget {
     final stripAsync = ref.watch(stripDaysProvider);
     final selected = ref.watch(selectedDateProvider);
     final language = ref.watch(appSettingsProvider).language;
+    final location = ref.watch(effectiveLocationProvider);
+    final localNow = DateTime.now().toUtc().add(location.tzOffset);
+    final today = DateTime(localNow.year, localNow.month, localNow.day);
 
     return Container(
       decoration: BoxDecoration(
@@ -870,6 +878,7 @@ class _DayStrip extends ConsumerWidget {
             final cellDate = DateTime(selected.year, selected.month, selected.day)
                 .add(Duration(days: i - 1));
             final isSelected = i == 1;
+            final isToday = cellDate == today;
             return Expanded(
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
@@ -880,6 +889,7 @@ class _DayStrip extends ConsumerWidget {
                   dayData: dayData,
                   date: cellDate,
                   isSelected: isSelected,
+                  isToday: isToday,
                   language: language,
                 ),
               ),
@@ -895,12 +905,14 @@ class _StripCell extends StatelessWidget {
   final DayData dayData;
   final DateTime date;
   final bool isSelected;
+  final bool isToday;
   final AppLanguage language;
 
   const _StripCell({
     required this.dayData,
     required this.date,
     required this.isSelected,
+    required this.isToday,
     required this.language,
   });
 
@@ -935,6 +947,7 @@ class _StripCell extends StatelessWidget {
     final weekday = AppStrings.weekdayShort(date.weekday, language);
 
     return Container(
+      clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(
         border: Border(
           right: BorderSide(color: colors.line),
@@ -959,12 +972,25 @@ class _StripCell extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 2),
-          Text(
-            '${date.day}',
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w700,
-              color: isSelected ? colors.shukla : colors.ink,
+          Container(
+            width: 26,
+            height: 26,
+            decoration: isToday
+                ? BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: colors.shukla,
+                  )
+                : null,
+            alignment: Alignment.center,
+            child: Text(
+              '${date.day}',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: isToday
+                    ? colors.background
+                    : (isSelected ? colors.shukla : colors.ink),
+              ),
             ),
           ),
           const SizedBox(height: 2),

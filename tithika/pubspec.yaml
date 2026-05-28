@@ -43,6 +43,9 @@ dependencies:
   # Notifications
   flutter_local_notifications: ^17.0.0
 
+  # Home-screen widgets (Android data bridge)
+  home_widget: ^0.6.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
