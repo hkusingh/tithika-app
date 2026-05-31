@@ -509,7 +509,7 @@ class _MonthFestivalList extends ConsumerWidget {
     final daysInMonth = DateTime(year, month + 1, 0).day;
 
     final festivals = <({int day, String name})>[];
-    final ekadashis = <({int day, String name})>[];
+    final ekadashis = <int>[];
 
     for (var d = 1; d <= daysInMonth; d++) {
       final data = monthData[d];
@@ -523,10 +523,8 @@ class _MonthFestivalList extends ConsumerWidget {
       if (!isVruddhiFirstDay && isEkadashiDay) {
         if (data.festivalName != null) {
           festivals.add((day: d, name: FestivalNames.localize(data.festivalName, language)!));
-        } else {
-          final ekTithi = primaryIsEk ? data.tithi : data.secondaryTithi!;
-          ekadashis.add((day: d, name: AppStrings.paksha(ekTithi.paksha, language)));
         }
+        ekadashis.add(d);
       } else if (data.festivalName != null) {
         festivals.add((day: d, name: FestivalNames.localize(data.festivalName, language)!));
       }
@@ -622,7 +620,38 @@ class _MonthFestivalList extends ConsumerWidget {
               ),
             ),
             Divider(height: 1, color: colors.line),
-            ...buildRows(ekadashis, colors.krishna),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(10, 6, 10, 6),
+              child: Column(
+                children: [
+                  for (int i = 0; i < ekadashis.length; i += 2)
+                    Padding(
+                      padding: EdgeInsets.only(top: i == 0 ? 0 : 6),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: _EkChip(
+                              date: DateTime(year, month, ekadashis[i]),
+                              colors: colors,
+                              language: language,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: (i + 1 < ekadashis.length)
+                                ? _EkChip(
+                                    date: DateTime(year, month, ekadashis[i + 1]),
+                                    colors: colors,
+                                    language: language,
+                                  )
+                                : const SizedBox.shrink(),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+            ),
           ],
           const SizedBox(height: 4),
         ],
@@ -681,6 +710,46 @@ class _NextHinduMonthNote extends ConsumerWidget {
           ),
         );
       },
+    );
+  }
+}
+
+// ── Ekadashi date chip ────────────────────────────────────────────────────────
+
+class _EkChip extends StatelessWidget {
+  final DateTime date;
+  final TithikaColors colors;
+  final AppLanguage language;
+  const _EkChip({required this.date, required this.colors, required this.language});
+
+  @override
+  Widget build(BuildContext context) {
+    final wd = AppStrings.weekdayShort(date.weekday, language);
+    final mo = AppStrings.gregMonthShort(date.month, language);
+    final label = '$wd, $mo ${date.day}';
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: colors.krishna.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: colors.krishna.withValues(alpha: 0.22)),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.brightness_3_rounded, color: colors.krishna, size: 14),
+          const SizedBox(width: 7),
+          Flexible(
+            child: Text(
+              label,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: colors.ink,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

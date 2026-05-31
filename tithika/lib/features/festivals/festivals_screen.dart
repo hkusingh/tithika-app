@@ -25,6 +25,9 @@ IconData _festivalIcon(String name) {
   final n = name.toLowerCase();
   if (n.contains('holika')) return Icons.local_fire_department_rounded;
   if (n.contains('holi')) return Icons.palette_rounded;
+  if (n.contains('gudi padwa') || n.contains('ugadi')) {
+    return Icons.celebration_rounded;
+  }
   if (n.contains('navratri') || n.contains('navaratri')) {
     return Icons.local_florist_rounded;
   }
@@ -37,6 +40,10 @@ IconData _festivalIcon(String name) {
     return Icons.agriculture_rounded;
   }
   if (n.contains('akshaya')) return Icons.monetization_on_rounded;
+  if (n.contains('ganga')) return Icons.water_rounded;
+  if (n.contains('hariyali') || n.contains('hartalika')) {
+    return Icons.spa_rounded;
+  }
   if (n.contains('raksha')) return Icons.favorite_rounded;
   if (n.contains('janmashtami') || n.contains('krishna')) {
     return Icons.music_note_rounded;
@@ -54,6 +61,11 @@ IconData _festivalIcon(String name) {
   }
   if (n.contains('chhath')) return Icons.wb_twilight_rounded;
   if (n.contains('nag panchami')) return Icons.pets_rounded;
+  if (n.contains('mahalaya')) return Icons.nights_stay_rounded;
+  if (n.contains('jivitputrika')) return Icons.child_care_rounded;
+  if (n.contains('karva')) return Icons.bedtime_rounded;
+  if (n.contains('ahoi')) return Icons.auto_awesome_rounded;
+  if (n.contains('tulsi')) return Icons.eco_rounded;
   if (n.contains('bhai dooj')) return Icons.diversity_1_rounded;
   if (n.contains('govardhan')) return Icons.terrain_rounded;
   if (n.contains('vasant') || n.contains('basant')) {

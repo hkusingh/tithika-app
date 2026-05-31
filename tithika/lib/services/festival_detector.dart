@@ -133,7 +133,7 @@ abstract final class FestivalDetector {
   static String? _byTithi(LunarMonth m, int t) {
     return switch ((m, t)) {
       // Chaitra
-      (LunarMonth.chaitra, 1)  => 'Chaitra Navratri',
+      (LunarMonth.chaitra, 1)  => 'Gudi Padwa / Ugadi / Chaitra Navratri',
       (LunarMonth.chaitra, 8)  => 'Maha Ashtami',
       (LunarMonth.chaitra, 9)  => 'Ram Navami',           // Shukla 9
       (LunarMonth.chaitra, 15) => 'Hanuman Jayanti',      // Purnima
@@ -144,6 +144,7 @@ abstract final class FestivalDetector {
       (LunarMonth.vaishakha, 15) => 'Buddha Purnima',
 
       // Jyeshtha
+      (LunarMonth.jyeshtha, 10) => 'Ganga Dussehra',     // Shukla 10
       (LunarMonth.jyeshtha, 11) => 'Nirjala Ekadashi',   // Shukla 11
       (LunarMonth.jyeshtha, 30) => 'Vat Savitri',        // Amavasya
 
@@ -153,33 +154,40 @@ abstract final class FestivalDetector {
       (LunarMonth.ashadha, 15) => 'Guru Purnima',
 
       // Shravana
+      (LunarMonth.shravana, 3)  => 'Hariyali Teej',      // Shukla 3
       (LunarMonth.shravana, 5)  => 'Nag Panchami',       // Shukla 5
       (LunarMonth.shravana, 15) => 'Raksha Bandhan',
 
       // Bhadrapada — Krishna 8 (tithi 23) falls here because in Purnimanta
       // the days after Shravana Purnima belong to Bhadrapada month.
+      (LunarMonth.bhadrapada, 3)  => 'Hartalika Teej',      // Shukla 3
       (LunarMonth.bhadrapada, 23) => 'Krishna Janmashtami', // Krishna 8
       // Ganesh Chaturthi (Bhadrapada 4) → _specialWindowFestival
       (LunarMonth.bhadrapada, 14) => 'Anant Chaturdashi',   // Shukla 14
 
       // Ashwina
       (LunarMonth.ashwina, 1)  => 'Sharad Navratri',
+      (LunarMonth.ashwina, 23) => 'Jivitputrika Vrat',   // Jitiya — Krishna 8
+      (LunarMonth.ashwina, 30) => 'Mahalaya Amavasya',
       (LunarMonth.ashwina, 8)  => 'Maha Ashtami',
       (LunarMonth.ashwina, 9)  => 'Maha Navami',
       (LunarMonth.ashwina, 10) => 'Vijayadashami',
       (LunarMonth.ashwina, 15) => 'Sharad Purnima',
 
       // Kartika — Krishna paksha (tithi 16–30) and Shukla (1–15) all in same month.
-      (LunarMonth.kartika, 28) => 'Dhanteras',              // Krishna 13
-      (LunarMonth.kartika, 29) => 'Naraka Chaturdashi',     // Krishna 14
+      (LunarMonth.kartika, 19) => 'Karva Chauth',            // Krishna 4
+      (LunarMonth.kartika, 23) => 'Ahoi Ashtami',            // Krishna 8
+      (LunarMonth.kartika, 28) => 'Dhanteras',               // Krishna 13
+      (LunarMonth.kartika, 29) => 'Naraka Chaturdashi',      // Krishna 14
       // Diwali (Kartika 30) → _specialWindowFestival
-      (LunarMonth.kartika, 1)  => 'Govardhan Puja',         // Shukla 1
-      (LunarMonth.kartika, 2)  => 'Bhai Dooj',              // Shukla 2
-      (LunarMonth.kartika, 4)  => 'Chhath — Nahay Khay',      // Shukla 4
-      (LunarMonth.kartika, 5)  => 'Chhath — Kharna',          // Shukla 5
-      (LunarMonth.kartika, 6)  => 'Chhath — Sandhya Arghya',  // Shukla 6
-      (LunarMonth.kartika, 7)  => 'Chhath — Usha Arghya',     // Shukla 7
-      (LunarMonth.kartika, 11) => 'Devutthana Ekadashi',    // Shukla 11
+      (LunarMonth.kartika, 1)  => 'Govardhan Puja',          // Shukla 1
+      (LunarMonth.kartika, 2)  => 'Bhai Dooj',               // Shukla 2
+      (LunarMonth.kartika, 4)  => 'Chhath — Nahay Khay',     // Shukla 4
+      (LunarMonth.kartika, 5)  => 'Chhath — Kharna',         // Shukla 5
+      (LunarMonth.kartika, 6)  => 'Chhath — Sandhya Arghya', // Shukla 6
+      (LunarMonth.kartika, 7)  => 'Chhath — Usha Arghya',    // Shukla 7
+      (LunarMonth.kartika, 11) => 'Devutthana Ekadashi',     // Shukla 11
+      (LunarMonth.kartika, 12) => 'Tulsi Vivah',             // Shukla 12
       (LunarMonth.kartika, 15) => 'Kartik Purnima',
 
       // Margashirsha
