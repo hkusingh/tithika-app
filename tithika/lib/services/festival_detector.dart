@@ -167,7 +167,7 @@ abstract final class FestivalDetector {
 
       // Ashwina
       (LunarMonth.ashwina, 1)  => 'Sharad Navratri',
-      (LunarMonth.ashwina, 23) => 'Jivitputrika Vrat',   // Jitiya — Krishna 8
+      (LunarMonth.ashwina, 23) => 'Jivitputrika Vrat (Jitiya)', // Krishna 8
       (LunarMonth.ashwina, 30) => 'Mahalaya Amavasya',
       (LunarMonth.ashwina, 8)  => 'Maha Ashtami',
       (LunarMonth.ashwina, 9)  => 'Maha Navami',
