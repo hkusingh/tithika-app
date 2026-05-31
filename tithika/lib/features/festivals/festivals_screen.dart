@@ -4,9 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/app_strings.dart';
 import '../../core/festival_names.dart';
 import '../../core/theme.dart';
-import '../../models/app_settings.dart';
-import '../../models/lunar_month.dart';
-import '../../models/paksha.dart';
 import '../../state/providers.dart';
 import '../shared/starfield_background.dart';
 import '../shared/page_title_bar.dart';
@@ -22,6 +19,60 @@ const _monthNamesShort = [
   'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
 ];
 
+/// Maps an English (canonical) festival name to a representative icon.
+/// Matching is substring-based on lowercase keywords so variants resolve too.
+IconData _festivalIcon(String name) {
+  final n = name.toLowerCase();
+  if (n.contains('holika')) return Icons.local_fire_department_rounded;
+  if (n.contains('holi')) return Icons.palette_rounded;
+  if (n.contains('navratri') || n.contains('navaratri')) {
+    return Icons.local_florist_rounded;
+  }
+  if (n.contains('ram navami')) return Icons.wb_sunny_rounded;
+  if (n.contains('hanuman')) return Icons.landscape_rounded;
+  if (n.contains('baisakhi') ||
+      n.contains('vishu') ||
+      n.contains('pongal') ||
+      n.contains('sankranti')) {
+    return Icons.agriculture_rounded;
+  }
+  if (n.contains('akshaya')) return Icons.monetization_on_rounded;
+  if (n.contains('raksha')) return Icons.favorite_rounded;
+  if (n.contains('janmashtami') || n.contains('krishna')) {
+    return Icons.music_note_rounded;
+  }
+  if (n.contains('ganesh')) return Icons.celebration_rounded;
+  if (n.contains('diwali') || n.contains('deepavali')) {
+    return Icons.light_mode_rounded;
+  }
+  if (n.contains('dhanteras')) return Icons.savings_rounded;
+  if (n.contains('shivaratri') || n.contains('shivratri')) {
+    return Icons.nightlight_round;
+  }
+  if (n.contains('vijayadashami') || n.contains('dashami')) {
+    return Icons.shield_rounded;
+  }
+  if (n.contains('chhath')) return Icons.wb_twilight_rounded;
+  if (n.contains('nag panchami')) return Icons.pets_rounded;
+  if (n.contains('bhai dooj')) return Icons.diversity_1_rounded;
+  if (n.contains('govardhan')) return Icons.terrain_rounded;
+  if (n.contains('vasant') || n.contains('basant')) {
+    return Icons.local_florist_rounded;
+  }
+  if (n.contains('vat savitri')) return Icons.park_rounded;
+  if (n.contains('buddha')) return Icons.self_improvement_rounded;
+  if (n.contains('guru')) return Icons.auto_stories_rounded;
+  if (n.contains('anant')) return Icons.all_inclusive_rounded;
+  if (n.contains('gita')) return Icons.menu_book_rounded;
+  if (n.contains('rath yatra')) return Icons.directions_boat_rounded;
+  if (n.contains('ekadashi')) return Icons.brightness_3_rounded;
+  if (n.contains('purnima')) return Icons.brightness_5_rounded;
+  if (n.contains('ashtami') || n.contains('navami')) {
+    return Icons.shield_rounded;
+  }
+  return Icons.celebration_rounded;
+}
+
 class FestivalsScreen extends ConsumerStatefulWidget {
   const FestivalsScreen({super.key});
 
@@ -33,6 +84,7 @@ class _FestivalsScreenState extends ConsumerState<FestivalsScreen> {
   final _scrollController = ScrollController();
   final _currentMonthKey = GlobalKey();
   bool _scrolledToMonth = false;
+  bool _showEkadashi = false;
 
   @override
   void dispose() {
@@ -84,6 +136,39 @@ class _FestivalsScreenState extends ConsumerState<FestivalsScreen> {
                   meta: '$year',
                 ),
 
+                // ── Pill toggle ────────────────────────────────────────────
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 4),
+                  child: Container(
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: colors.ink.withValues(alpha: 0.06),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: colors.line),
+                    ),
+                    child: Row(
+                      children: [
+                        _PillTab(
+                          label: AppStrings.festivalsPageTitle(language),
+                          selected: !_showEkadashi,
+                          onTap: () => setState(() {
+                            _showEkadashi = false;
+                            _scrolledToMonth = false;
+                          }),
+                        ),
+                        _PillTab(
+                          label: AppStrings.ekadashi(language),
+                          selected: _showEkadashi,
+                          onTap: () => setState(() {
+                            _showEkadashi = true;
+                            _scrolledToMonth = false;
+                          }),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
                 // ── Body ──────────────────────────────────────────────────
                 Expanded(
                   child: festivalsAsync.when(
@@ -101,10 +186,16 @@ class _FestivalsScreenState extends ConsumerState<FestivalsScreen> {
                       ),
                     ),
                     data: (entries) {
-                      if (entries.isEmpty) {
+                      final filtered = _showEkadashi
+                          ? entries.where((e) => e.isEkadashi).toList()
+                          : entries.where((e) => e.inFestivals).toList();
+
+                      if (filtered.isEmpty) {
                         return Center(
                           child: Text(
-                            'No festivals found for $year.',
+                            _showEkadashi
+                                ? 'No Ekadashi dates found for $year.'
+                                : 'No festivals found for $year.',
                             style: Theme.of(context)
                                 .textTheme
                                 .bodySmall
@@ -114,46 +205,37 @@ class _FestivalsScreenState extends ConsumerState<FestivalsScreen> {
                       }
 
                       // Group current year by Gregorian month.
-                      final Map<int, List<FestivalEntry>> byMonth = {};
-                      for (final e in entries) {
-                        byMonth.putIfAbsent(e.date.month, () => []).add(e);
-                      }
+                      final byMonth = _groupByMonth(filtered);
                       final months = byMonth.keys.toList()..sort();
 
-                      // Build a flat widget list so every item is in the tree
-                      // immediately, allowing GlobalKey lookup for scroll-to-month.
                       final items = <Widget>[];
                       for (final m in months) {
-                        items.add(_MonthHeader(
+                        items.add(_MonthCard(
                           key: m == currentMonth ? _currentMonthKey : null,
                           month: m,
+                          entries: byMonth[m]!,
+                          showEkadashi: _showEkadashi,
                         ));
-                        for (final entry in byMonth[m]!) {
-                          items.add(_FestivalCard(entry: entry));
-                        }
                       }
 
                       // In December, append Jan–Mar of next year.
                       if (isDecember) {
-                        final nextEntries = nextYearAsync.valueOrNull ?? [];
-                        if (nextEntries.isNotEmpty) {
-                          final Map<int, List<FestivalEntry>> nextByMonth = {};
-                          for (final e in nextEntries) {
-                            if (e.date.month <= 3) {
-                              nextByMonth
-                                  .putIfAbsent(e.date.month, () => [])
-                                  .add(e);
-                            }
-                          }
-                          if (nextByMonth.isNotEmpty) {
-                            items.add(_YearHeader(year: year + 1));
-                            for (final m in [1, 2, 3]) {
-                              if (nextByMonth.containsKey(m)) {
-                                items.add(_MonthHeader(month: m));
-                                for (final entry in nextByMonth[m]!) {
-                                  items.add(_FestivalCard(entry: entry));
-                                }
-                              }
+                        final nextAll = nextYearAsync.valueOrNull ?? [];
+                        final nextFiltered = _showEkadashi
+                            ? nextAll.where((e) => e.isEkadashi).toList()
+                            : nextAll.where((e) => e.inFestivals).toList();
+                        final nextByMonth = _groupByMonth(nextFiltered
+                            .where((e) => e.date.month <= 3)
+                            .toList());
+                        if (nextByMonth.isNotEmpty) {
+                          items.add(_YearHeader(year: year + 1));
+                          for (final m in [1, 2, 3]) {
+                            if (nextByMonth.containsKey(m)) {
+                              items.add(_MonthCard(
+                                month: m,
+                                entries: nextByMonth[m]!,
+                                showEkadashi: _showEkadashi,
+                              ));
                             }
                           }
                         }
@@ -163,8 +245,7 @@ class _FestivalsScreenState extends ConsumerState<FestivalsScreen> {
 
                       return ListView(
                         controller: _scrollController,
-                        cacheExtent: 4000,
-                        padding: const EdgeInsets.only(bottom: 32),
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
                         children: items,
                       );
                     },
@@ -174,6 +255,53 @@ class _FestivalsScreenState extends ConsumerState<FestivalsScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Map<int, List<FestivalEntry>> _groupByMonth(List<FestivalEntry> list) {
+    final map = <int, List<FestivalEntry>>{};
+    for (final e in list) {
+      map.putIfAbsent(e.date.month, () => []).add(e);
+    }
+    return map;
+  }
+}
+
+// ── Pill toggle tab ───────────────────────────────────────────────────────────
+
+class _PillTab extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+  const _PillTab(
+      {required this.label, required this.selected, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = TithikaColors.of(context);
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          margin: const EdgeInsets.all(3),
+          decoration: BoxDecoration(
+            color: selected
+                ? colors.shukla.withValues(alpha: 0.20)
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(17),
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            label,
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                  color: selected ? colors.shukla : colors.inkMuted,
+                  fontSize: 13,
+                ),
+          ),
+        ),
       ),
     );
   }
@@ -189,7 +317,7 @@ class _YearHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = TithikaColors.of(context);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 28, 20, 4),
+      padding: const EdgeInsets.fromLTRB(8, 24, 8, 8),
       child: Row(
         children: [
           Expanded(child: Divider(color: colors.line, height: 1)),
@@ -212,129 +340,235 @@ class _YearHeader extends StatelessWidget {
   }
 }
 
-// ── Month section header ──────────────────────────────────────────────────────
+// ── Month card ────────────────────────────────────────────────────────────────
 
-class _MonthHeader extends StatelessWidget {
+class _MonthCard extends StatelessWidget {
   final int month;
-  const _MonthHeader({super.key, required this.month});
+  final List<FestivalEntry> entries;
+  final bool showEkadashi;
+  const _MonthCard({
+    super.key,
+    required this.month,
+    required this.entries,
+    required this.showEkadashi,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 6),
-      child: Text(
-        _monthNames[month - 1],
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: TithikaColors.of(context).shukla,
-              fontWeight: FontWeight.w700,
-              fontSize: 13,
-              letterSpacing: 0.5,
+    final colors = TithikaColors.of(context);
+    final countLabel = showEkadashi
+        ? '${entries.length} ${entries.length == 1 ? 'date' : 'dates'}'
+        : '${entries.length} ${entries.length == 1 ? 'festival' : 'festivals'}';
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+      decoration: BoxDecoration(
+        color: colors.ink.withValues(alpha: 0.03),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: colors.line),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Card header: month name + count
+          Padding(
+            padding: const EdgeInsets.only(bottom: 6, left: 2, right: 2),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  _monthNames[month - 1].toUpperCase(),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: colors.shukla,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 12,
+                        letterSpacing: 0.8,
+                      ),
+                ),
+                Text(
+                  countLabel,
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: colors.inkMuted,
+                        fontSize: 11,
+                      ),
+                ),
+              ],
             ),
+          ),
+          if (showEkadashi)
+            _EkadashiDateGrid(entries: entries)
+          else
+            for (int i = 0; i < entries.length; i++)
+              _FestivalRow(
+                entry: entries[i],
+                showDivider: i < entries.length - 1,
+              ),
+        ],
       ),
     );
   }
 }
 
-// ── Festival card ─────────────────────────────────────────────────────────────
+// ── Festival row (Festivals tab) ──────────────────────────────────────────────
 
-class _FestivalCard extends ConsumerWidget {
+class _FestivalRow extends ConsumerWidget {
   final FestivalEntry entry;
-  const _FestivalCard({required this.entry});
+  final bool showDivider;
+  const _FestivalRow({required this.entry, required this.showDivider});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = TithikaColors.of(context);
     final language = ref.watch(appSettingsProvider).language;
     final date = entry.date;
-    final data = entry.data;
-    final isShukla = data.tithi.paksha == Paksha.shukla;
-    final pakshaColor = isShukla ? colors.shukla : colors.krishna;
+    final canonical = entry.data.festivalName ?? 'Ekadashi';
+    final name = FestivalNames.localize(canonical, language) ?? canonical;
 
     final wd = _weekdays[date.weekday % 7];
     final mo = _monthNamesShort[date.month - 1];
     final gregDate = '$wd, $mo ${date.day}';
 
-    final pakshaLabel = AppStrings.paksha(data.tithi.paksha, language);
-    final monthName = switch (language) {
-      AppLanguage.hindiDevanagari => data.lunarMonth.nameDeva,
-      AppLanguage.tamil           => data.lunarMonth.nameTamil,
-      AppLanguage.bengali         => data.lunarMonth.nameBengali,
-      _                           => data.lunarMonth.nameEn,
-    };
-    final hinduDate = '$monthName · $pakshaLabel ${data.tithi.pakshaNumber}';
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: Container(
-        decoration: BoxDecoration(
-          color: colors.festival.withValues(alpha: 0.07),
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: colors.festival.withValues(alpha: 0.18),
-            width: 1,
-          ),
-        ),
-        child: Row(
-          children: [
-            // Left accent
-            Container(
-              width: 36,
-              height: 56,
-              decoration: BoxDecoration(
-                color: colors.festival.withValues(alpha: 0.15),
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(10),
-                  bottomLeft: Radius.circular(10),
-                ),
-              ),
-              child: Icon(
-                Icons.flare_rounded,
-                color: colors.festival,
-                size: 18,
-              ),
+    return Container(
+      decoration: BoxDecoration(
+        border: showDivider
+            ? Border(bottom: BorderSide(color: colors.line))
+            : null,
+      ),
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
+      child: Row(
+        children: [
+          // Icon chip
+          Container(
+            width: 34,
+            height: 34,
+            decoration: BoxDecoration(
+              color: colors.festival.withValues(alpha: 0.14),
+              borderRadius: BorderRadius.circular(10),
             ),
-            const SizedBox(width: 12),
-            // Content
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      FestivalNames.localize(entry.data.festivalName, language)!,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: colors.ink,
+            child: Icon(
+              _festivalIcon(canonical),
+              color: colors.festival,
+              size: 18,
+            ),
+          ),
+          const SizedBox(width: 11),
+          // Name (+ Ekadashi tag when applicable)
+          Expanded(
+            child: Row(
+              children: [
+                Flexible(
+                  child: Text(
+                    name,
+                    style: scriptStyle(
+                      language,
+                      Theme.of(context).textTheme.bodyMedium,
+                      fontWeight: FontWeight.w600,
+                      color: colors.ink,
+                    ),
+                  ),
+                ),
+                if (entry.isEkadashi) ...[
+                  const SizedBox(width: 6),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                    decoration: BoxDecoration(
+                      color: colors.krishna.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      AppStrings.ekadashi(language),
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            color: colors.krishna,
+                            fontSize: 9,
+                            fontWeight: FontWeight.w700,
                           ),
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      hinduDate,
-                      style: scriptStyle(
-                        language,
-                        Theme.of(context).textTheme.bodySmall,
-                        color: pakshaColor,
-                        fontSize: 11,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+                  ),
+                ],
+              ],
             ),
-            // Gregorian date
-            Padding(
-              padding: const EdgeInsets.only(right: 14),
-              child: Text(
-                gregDate,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: colors.inkMuted,
-                      fontSize: 11,
-                    ),
-              ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            gregDate,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: colors.inkSoft,
+                  fontSize: 11.5,
+                ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Ekadashi date grid (Ekadasi tab) ──────────────────────────────────────────
+
+class _EkadashiDateGrid extends StatelessWidget {
+  final List<FestivalEntry> entries;
+  const _EkadashiDateGrid({required this.entries});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = TithikaColors.of(context);
+    final rows = <Widget>[];
+    // Two date chips per row.
+    for (int i = 0; i < entries.length; i += 2) {
+      final second = (i + 1 < entries.length) ? entries[i + 1] : null;
+      rows.add(Padding(
+        padding: EdgeInsets.only(top: i == 0 ? 2 : 8),
+        child: Row(
+          children: [
+            Expanded(child: _EkadashiChip(date: entries[i].date, colors: colors)),
+            const SizedBox(width: 8),
+            Expanded(
+              child: second != null
+                  ? _EkadashiChip(date: second.date, colors: colors)
+                  : const SizedBox.shrink(),
             ),
           ],
         ),
+      ));
+    }
+    return Column(children: rows);
+  }
+}
+
+class _EkadashiChip extends StatelessWidget {
+  final DateTime date;
+  final TithikaColors colors;
+  const _EkadashiChip({required this.date, required this.colors});
+
+  @override
+  Widget build(BuildContext context) {
+    final wd = _weekdays[date.weekday % 7];
+    final mo = _monthNamesShort[date.month - 1];
+    final label = '$wd, $mo ${date.day}';
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+      decoration: BoxDecoration(
+        color: colors.krishna.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: colors.krishna.withValues(alpha: 0.22)),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.brightness_3_rounded, color: colors.krishna, size: 15),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              label,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: colors.ink,
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w500,
+                  ),
+            ),
+          ),
+        ],
       ),
     );
   }

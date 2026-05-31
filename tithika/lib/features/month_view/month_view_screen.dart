@@ -10,6 +10,7 @@ import '../../models/app_settings.dart';
 import '../../models/day_data.dart';
 import '../../models/lunar_month.dart';
 import '../../models/paksha.dart';
+import '../../models/special_tithi.dart';
 import '../../state/providers.dart';
 import '../day_view/moon_phase_widget.dart';
 import '../shared/starfield_background.dart';
@@ -505,14 +506,79 @@ class _MonthFestivalList extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = TithikaColors.of(context);
     final language = ref.watch(appSettingsProvider).language;
-    final festivals = <({int day, String name})>[];
     final daysInMonth = DateTime(year, month + 1, 0).day;
+
+    final festivals = <({int day, String name})>[];
+    final ekadashis = <({int day, String name})>[];
+
     for (var d = 1; d <= daysInMonth; d++) {
-      final key = monthData[d]?.festivalName;
-      if (key != null) festivals.add((day: d, name: FestivalNames.localize(key, language)!));
+      final data = monthData[d];
+      if (data == null) continue;
+      final primaryIsEk = data.tithi.special == SpecialTithi.ekadashi;
+      final kshayaIsEk = data.secondaryIsKshaya &&
+          data.secondaryTithi?.special == SpecialTithi.ekadashi;
+      final isEkadashiDay = primaryIsEk || kshayaIsEk;
+      final tomorrowIsEk = monthData[d + 1]?.tithi.special == SpecialTithi.ekadashi;
+      final isVruddhiFirstDay = primaryIsEk && tomorrowIsEk;
+      if (!isVruddhiFirstDay && isEkadashiDay) {
+        if (data.festivalName != null) {
+          festivals.add((day: d, name: FestivalNames.localize(data.festivalName, language)!));
+        } else {
+          final ekTithi = primaryIsEk ? data.tithi : data.secondaryTithi!;
+          ekadashis.add((day: d, name: AppStrings.paksha(ekTithi.paksha, language)));
+        }
+      } else if (data.festivalName != null) {
+        festivals.add((day: d, name: FestivalNames.localize(data.festivalName, language)!));
+      }
     }
 
-    if (festivals.isEmpty) return const SizedBox.shrink();
+    if (festivals.isEmpty && ekadashis.isEmpty) return const SizedBox.shrink();
+
+    Iterable<Widget> buildRows(
+      List<({int day, String name})> items,
+      Color dotColor,
+    ) =>
+        items.map((f) {
+          final date = DateTime(year, month, f.day);
+          final wd = AppStrings.weekdayShort(date.weekday, language);
+          final mo = AppStrings.gregMonthShort(month, language);
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 54,
+                  child: Text(
+                    '$wd ${f.day} $mo',
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: colors.inkSoft,
+                          fontSize: 10,
+                        ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  width: 3,
+                  height: 3,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: dotColor,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    f.name,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
 
     return Container(
       margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
@@ -524,60 +590,40 @@ class _MonthFestivalList extends ConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
-            child: Text(
-              AppStrings.festivals(language),
-              style: scriptStyle(
-                language,
-                Theme.of(context).textTheme.labelSmall,
-                color: colors.shukla,
-                fontSize: 10,
+          if (festivals.isNotEmpty) ...[
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+              child: Text(
+                AppStrings.festivals(language),
+                style: scriptStyle(
+                  language,
+                  Theme.of(context).textTheme.labelSmall,
+                  color: colors.shukla,
+                  fontSize: 10,
+                ),
               ),
             ),
-          ),
-          Divider(height: 1, color: colors.line),
-          ...festivals.map((f) {
-            final date = DateTime(year, month, f.day);
-            final wd = AppStrings.weekdayShort(date.weekday, language);
-            final mo = AppStrings.gregMonthShort(month, language);
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              child: Row(
-                children: [
-                  SizedBox(
-                    width: 54,
-                    child: Text(
-                      '$wd ${f.day} $mo',
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: colors.inkSoft,
-                            fontSize: 10,
-                          ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    width: 3,
-                    height: 3,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: colors.festival,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      f.name,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                          ),
-                    ),
-                  ),
-                ],
+            Divider(height: 1, color: colors.line),
+            ...buildRows(festivals, colors.festival),
+          ],
+          if (festivals.isNotEmpty && ekadashis.isNotEmpty)
+            Divider(height: 1, color: colors.line),
+          if (ekadashis.isNotEmpty) ...[
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+              child: Text(
+                AppStrings.ekadashi(language).toUpperCase(),
+                style: scriptStyle(
+                  language,
+                  Theme.of(context).textTheme.labelSmall,
+                  color: colors.shukla,
+                  fontSize: 10,
+                ),
               ),
-            );
-          }),
+            ),
+            Divider(height: 1, color: colors.line),
+            ...buildRows(ekadashis, colors.krishna),
+          ],
           const SizedBox(height: 4),
         ],
       ),

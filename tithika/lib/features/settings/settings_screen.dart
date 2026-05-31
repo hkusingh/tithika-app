@@ -623,6 +623,7 @@ class _NotifSubGroup extends StatelessWidget {
             ),
           _SubRow(
             label: 'Festival alerts',
+            subtitle: 'Notified the day before at 6 AM',
             trailing: Switch(
               value: notif.festivalAlertsEnabled,
               onChanged: onFestivalChanged,
@@ -637,6 +638,7 @@ class _NotifSubGroup extends StatelessWidget {
           ),
           _SubRow(
             label: 'Ekadashi alerts',
+            subtitle: 'Notified the day before at 6 AM',
             trailing: Switch(
               value: notif.ekadashiAlertsEnabled,
               onChanged: onEkadashiChanged,
@@ -656,11 +658,13 @@ class _NotifSubGroup extends StatelessWidget {
 
 class _SubRow extends StatelessWidget {
   final String label;
+  final String? subtitle;
   final Widget trailing;
   final bool divider;
 
   const _SubRow({
     required this.label,
+    this.subtitle,
     required this.trailing,
     required this.divider,
   });
@@ -678,12 +682,25 @@ class _SubRow extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: Theme.of(context)
-                .textTheme
-                .bodyMedium
-                ?.copyWith(fontWeight: FontWeight.w500),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium
+                    ?.copyWith(fontWeight: FontWeight.w500),
+              ),
+              if (subtitle != null)
+                Text(
+                  subtitle!,
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.copyWith(color: colors.inkMuted),
+                ),
+            ],
           ),
           trailing,
         ],

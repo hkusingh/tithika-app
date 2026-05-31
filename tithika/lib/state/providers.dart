@@ -8,6 +8,7 @@ import '../models/lunar_month.dart';
 import '../models/muhurta_data.dart';
 import '../models/paksha.dart';
 import '../models/pancha_data.dart';
+import '../models/special_tithi.dart';
 import '../services/festival_detector.dart';
 import '../services/hora_service.dart';
 import '../services/muhurta_service.dart';
@@ -260,7 +261,19 @@ class FestivalEntry {
   final DateTime date;
   final DayData data;
 
-  const FestivalEntry({required this.date, required this.data});
+  /// True for any Ekadashi day (named or generic) — controls the Ekadasi tab.
+  final bool isEkadashi;
+
+  /// True when the day carries a proper festival name (including named
+  /// Ekadashis like Nirjala) — controls the Festivals tab.
+  final bool inFestivals;
+
+  const FestivalEntry({
+    required this.date,
+    required this.data,
+    this.isEkadashi = false,
+    this.inFestivals = false,
+  });
 }
 
 /// All festival days for [year] at the effective location.
@@ -284,9 +297,35 @@ final yearFestivalsProvider =
       );
       final adjusted = _applyMonthSystem(raw, monthSystem);
       final purnimanta = _applyMonthSystem(raw, MonthSystem.purnimanta);
-      final enriched = adjusted.copyWith(festivalName: FestivalDetector.detect(purnimanta));
-      if (enriched.festivalName != null) {
-        entries.add(FestivalEntry(date: date, data: enriched));
+      final primaryIsEkadashi = raw.tithi.special == SpecialTithi.ekadashi;
+      final kshayaIsEkadashi = raw.secondaryIsKshaya &&
+          raw.secondaryTithi?.special == SpecialTithi.ekadashi;
+      final isEkadashiDay = primaryIsEkadashi || kshayaIsEkadashi;
+      // Vruddhi: look ahead — if tomorrow also has Ekadashi as primary, today
+      // is Day 1 and should be suppressed (observe on Day 2).  Lookahead is
+      // more robust than secondaryTithi == null alone, which can miss the case
+      // where Ekadashi ends minutes before the next sunrise.
+      final isVruddhiFirstDay = primaryIsEkadashi && () {
+        final tomorrow = date.add(const Duration(days: 1));
+        return tithiSvc.calculateForDate(
+          localDate: tomorrow,
+          lat: location.lat,
+          lon: location.lon,
+          tzOffset: location.tzOffsetAt(tomorrow),
+        ).tithi.special == SpecialTithi.ekadashi;
+      }();
+      final detectedName = FestivalDetector.detect(purnimanta);
+      final isObservedEkadashi = isEkadashiDay && !isVruddhiFirstDay;
+      final inFestivals = detectedName != null;
+      final festivalName = detectedName ?? (isObservedEkadashi ? 'Ekadashi' : null);
+      final enriched = adjusted.copyWith(festivalName: festivalName);
+      if (inFestivals || isObservedEkadashi) {
+        entries.add(FestivalEntry(
+          date: date,
+          data: enriched,
+          isEkadashi: isObservedEkadashi,
+          inFestivals: inFestivals,
+        ));
       }
     }
   }

@@ -79,17 +79,19 @@ void main() async {
     } catch (_) {}
   }());
 
-  // Reschedule notifications after ephemeris is warmed up.
+  // Check if the weekly notification window has expired; reschedule if so.
+  // Re-arms the in-memory timer if the process was restarted mid-week.
   unawaited(() async {
     try {
       final settings = container.read(appSettingsProvider);
       if (settings.notificationSettings.enabled) {
         final tithiSvc =
             await container.read(tithiServiceProvider.future);
-        await NotificationService.scheduleAll(
+        await NotificationService.checkAndRescheduleIfDue(
           settings: settings.notificationSettings,
           appSettings: settings,
           tithiService: tithiSvc,
+          prefs: prefs,
         );
       }
     } catch (_) {}

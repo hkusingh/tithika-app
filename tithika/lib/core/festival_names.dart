@@ -56,6 +56,7 @@ abstract final class FestivalNames {
     'Vasant Panchami':            'वसंत पंचमी',
     'Maha Shivaratri':            'महाशिवरात्रि',
     'Holika Dahan':               'होलिका दहन',
+    'Ekadashi':                   'एकादशी',
   };
 
   static const _ta = <String, String>{
@@ -97,6 +98,7 @@ abstract final class FestivalNames {
     'Vasant Panchami':            'வசந்த பஞ்சமி',
     'Maha Shivaratri':            'மஹா சிவராத்திரி',
     'Holika Dahan':               'ஹோலிகா தகனம்',
+    'Ekadashi':                   'ஏகாதசி',
   };
 
   static const _bn = <String, String>{
@@ -138,5 +140,6 @@ abstract final class FestivalNames {
     'Vasant Panchami':            'বসন্ত পঞ্চমী',
     'Maha Shivaratri':            'মহাশিবরাত্রি',
     'Holika Dahan':               'হোলিকা দহন',
+    'Ekadashi':                   'একাদশী',
   };
 }

@@ -47,11 +47,13 @@ class AppSettingsNotifier extends Notifier<AppSettings> {
 
   Future<void> _rescheduleNotifications() async {
     try {
+      final prefs = ref.read(sharedPreferencesProvider);
       final tithiSvc = await ref.read(tithiServiceProvider.future);
       await NotificationService.scheduleAll(
         settings: state.notificationSettings,
         appSettings: state,
         tithiService: tithiSvc,
+        prefs: prefs,
       );
     } catch (_) {}
   }

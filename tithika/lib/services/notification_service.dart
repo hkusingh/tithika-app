@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 import '../models/app_location.dart';
@@ -6,11 +9,19 @@ import '../models/app_settings.dart';
 import '../models/day_data.dart';
 import '../models/lunar_month.dart';
 import '../models/paksha.dart';
+import '../models/special_tithi.dart';
 import 'festival_detector.dart';
+import 'muhurta_service.dart';
 import 'tithi_service.dart';
 
 const _channelDaily = 'tithika_daily';
 const _channelEvents = 'tithika_events';
+const _rescheduleKey = 'notif_next_reschedule';
+
+// Notification ID ranges:
+// 0–6:     daily reminders (7 days)
+// 100–119: festival alerts
+// 200–201: ekadashi alerts
 
 const _dailyDetails = NotificationDetails(
   android: AndroidNotificationDetails(
@@ -36,6 +47,7 @@ const _eventDetails = NotificationDetails(
 
 class NotificationService {
   static final _plugin = FlutterLocalNotificationsPlugin();
+  static Timer? _refreshTimer;
 
   static Future<void> initialize() async {
     const android = AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -67,21 +79,27 @@ class NotificationService {
 
   static Future<void> cancelAll() => _plugin.cancelAll();
 
+  /// Schedule the next 7 days of notifications and arm the weekly 2 AM refresh timer.
   static Future<void> scheduleAll({
     required NotificationSettings settings,
     required AppSettings appSettings,
     required TithiService tithiService,
+    required SharedPreferences prefs,
   }) async {
     await cancelAll();
-    if (!settings.enabled) return;
+    _cancelTimer();
+
+    if (!settings.enabled) {
+      await prefs.remove(_rescheduleKey);
+      return;
+    }
 
     final effectiveLoc = appSettings.location ?? AppLocation.ujjain;
-    final tzId =
-        effectiveLoc.tzId.isNotEmpty ? effectiveLoc.tzId : 'Asia/Kolkata';
+    final tzId = effectiveLoc.tzId.isNotEmpty ? effectiveLoc.tzId : 'Asia/Kolkata';
     final tzLocation = tz.getLocation(tzId);
 
     if (settings.dailyReminderEnabled) {
-      await _scheduleDailyReminder(settings, tzLocation);
+      await _scheduleDailyReminders(settings, effectiveLoc, tithiService, tzLocation);
     }
     if (settings.festivalAlertsEnabled) {
       await _scheduleFestivalAlerts(effectiveLoc, tithiService, tzLocation);
@@ -89,35 +107,140 @@ class NotificationService {
     if (settings.ekadashiAlertsEnabled) {
       await _scheduleEkadashiAlerts(effectiveLoc, tithiService, tzLocation);
     }
+
+    final nextReschedule = _next2am(tzLocation);
+    await prefs.setString(_rescheduleKey, nextReschedule.toUtc().toIso8601String());
+    _startTimer(nextReschedule, settings, appSettings, tithiService, prefs);
   }
 
-  static Future<void> _scheduleDailyReminder(
-    NotificationSettings settings,
-    tz.Location location,
-  ) async {
-    final now = tz.TZDateTime.now(location);
-    var scheduled = tz.TZDateTime(
-      location,
-      now.year,
-      now.month,
-      now.day,
-      settings.dailyReminderHour,
-      settings.dailyReminderMinute,
-    );
-    if (scheduled.isBefore(now)) {
-      scheduled = scheduled.add(const Duration(days: 1));
+  /// Called on every app open. Reschedules if the weekly window has expired,
+  /// or re-arms the in-memory timer if the process was restarted.
+  static Future<void> checkAndRescheduleIfDue({
+    required NotificationSettings settings,
+    required AppSettings appSettings,
+    required TithiService tithiService,
+    required SharedPreferences prefs,
+  }) async {
+    if (!settings.enabled) return;
+
+    final stored = prefs.getString(_rescheduleKey);
+
+    if (stored == null || DateTime.now().toUtc().isAfter(DateTime.parse(stored))) {
+      await scheduleAll(
+        settings: settings,
+        appSettings: appSettings,
+        tithiService: tithiService,
+        prefs: prefs,
+      );
+    } else if (_refreshTimer == null) {
+      // Process was restarted — re-arm the timer without rescheduling
+      _startTimer(
+        DateTime.parse(stored),
+        settings, appSettings, tithiService, prefs,
+      );
     }
-    await _plugin.zonedSchedule(
-      0,
-      'Tithika Panchanga',
-      'Tap to see today\'s tithi, nakshatra, and more',
-      scheduled,
-      _dailyDetails,
-      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-      matchDateTimeComponents: DateTimeComponents.time,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
-    );
+  }
+
+  static void _cancelTimer() {
+    _refreshTimer?.cancel();
+    _refreshTimer = null;
+  }
+
+  static void _startTimer(
+    DateTime fireAt,
+    NotificationSettings settings,
+    AppSettings appSettings,
+    TithiService tithiService,
+    SharedPreferences prefs,
+  ) {
+    _cancelTimer();
+    final delay = fireAt.toUtc().difference(DateTime.now().toUtc());
+    if (delay.isNegative) {
+      Timer.run(() async {
+        await scheduleAll(
+          settings: settings, appSettings: appSettings,
+          tithiService: tithiService, prefs: prefs,
+        );
+      });
+      return;
+    }
+    _refreshTimer = Timer(delay, () async {
+      await scheduleAll(
+        settings: settings, appSettings: appSettings,
+        tithiService: tithiService, prefs: prefs,
+      );
+    });
+  }
+
+  /// 2 AM in the user's timezone, exactly 7 days from today.
+  static DateTime _next2am(tz.Location tzLocation) {
+    final now = tz.TZDateTime.now(tzLocation);
+    return tz.TZDateTime(tzLocation, now.year, now.month, now.day, 2, 0)
+        .add(const Duration(days: 7));
+  }
+
+  static Future<void> _scheduleDailyReminders(
+    NotificationSettings settings,
+    AppLocation location,
+    TithiService tithiService,
+    tz.Location tzLocation,
+  ) async {
+    final now = tz.TZDateTime.now(tzLocation);
+
+    for (var i = 0; i < 7; i++) {
+      final date = DateTime.now().add(Duration(days: i));
+      final scheduled = tz.TZDateTime(
+        tzLocation, date.year, date.month, date.day,
+        settings.dailyReminderHour, settings.dailyReminderMinute,
+      );
+      if (scheduled.isBefore(now)) continue;
+
+      final raw = tithiService.calculateForDate(
+        localDate: date, lat: location.lat, lon: location.lon,
+        tzOffset: location.tzOffsetAt(date),
+      );
+
+      String body = '${raw.tithi.fullNameEn} · ${raw.nakshatra.nameEn}';
+
+      if (raw.sunriseUtc != null && raw.sunsetUtc != null) {
+        final nextDate = date.add(const Duration(days: 1));
+        final nextRaw = tithiService.calculateForDate(
+          localDate: nextDate, lat: location.lat, lon: location.lon,
+          tzOffset: location.tzOffsetAt(nextDate),
+        );
+        if (nextRaw.sunriseUtc != null) {
+          final muhurta = MuhurtaService.calculate(
+            sunriseUtc: raw.sunriseUtc!,
+            sunsetUtc: raw.sunsetUtc!,
+            nextSunriseUtc: nextRaw.sunriseUtc!,
+            weekday: date.weekday,
+          );
+          final rahuStart = tz.TZDateTime.from(muhurta.rahuKaal.start, tzLocation);
+          final rahuEnd = tz.TZDateTime.from(muhurta.rahuKaal.end, tzLocation);
+          body += ' · Rahu Kaal ${_fmtTime(rahuStart)}–${_fmtTime(rahuEnd)}';
+        }
+      }
+
+      final festival = FestivalDetector.detect(_purnimanta(raw));
+      if (festival != null) body += ' · $festival';
+
+      await _plugin.zonedSchedule(
+        i,
+        'Tithika Panchanga',
+        body,
+        scheduled,
+        _dailyDetails,
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+      );
+    }
+  }
+
+  static String _fmtTime(tz.TZDateTime t) {
+    final h = t.hour % 12 == 0 ? 12 : t.hour % 12;
+    final m = t.minute.toString().padLeft(2, '0');
+    return '$h:$m ${t.hour < 12 ? "AM" : "PM"}';
   }
 
   static Future<void> _scheduleFestivalAlerts(
@@ -126,41 +249,33 @@ class NotificationService {
     tz.Location tzLocation,
   ) async {
     final now = tz.TZDateTime.now(tzLocation);
-    var notifId = 1;
+    var notifId = 100;
 
-    for (final year in [now.year, now.year + 1]) {
-      if (notifId > 200) break;
-      for (var month = 1; month <= 12; month++) {
-        if (notifId > 200) break;
-        final daysInMonth = DateTime(year, month + 1, 0).day;
-        for (var day = 1; day <= daysInMonth; day++) {
-          if (notifId > 200) break;
-          final date = DateTime(year, month, day);
-          final scheduleTime =
-              tz.TZDateTime(tzLocation, year, month, day, 8, 0);
-          if (scheduleTime.isBefore(now)) continue;
+    for (var i = 1; i <= 7; i++) {
+      if (notifId > 119) break;
+      final date = DateTime.now().add(Duration(days: i));
+      final scheduleTime =
+          tz.TZDateTime(tzLocation, date.year, date.month, date.day, 6, 0)
+              .subtract(const Duration(days: 1));
+      if (scheduleTime.isBefore(now)) continue;
 
-          final raw = tithiService.calculateForDate(
-            localDate: date,
-            lat: location.lat,
-            lon: location.lon,
-            tzOffset: location.tzOffsetAt(date),
-          );
-          final festivalName = FestivalDetector.detect(_purnimanta(raw));
-          if (festivalName == null) continue;
+      final raw = tithiService.calculateForDate(
+        localDate: date, lat: location.lat, lon: location.lon,
+        tzOffset: location.tzOffsetAt(date),
+      );
+      final festivalName = FestivalDetector.detect(_purnimanta(raw));
+      if (festivalName == null) continue;
 
-          await _plugin.zonedSchedule(
-            notifId++,
-            festivalName,
-            'Wishing you a blessed celebration!',
-            scheduleTime,
-            _eventDetails,
-            androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-            uiLocalNotificationDateInterpretation:
-                UILocalNotificationDateInterpretation.absoluteTime,
-          );
-        }
-      }
+      await _plugin.zonedSchedule(
+        notifId++,
+        '$festivalName tomorrow',
+        'Wishing you a blessed celebration!',
+        scheduleTime,
+        _eventDetails,
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+      );
     }
   }
 
@@ -170,26 +285,30 @@ class NotificationService {
     tz.Location tzLocation,
   ) async {
     final now = tz.TZDateTime.now(tzLocation);
-    var notifId = 201;
-    var found = 0;
+    var notifId = 200;
 
-    for (var i = 0; i < 60 && found < 30; i++) {
+    for (var i = 1; i <= 7 && notifId <= 201; i++) {
       final date = DateTime.now().add(Duration(days: i));
       final raw = tithiService.calculateForDate(
-        localDate: date,
-        lat: location.lat,
-        lon: location.lon,
+        localDate: date, lat: location.lat, lon: location.lon,
         tzOffset: location.tzOffsetAt(date),
       );
-      if (raw.tithi.number != 11) continue;
+      final isEkadashi = raw.tithi.special == SpecialTithi.ekadashi ||
+          (raw.secondaryIsKshaya &&
+           raw.secondaryTithi?.special == SpecialTithi.ekadashi);
+      // Vruddhi first day: skip — the named festival alert fires the next day
+      final isVruddhiFirstDay =
+          raw.tithi.special == SpecialTithi.ekadashi && raw.secondaryTithi == null;
+      if (!isEkadashi || isVruddhiFirstDay) continue;
 
       final scheduleTime =
-          tz.TZDateTime(tzLocation, date.year, date.month, date.day, 6, 0);
+          tz.TZDateTime(tzLocation, date.year, date.month, date.day, 6, 0)
+              .subtract(const Duration(days: 1));
       if (scheduleTime.isBefore(now)) continue;
 
       await _plugin.zonedSchedule(
         notifId++,
-        'Ekadashi Today',
+        'Ekadashi Tomorrow',
         'An auspicious day for fasting and devotion',
         scheduleTime,
         _eventDetails,
@@ -197,7 +316,6 @@ class NotificationService {
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
       );
-      found++;
     }
   }
 }
