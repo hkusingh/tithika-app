@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tithika — Festivals & Ekadasi Redesign (Phase 3.4 · v7)</title>
+<style>
+  :root {
+    --bg-page:        #0a0a14;
+    --bg-panel:       #11132a;
+    --line-page:      rgba(255,255,255,0.08);
+    --ink-page:       #f3eedf;
+    --ink-page-soft:  #aab0c5;
+    --ink-page-muted: #6c7290;
+
+    --app-bg:        #0B0F1E;
+    --app-card:      rgba(255,255,255,0.03);
+    --app-line:      rgba(255,255,255,0.08);
+    --ink:           #F3EEDF;
+    --ink-soft:      #AAB0C5;
+    --ink-muted:     #6C7290;
+    --shukla:        #E6B85C;
+    --krishna:       #7D8DF0;
+    --festival:      #FF8C42;
+    --border-phone:  #2a2f48;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg-page); color: var(--ink-page);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  header { padding: 40px 40px 16px; border-bottom: 1px solid var(--line-page); }
+  header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 6px; }
+  header .subtitle { color: var(--ink-page-soft); font-size: 15px; }
+  header .meta { color: var(--ink-page-muted); font-size: 13px; margin-top: 10px; }
+
+  main { padding: 32px 40px 80px; }
+
+  .grid { display: flex; gap: 56px; flex-wrap: wrap; justify-content: center; max-width: 1100px; margin: 0 auto; }
+
+  .screen { display: flex; flex-direction: column; align-items: center; }
+  .screen-name { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .screen-desc { font-size: 13px; color: var(--ink-page-soft); text-align: center; max-width: 300px; margin: 0 0 16px; line-height: 1.45; }
+
+  /* ── Phone frame ── */
+  .phone {
+    width: 340px; height: 720px;
+    background: var(--app-bg);
+    border: 9px solid var(--border-phone);
+    border-radius: 40px; position: relative; overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.55);
+  }
+  .notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 120px; height: 22px; background: var(--border-phone); border-radius: 0 0 14px 14px; z-index: 50; }
+  .phone-screen { position: absolute; inset: 0; display: flex; flex-direction: column; }
+
+  .status-bar { display: flex; justify-content: space-between; align-items: flex-end; height: 34px; padding: 8px 24px 0; font-size: 11px; font-weight: 600; color: var(--ink-soft); }
+
+  .nav { display:flex; align-items:center; justify-content:space-between; padding: 10px 18px; border-bottom:1px solid var(--app-line); }
+  .nav .brand { font-size: 14px; font-weight: 700; letter-spacing: 0.18em; color: var(--ink); }
+  .nav .ic { color: var(--ink-muted); font-size: 17px; }
+
+  .page-title { padding: 14px 20px 6px; display:flex; align-items:baseline; justify-content:space-between; }
+  .page-title h2 { font-size: 17px; font-weight: 700; color: var(--ink); }
+  .page-title .yr { font-size: 13px; color: var(--ink-muted); }
+
+  /* ── Pill toggle ── */
+  .pills { margin: 6px 20px 4px; height: 36px; display:flex; gap:6px; background: rgba(255,255,255,0.05); border:1px solid var(--app-line); border-radius: 20px; padding: 3px; }
+  .pill { flex:1; display:flex; align-items:center; justify-content:center; border-radius:17px; font-size:13px; cursor:pointer; color: var(--ink-muted); }
+  .pill.active { background: rgba(230,184,92,0.20); color: var(--shukla); font-weight:600; }
+
+  .scroll { flex:1; overflow-y:auto; padding: 8px 16px 24px; }
+  .scroll::-webkit-scrollbar { width:0; }
+
+  /* ── Month card ── */
+  .mcard { background: var(--app-card); border:1px solid var(--app-line); border-radius:14px; padding: 10px 12px; margin-bottom: 12px; }
+  .mcard-head { display:flex; align-items:center; justify-content:space-between; margin-bottom: 8px; }
+  .mcard-month { color: var(--shukla); font-weight:600; font-size:13px; letter-spacing:0.5px; }
+  .mcard-count { color: var(--ink-muted); font-size:11px; }
+
+  /* ── Festival row ── */
+  .frow { display:flex; align-items:center; gap:11px; padding: 8px 2px; }
+  .frow + .frow { border-top:1px solid var(--app-line); }
+  .fchip { width:34px; height:34px; flex:none; border-radius:10px; background: rgba(255,140,66,0.14); display:flex; align-items:center; justify-content:center; color: var(--festival); font-size:18px; }
+  .fchip.ek { background: rgba(125,141,240,0.14); color: var(--krishna); }
+  .fname { flex:1; min-width:0; color: var(--ink); font-size:13.5px; font-weight:500; }
+  .fname .tag { display:inline-block; margin-left:6px; font-size:9.5px; font-weight:700; letter-spacing:0.04em; color: var(--krishna); background: rgba(125,141,240,0.15); padding:1px 6px; border-radius:6px; vertical-align:1px; }
+  .fdate { color: var(--ink-soft); font-size:11.5px; white-space:nowrap; }
+
+  /* ── Ekadasi date chips ── */
+  .ek-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .ek-chip { display:flex; align-items:center; gap:8px; background: rgba(125,141,240,0.10); border:1px solid rgba(125,141,240,0.22); border-radius:10px; padding:9px 10px; }
+  .ek-chip .ic { color: var(--krishna); font-size:15px; }
+  .ek-chip .d { color: var(--ink); font-size:12.5px; font-weight:500; }
+
+  .tabbar { display:flex; border-top:1px solid var(--app-line); padding: 8px 0 14px; }
+  .tab { flex:1; text-align:center; font-size:10px; color: var(--ink-muted); }
+  .tab.on { color: var(--shukla); }
+  .tab .ic { display:block; font-size:18px; margin-bottom:3px; }
+
+  .legend { max-width: 1100px; margin: 48px auto 0; padding-top:24px; border-top:1px solid var(--line-page); }
+  .legend h3 { font-size:14px; margin-bottom:12px; }
+  .legend ul { list-style:none; display:flex; flex-wrap:wrap; gap:10px 28px; }
+  .legend li { font-size:12.5px; color: var(--ink-page-soft); }
+  .legend b { color: var(--ink-page); font-weight:600; }
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.40.0/iconfont/tabler-icons.min.css">
+</head>
+<body>
+<header>
+  <h1>Festivals &amp; Ekadasi — Redesign</h1>
+  <p class="subtitle">Month-card layout · per-festival icons · date-only Ekadasi list</p>
+  <p class="meta">Phase 3.4 · wireframe v7 · 2026</p>
+</header>
+
+<main>
+<div class="grid">
+
+  <!-- ════════ FESTIVALS TAB ════════ -->
+  <div class="screen">
+    <div class="screen-name">Festivals tab</div>
+    <p class="screen-desc">Each month is a card. Every festival gets its own icon. Named ekadashis appear here too.</p>
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="phone-screen">
+        <div class="status-bar"><span>9:41</span><span>&#9679;&#9679;&#9679; &#9683;</span></div>
+        <div class="nav"><i class="ti ti-home ic"></i><span class="brand">TITHIKA</span><i class="ti ti-settings ic"></i></div>
+        <div class="page-title"><h2>Festivals</h2><span class="yr">2026</span></div>
+        <div class="pills"><div class="pill active">Festivals</div><div class="pill">Ekadasi</div></div>
+
+        <div class="scroll">
+          <div class="mcard">
+            <div class="mcard-head"><span class="mcard-month">MARCH</span><span class="mcard-count">4 festivals</span></div>
+            <div class="frow"><div class="fchip"><i class="ti ti-flame"></i></div><span class="fname">Holika Dahan</span><span class="fdate">Tue, Mar 3</span></div>
+            <div class="frow"><div class="fchip"><i class="ti ti-palette"></i></div><span class="fname">Holi</span><span class="fdate">Wed, Mar 4</span></div>
+            <div class="frow"><div class="fchip"><i class="ti ti-flower"></i></div><span class="fname">Chaitra Navratri</span><span class="fdate">Sat, Mar 21</span></div>
+            <div class="frow"><div class="fchip"><i class="ti ti-sun-high"></i></div><span class="fname">Ram Navami</span><span class="fdate">Sun, Mar 29</span></div>
+          </div>
+
+          <div class="mcard">
+            <div class="mcard-head"><span class="mcard-month">APRIL</span><span class="mcard-count">3 festivals</span></div>
+            <div class="frow"><div class="fchip"><i class="ti ti-mountain"></i></div><span class="fname">Hanuman Jayanti</span><span class="fdate">Mon, Apr 13</span></div>
+            <div class="frow"><div class="fchip"><i class="ti ti-wheat"></i></div><span class="fname">Baisakhi / Vishu</span><span class="fdate">Tue, Apr 14</span></div>
+            <div class="frow"><div class="fchip"><i class="ti ti-coin"></i></div><span class="fname">Akshaya Tritiya</span><span class="fdate">Sun, Apr 26</span></div>
+          </div>
+
+          <div class="mcard">
+            <div class="mcard-head"><span class="mcard-month">JUNE</span><span class="mcard-count">1 festival</span></div>
+            <div class="frow"><div class="fchip ek"><i class="ti ti-droplet"></i></div><span class="fname">Nirjala Ekadashi<span class="tag">EKADASI</span></span><span class="fdate">Thu, Jun 25</span></div>
+          </div>
+
+          <div class="mcard">
+            <div class="mcard-head"><span class="mcard-month">AUGUST</span><span class="mcard-count">3 festivals</span></div>
+            <div class="frow"><div class="fchip"><i class="ti ti-link"></i></div><span class="fname">Raksha Bandhan</span><span class="fdate">Sat, Aug 8</span></div>
+            <div class="frow"><div class="fchip"><i class="ti ti-crown"></i></div><span class="fname">Krishna Janmashtami</span><span class="fdate">Sun, Aug 16</span></div>
+            <div class="frow"><div class="fchip"><i class="ti ti-confetti"></i></div><span class="fname">Ganesh Chaturthi</span><span class="fdate">Fri, Aug 28</span></div>
+          </div>
+        </div>
+
+        <div class="tabbar">
+          <div class="tab"><i class="ti ti-calendar ic"></i>Today</div>
+          <div class="tab"><i class="ti ti-grid-dots ic"></i>Month</div>
+          <div class="tab on"><i class="ti ti-confetti ic"></i>Festivals</div>
+          <div class="tab"><i class="ti ti-adjustments ic"></i>More</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ EKADASI TAB ════════ -->
+  <div class="screen">
+    <div class="screen-name">Ekadasi tab</div>
+    <p class="screen-desc">All 24 ekadashis per year as date-only chips — no paksha, no tithi, no names. Two per month.</p>
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="phone-screen">
+        <div class="status-bar"><span>9:41</span><span>&#9679;&#9679;&#9679; &#9683;</span></div>
+        <div class="nav"><i class="ti ti-home ic"></i><span class="brand">TITHIKA</span><i class="ti ti-settings ic"></i></div>
+        <div class="page-title"><h2>Ekadasi</h2><span class="yr">2026</span></div>
+        <div class="pills"><div class="pill">Festivals</div><div class="pill active">Ekadasi</div></div>
+
+        <div class="scroll">
+          <div class="mcard">
+            <div class="mcard-head"><span class="mcard-month">MARCH</span><span class="mcard-count">2 dates</span></div>
+            <div class="ek-grid">
+              <div class="ek-chip"><i class="ti ti-moon ic"></i><span class="d">Sun, Mar 1</span></div>
+              <div class="ek-chip"><i class="ti ti-moon ic"></i><span class="d">Mon, Mar 16</span></div>
+            </div>
+          </div>
+          <div class="mcard">
+            <div class="mcard-head"><span class="mcard-month">APRIL</span><span class="mcard-count">2 dates</span></div>
+            <div class="ek-grid">
+              <div class="ek-chip"><i class="ti ti-moon ic"></i><span class="d">Tue, Apr 14</span></div>
+              <div class="ek-chip"><i class="ti ti-moon ic"></i><span class="d">Wed, Apr 29</span></div>
+            </div>
+          </div>
+          <div class="mcard">
+            <div class="mcard-head"><span class="mcard-month">MAY</span><span class="mcard-count">2 dates</span></div>
+            <div class="ek-grid">
+              <div class="ek-chip"><i class="ti ti-moon ic"></i><span class="d">Fri, May 13</span></div>
+              <div class="ek-chip"><i class="ti ti-moon ic"></i><span class="d">Sat, May 28</span></div>
+            </div>
+          </div>
+          <div class="mcard">
+            <div class="mcard-head"><span class="mcard-month">JUNE</span><span class="mcard-count">2 dates</span></div>
+            <div class="ek-grid">
+              <div class="ek-chip"><i class="ti ti-moon ic"></i><span class="d">Thu, Jun 11</span></div>
+              <div class="ek-chip"><i class="ti ti-moon ic"></i><span class="d">Fri, Jun 25</span></div>
+            </div>
+          </div>
+          <div class="mcard">
+            <div class="mcard-head"><span class="mcard-month">JULY</span><span class="mcard-count">2 dates</span></div>
+            <div class="ek-grid">
+              <div class="ek-chip"><i class="ti ti-moon ic"></i><span class="d">Sun, Jul 11</span></div>
+              <div class="ek-chip"><i class="ti ti-moon ic"></i><span class="d">Mon, Jul 26</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabbar">
+          <div class="tab"><i class="ti ti-calendar ic"></i>Today</div>
+          <div class="tab"><i class="ti ti-grid-dots ic"></i>Month</div>
+          <div class="tab on"><i class="ti ti-confetti ic"></i>Festivals</div>
+          <div class="tab"><i class="ti ti-adjustments ic"></i>More</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="legend">
+  <h3>Design notes</h3>
+  <ul>
+    <li><b>Month cards:</b> each Gregorian month is a rounded card; header shows month + count.</li>
+    <li><b>Per-festival icons:</b> distinct icon chip per festival (palette = Holi, crown = Janmashtami, etc.).</li>
+    <li><b>Named ekadashis:</b> shown in <i>both</i> tabs — tagged EKADASI in the Festivals list.</li>
+    <li><b>Ekadasi tab:</b> date-only chips, all 24/year, no paksha or tithi labels.</li>
+    <li><b>Fix:</b> all ekadashis now reach the Ekadasi tab (named ones were previously dropped).</li>
+  </ul>
+</div>
+</main>
+</body>
+</html>

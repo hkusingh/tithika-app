@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tithika — Festival Detail Pages (v7)</title>
+<style>
+  :root {
+    --dk-bg:           #0B0F1E;
+    --dk-panel:        #141829;
+    --dk-panel2:       #1A1F33;
+    --dk-ink:          #F3EEDF;
+    --dk-ink-soft:     #AAB0C5;
+    --dk-ink-muted:    #6C7290;
+    --dk-line:         rgba(255,255,255,0.07);
+    --dk-line-strong:  rgba(255,255,255,0.13);
+    --dk-shukla:       #E6B85C;
+    --dk-krishna:      #7B8EE8;
+    --dk-festival:     #E07840;
+
+    --page-bg:    #07090F;
+    --page-ink:   #F3EEDF;
+    --page-soft:  #AAB0C5;
+    --page-muted: #6C7290;
+    --page-line:  rgba(255,255,255,0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--page-bg); color: var(--page-ink);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  header { padding: 40px 44px 20px; border-bottom: 1px solid var(--page-line); }
+  header h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 6px; }
+  header .subtitle { color: var(--page-soft); font-size: 15px; }
+  header .meta { color: var(--page-muted); font-size: 12px; margin-top: 8px; }
+
+  main { padding: 40px 44px 100px; max-width: 1800px; }
+
+  .sec-header { margin: 56px 0 28px; padding-bottom: 14px; border-bottom: 1px solid var(--page-line); }
+  .sec-header:first-child { margin-top: 0; }
+  .sec-header h2 { font-size: 18px; font-weight: 700; color: var(--dk-shukla); letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 4px; }
+  .sec-header p { color: var(--page-soft); font-size: 13px; }
+
+  .row { display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 32px; }
+
+  /* ── Phone shell ── */
+  .phone {
+    width: 320px;
+    min-height: 640px;
+    background: var(--dk-bg);
+    border-radius: 40px;
+    border: 2px solid rgba(255,255,255,0.12);
+    overflow: hidden;
+    position: relative;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .phone.tall { min-height: 720px; }
+  .phone.sheet { min-height: 800px; }
+
+  .phone-label {
+    font-size: 11px; color: var(--page-muted); margin-bottom: 8px;
+    text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600;
+  }
+  .phone-wrap { display: flex; flex-direction: column; }
+
+  /* ── Status bar ── */
+  .status-bar {
+    height: 44px;
+    background: var(--dk-bg);
+    display: flex; align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    flex-shrink: 0;
+  }
+  .status-bar .time { font-size: 13px; font-weight: 600; color: var(--dk-ink); }
+  .status-bar .icons { font-size: 11px; color: var(--dk-ink-soft); letter-spacing: 1px; }
+
+  /* ── Nav bar ── */
+  .nav-bar {
+    height: 44px; background: var(--dk-bg);
+    border-bottom: 1px solid var(--dk-line);
+    display: flex; align-items: center;
+    padding: 0 16px; gap: 12px; flex-shrink: 0;
+  }
+  .nav-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--dk-festival); }
+  .nav-title { font-size: 13px; font-weight: 600; color: var(--dk-ink); letter-spacing: 0.04em; }
+  .nav-spacer { flex: 1; }
+
+  /* ── Page title bar ── */
+  .page-title-bar {
+    padding: 10px 16px 8px;
+    background: var(--dk-bg);
+    border-bottom: 1px solid var(--dk-line);
+    flex-shrink: 0;
+  }
+  .page-title { font-size: 18px; font-weight: 700; color: var(--dk-ink); }
+  .page-meta { font-size: 11px; color: var(--dk-ink-muted); margin-top: 1px; }
+
+  /* ── Pill toggle ── */
+  .pill-toggle {
+    display: flex;
+    margin: 8px 16px 6px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--dk-line-strong);
+    border-radius: 20px;
+    padding: 3px;
+    flex-shrink: 0;
+  }
+  .pill-tab {
+    flex: 1; text-align: center;
+    padding: 5px 8px;
+    font-size: 12px; font-weight: 500;
+    color: var(--dk-ink-muted);
+    border-radius: 16px;
+    cursor: pointer;
+  }
+  .pill-tab.active {
+    background: rgba(230,184,92,0.2);
+    color: var(--dk-shukla);
+    font-weight: 600;
+  }
+
+  /* ── Scrollable content area ── */
+  .scroll-area { flex: 1; overflow: hidden; padding: 8px 14px 16px; }
+
+  /* ── Month card ── */
+  .month-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--dk-line);
+    border-radius: 14px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+  }
+  .month-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 6px;
+  }
+  .month-name { font-size: 11px; font-weight: 700; color: var(--dk-shukla); letter-spacing: 0.8px; text-transform: uppercase; }
+  .month-count { font-size: 10px; color: var(--dk-ink-muted); }
+
+  /* ── Festival row ── */
+  .fest-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 2px;
+    border-bottom: 1px solid var(--dk-line);
+    cursor: pointer;
+    transition: background 0.1s;
+  }
+  .fest-row:last-child { border-bottom: none; }
+  .fest-row:hover { background: rgba(255,255,255,0.03); border-radius: 6px; }
+  .fest-icon-wrap {
+    width: 32px; height: 32px; border-radius: 9px;
+    background: rgba(224,120,64,0.14);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0;
+  }
+  .fest-name { font-size: 12.5px; font-weight: 600; color: var(--dk-ink); flex: 1; }
+  .fest-date { font-size: 10.5px; color: var(--dk-ink-soft); }
+  .fest-chevron { font-size: 10px; color: var(--dk-ink-muted); }
+
+  /* ── Detail sheet overlay ── */
+  .detail-sheet {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: var(--dk-bg);
+    border-radius: 40px;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+
+  .sheet-header {
+    height: 200px;
+    position: relative;
+    flex-shrink: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-end;
+    padding-bottom: 20px;
+  }
+  .sheet-header-icon {
+    font-size: 48px;
+    margin-bottom: 10px;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
+  }
+  .sheet-header-title {
+    font-size: 20px; font-weight: 700; color: #fff;
+    text-align: center; padding: 0 40px;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+    line-height: 1.25;
+  }
+  .sheet-header-subtitle {
+    font-size: 11.5px; color: rgba(255,255,255,0.75);
+    margin-top: 4px; text-align: center;
+    letter-spacing: 0.04em;
+  }
+  .sheet-close {
+    position: absolute; top: 48px; right: 16px;
+    width: 28px; height: 28px; border-radius: 50%;
+    background: rgba(0,0,0,0.35);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: rgba(255,255,255,0.85);
+    cursor: pointer;
+  }
+
+  .sheet-body { flex: 1; overflow: hidden; padding: 18px 18px 24px; }
+
+  .sheet-date-row {
+    display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;
+  }
+  .sheet-date-chip {
+    padding: 4px 10px; border-radius: 20px;
+    font-size: 11px; font-weight: 500;
+  }
+  .chip-shukla { background: rgba(230,184,92,0.15); color: var(--dk-shukla); }
+  .chip-greg { background: rgba(255,255,255,0.07); color: var(--dk-ink-soft); }
+
+  .sheet-section-label {
+    font-size: 10px; font-weight: 700; color: var(--dk-shukla);
+    letter-spacing: 0.1em; text-transform: uppercase;
+    margin-bottom: 7px; margin-top: 14px;
+  }
+  .sheet-section-label:first-of-type { margin-top: 0; }
+
+  .sheet-desc {
+    font-size: 12.5px; line-height: 1.6;
+    color: var(--dk-ink-soft);
+  }
+
+  .sheet-observances { margin-top: 6px; }
+  .sheet-obs-item {
+    display: flex; gap: 8px; align-items: flex-start;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--dk-line);
+    font-size: 12px; color: var(--dk-ink-soft); line-height: 1.4;
+  }
+  .sheet-obs-item:last-child { border-bottom: none; }
+  .obs-dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--dk-festival);
+    margin-top: 5px; flex-shrink: 0;
+  }
+
+  /* ── Combined festival sections ── */
+  .combined-section {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--dk-line);
+    border-radius: 10px;
+    padding: 12px 12px 8px;
+    margin-bottom: 10px;
+  }
+  .combined-region-label {
+    font-size: 9.5px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--dk-ink-muted); margin-bottom: 4px;
+  }
+  .combined-title { font-size: 13px; font-weight: 700; color: var(--dk-ink); margin-bottom: 6px; }
+  .combined-desc { font-size: 11.5px; line-height: 1.5; color: var(--dk-ink-soft); }
+
+  /* ── Ekadashi tab paragraph ── */
+  .ek-intro {
+    background: rgba(123,142,232,0.08);
+    border: 1px solid rgba(123,142,232,0.2);
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+  }
+  .ek-intro-text { font-size: 11.5px; line-height: 1.6; color: var(--dk-ink-soft); }
+
+  .ek-chip-row { display: flex; gap: 8px; margin-bottom: 8px; }
+  .ek-chip {
+    flex: 1; padding: 8px 10px;
+    background: rgba(123,142,232,0.10);
+    border: 1px solid rgba(123,142,232,0.22);
+    border-radius: 10px;
+    display: flex; align-items: center; gap: 7px;
+    font-size: 11.5px; color: var(--dk-ink); font-weight: 500;
+  }
+  .ek-moon { font-size: 13px; }
+
+  /* ── Gradient presets ── */
+  .grad-fire    { background: linear-gradient(160deg, #3D1A0A 0%, #7A2E10 50%, #C04A18 100%); }
+  .grad-saffron { background: linear-gradient(160deg, #2A1800 0%, #7A4A00 50%, #C07800 100%); }
+  .grad-lotus   { background: linear-gradient(160deg, #1A0A2A 0%, #5A1A6A 50%, #9040A0 100%); }
+  .grad-water   { background: linear-gradient(160deg, #0A1A3A 0%, #1A3A7A 50%, #2060C0 100%); }
+  .grad-earth   { background: linear-gradient(160deg, #1A1A0A 0%, #4A4A0A 50%, #808018 100%); }
+  .grad-night   { background: linear-gradient(160deg, #060A18 0%, #101830 50%, #1A2848 100%); }
+  .grad-moon    { background: linear-gradient(160deg, #0A0A2A 0%, #1A1A4A 50%, #2A2A7A 100%); }
+
+  /* ── Annotation boxes ── */
+  .annotation {
+    background: rgba(230,184,92,0.08);
+    border: 1px solid rgba(230,184,92,0.2);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 13px; color: var(--page-soft); line-height: 1.6;
+    max-width: 340px;
+    align-self: flex-start;
+  }
+  .annotation strong { color: var(--dk-shukla); }
+  .annotation ul { margin: 6px 0 0 14px; }
+  .annotation li { margin-bottom: 4px; }
+
+  /* ── Arch table ── */
+  table { border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; padding: 8px 16px; background: rgba(255,255,255,0.04); color: var(--dk-shukla); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; }
+  td { padding: 8px 16px; border-top: 1px solid var(--page-line); color: var(--page-soft); vertical-align: top; }
+  td code { font-family: "SF Mono", monospace; font-size: 11px; background: rgba(255,255,255,0.07); padding: 1px 5px; border-radius: 4px; color: var(--dk-ink); }
+  td strong { color: var(--dk-ink); }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .size-plus  { color: #6ECF8A; font-weight: 700; }
+  .size-small { color: var(--dk-ink-muted); }
+
+  .tag {
+    display: inline-block; padding: 2px 8px; border-radius: 4px;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .tag-green  { background: rgba(110,207,138,0.15); color: #6ECF8A; }
+  .tag-yellow { background: rgba(230,184,92,0.15); color: var(--dk-shukla); }
+  .tag-blue   { background: rgba(123,142,232,0.15); color: var(--dk-krishna); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Tithika — Festival Detail Pages</h1>
+  <div class="subtitle">Full-screen detail sheet, combined festival layout, Ekadashi tab intro</div>
+  <div class="meta">Wireframe v7 · June 2026</div>
+</header>
+
+<main>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 1 — Architecture Overview                              -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+
+<div class="sec-header">
+  <h2>Architecture</h2>
+  <p>Content data layer, imagery strategy, and app size impact</p>
+</div>
+
+<div class="row" style="gap:32px; align-items:flex-start;">
+
+  <!-- Content layer -->
+  <div>
+    <div class="phone-label" style="margin-bottom:12px;">Content data layer</div>
+    <table>
+      <tr>
+        <th>Asset path</th>
+        <th>Language</th>
+        <th>Notes</th>
+      </tr>
+      <tr>
+        <td><code>assets/festival_content/en.json</code></td>
+        <td><strong>English</strong></td>
+        <td>Natively authored in English</td>
+      </tr>
+      <tr>
+        <td><code>assets/festival_content/hi.json</code></td>
+        <td><strong>Hindi Devanagari</strong></td>
+        <td>Natively authored in हिंदी</td>
+      </tr>
+      <tr>
+        <td><code>assets/festival_content/ta.json</code></td>
+        <td><strong>Tamil</strong></td>
+        <td>Natively authored in தமிழ்</td>
+      </tr>
+      <tr>
+        <td><code>assets/festival_content/bn.json</code></td>
+        <td><strong>Bengali</strong></td>
+        <td>Natively authored in বাংলা</td>
+      </tr>
+      <tr>
+        <td><em>hindi_latin</em> → <code>en.json</code></td>
+        <td><strong>Hindi Latin</strong></td>
+        <td>Falls back to English</td>
+      </tr>
+    </table>
+
+    <div style="margin-top:16px;">
+      <div class="phone-label" style="margin-bottom:8px;">JSON entry structure (same shape in all languages)</div>
+      <div style="background:rgba(255,255,255,0.04);border:1px solid var(--page-line);border-radius:8px;padding:14px 16px;font-family:'SF Mono',monospace;font-size:12px;color:var(--dk-ink-soft);line-height:1.8;">
+        <span style="color:#9acd7a;">"Ram Navami"</span>: {<br>
+        &nbsp;&nbsp;<span style="color:#9acd7a;">"subtitle"</span>: <span style="color:#e6b85c;">"Birth of Lord Rama"</span>,<br>
+        &nbsp;&nbsp;<span style="color:#9acd7a;">"description"</span>: <span style="color:#e6b85c;">"Ram Navami marks the birth of Lord Rama, the seventh avatar of Vishnu, celebrated on the ninth day of Chaitra Shukla paksha. It is one of the most auspicious days in the Hindu calendar..."</span>,<br>
+        &nbsp;&nbsp;<span style="color:#9acd7a;">"observances"</span>: [<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#e6b85c;">"Fast from sunrise to sunset, breaking only after the evening aarti"</span>,<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#e6b85c;">"Visit Ram temples and attend kirtan or Ramayana recitation"</span>,<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#e6b85c;">"Offer tulsi, flowers, and panchamrit to Ram's idol"</span>,<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#e6b85c;">"Read Sundarkand or Ramcharitmanas"</span><br>
+        &nbsp;&nbsp;]<br>
+        }
+      </div>
+    </div>
+
+    <div style="margin-top:16px;">
+      <div class="phone-label" style="margin-bottom:8px;">Adding a new language</div>
+      <div class="annotation" style="max-width:500px;">
+        1. Create <code>assets/festival_content/mr.json</code> (Marathi)<br>
+        2. Add <code>AppLanguage.marathi</code> to enum<br>
+        3. Add one switch case in <code>FestivalContentService</code><br>
+        <br>
+        No other files change. Keys are canonical English — the same key that <code>FestivalDetector</code> returns.
+      </div>
+    </div>
+  </div>
+
+  <!-- App size impact -->
+  <div>
+    <div class="phone-label" style="margin-bottom:12px;">App size impact</div>
+    <table>
+      <tr>
+        <th>Addition</th>
+        <th>Size</th>
+        <th>Status</th>
+      </tr>
+      <tr>
+        <td><strong>Content JSON</strong><br><span style="font-size:11px;color:var(--dk-ink-muted);">4 language files × ~45 festivals × ~400 chars avg</span></td>
+        <td class="size-plus">~300 KB</td>
+        <td><span class="tag tag-green">MVP</span></td>
+      </tr>
+      <tr>
+        <td><strong>Images — MVP (generated gradients)</strong><br><span style="font-size:11px;color:var(--dk-ink-muted);">Flutter-drawn, no bundled assets</span></td>
+        <td class="size-small">0 KB</td>
+        <td><span class="tag tag-green">MVP</span></td>
+      </tr>
+      <tr>
+        <td><strong>Images — future (WebP, ~20 unique)</strong><br><span style="font-size:11px;color:var(--dk-ink-muted);">~60 KB each, shared across thematic groups</span></td>
+        <td class="size-plus">~1.2 MB</td>
+        <td><span class="tag tag-yellow">v2</span></td>
+      </tr>
+      <tr>
+        <td><strong>New Dart code</strong><br><span style="font-size:11px;color:var(--dk-ink-muted);">Service + model + sheet widget</span></td>
+        <td class="size-small">~60 KB</td>
+        <td><span class="tag tag-green">MVP</span></td>
+      </tr>
+      <tr style="border-top:2px solid var(--page-line);">
+        <td><strong>Total — MVP</strong></td>
+        <td class="size-plus">~360 KB</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><strong>Total — with images</strong></td>
+        <td class="size-plus">~1.6 MB</td>
+        <td></td>
+      </tr>
+    </table>
+    <div style="margin-top:12px;" class="annotation" style="max-width:440px;">
+      Current app is ~15 MB (dominated by Swiss Ephemeris).
+      <br>MVP addition is <strong>&lt;2.5%</strong> size increase.
+      <br>With future images: <strong>~10%</strong> increase — still acceptable.
+    </div>
+
+    <div style="margin-top:20px;">
+      <div class="phone-label" style="margin-bottom:12px;">New files</div>
+      <table>
+        <tr><th>File</th><th>Purpose</th></tr>
+        <tr><td><code>assets/festival_content/{en,hi,ta,bn}.json</code></td><td>Localized content</td></tr>
+        <tr><td><code>lib/models/festival_content.dart</code></td><td>Data model</td></tr>
+        <tr><td><code>lib/services/festival_content_service.dart</code></td><td>JSON loader + cache</td></tr>
+        <tr><td><code>lib/features/festivals/festival_detail_sheet.dart</code></td><td>Full-screen modal UI</td></tr>
+        <tr><td><code>lib/core/app_strings.dart</code></td><td>Ekadashi intro paragraph strings</td></tr>
+        <tr><td><code>lib/features/festivals/festivals_screen.dart</code></td><td>Make rows tappable; add Ek intro</td></tr>
+        <tr><td><code>tithika/pubspec.yaml</code></td><td>Register asset paths</td></tr>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 2 — Standard Festival Detail Sheet                     -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+
+<div class="sec-header">
+  <h2>Festival Detail Sheet — Standard</h2>
+  <p>Single festival, full-screen modal, slides up on tap. Example: Ram Navami</p>
+</div>
+
+<div class="row" style="align-items:flex-start;">
+
+  <!-- Festival list (before tap) -->
+  <div class="phone-wrap">
+    <div class="phone-label">Festivals tab — tap a row to open</div>
+    <div class="phone">
+      <div class="status-bar">
+        <span class="time">9:41</span>
+        <span class="icons">●●● ▲ ■</span>
+      </div>
+      <div class="nav-bar">
+        <div class="nav-dot"></div>
+        <span class="nav-title">TITHIKA</span>
+        <div class="nav-spacer"></div>
+      </div>
+      <div class="page-title-bar">
+        <div class="page-title">Festivals</div>
+        <div class="page-meta">2026</div>
+      </div>
+      <div class="pill-toggle">
+        <div class="pill-tab active">Festivals</div>
+        <div class="pill-tab">Ekadashi</div>
+      </div>
+      <div class="scroll-area">
+        <div class="month-card">
+          <div class="month-header">
+            <div class="month-name">March</div>
+            <div class="month-count">2 festivals</div>
+          </div>
+          <div class="fest-row">
+            <div class="fest-icon-wrap">🔥</div>
+            <div class="fest-name">Holika Dahan</div>
+            <div class="fest-date">Wed, Mar 11</div>
+            <div class="fest-chevron">›</div>
+          </div>
+          <div class="fest-row">
+            <div class="fest-icon-wrap">🎨</div>
+            <div class="fest-name">Holi</div>
+            <div class="fest-date">Thu, Mar 12</div>
+            <div class="fest-chevron">›</div>
+          </div>
+        </div>
+        <div class="month-card">
+          <div class="month-header">
+            <div class="month-name">April</div>
+            <div class="month-count">4 festivals</div>
+          </div>
+          <div class="fest-row" style="background:rgba(230,184,92,0.06);border-radius:8px;">
+            <div class="fest-icon-wrap" style="background:rgba(230,184,92,0.2);">☀️</div>
+            <div class="fest-name" style="color:var(--dk-shukla);">Ram Navami</div>
+            <div class="fest-date">Mon, Apr 27</div>
+            <div class="fest-chevron" style="color:var(--dk-shukla);">›</div>
+          </div>
+          <div class="fest-row">
+            <div class="fest-icon-wrap">🎉</div>
+            <div class="fest-name">Gudi Padwa / Ugadi</div>
+            <div class="fest-date">Sat, Apr 18</div>
+            <div class="fest-chevron">›</div>
+          </div>
+          <div class="fest-row">
+            <div class="fest-icon-wrap">🌄</div>
+            <div class="fest-name">Hanuman Jayanti</div>
+            <div class="fest-date">Thu, Apr 30</div>
+            <div class="fest-chevron">›</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Arrow -->
+  <div style="font-size:28px;color:var(--page-muted);align-self:center;padding-top:40px;">→</div>
+
+  <!-- Detail sheet (after tap) -->
+  <div class="phone-wrap">
+    <div class="phone-label">Detail sheet — slides up (full screen)</div>
+    <div class="phone sheet">
+      <div class="status-bar" style="position:absolute;top:0;left:0;right:0;z-index:2;background:transparent;">
+        <span class="time" style="color:rgba(255,255,255,0.8);">9:41</span>
+        <span class="icons" style="color:rgba(255,255,255,0.6);">●●● ▲ ■</span>
+      </div>
+      <div class="detail-sheet">
+        <!-- Header -->
+        <div class="sheet-header grad-saffron">
+          <div class="sheet-close">✕</div>
+          <div class="sheet-header-icon">☀️</div>
+          <div class="sheet-header-title">Ram Navami</div>
+          <div class="sheet-header-subtitle">Birth of Lord Rama</div>
+        </div>
+        <!-- Body -->
+        <div class="sheet-body" style="overflow-y:auto;">
+          <div class="sheet-date-row">
+            <div class="sheet-date-chip chip-shukla">Chaitra · Shukla 9</div>
+            <div class="sheet-date-chip chip-greg">Mon, Apr 27 2026</div>
+          </div>
+
+          <div class="sheet-section-label">About</div>
+          <div class="sheet-desc">
+            Ram Navami celebrates the birth of Lord Rama, the seventh avatar of Vishnu and the hero of the Ramayana. It falls on the ninth day of the bright fortnight of Chaitra, believed to be the moment Rama was born in Ayodhya to King Dasharatha and Queen Kaushalya.
+            <br><br>
+            The day marks the ideals of dharma, righteousness, and devotion that Lord Rama embodied throughout his life.
+          </div>
+
+          <div class="sheet-section-label">How to Observe</div>
+          <div class="sheet-observances">
+            <div class="sheet-obs-item"><div class="obs-dot"></div><div>Fast from sunrise to sunset, breaking only after evening aarti</div></div>
+            <div class="sheet-obs-item"><div class="obs-dot"></div><div>Visit Ram temples and attend kirtan or Ramayana recitation</div></div>
+            <div class="sheet-obs-item"><div class="obs-dot"></div><div>Offer tulsi leaves, flowers, and panchamrit to Ram's idol</div></div>
+            <div class="sheet-obs-item"><div class="obs-dot"></div><div>Read Sundarkand or Ramcharitmanas throughout the day</div></div>
+            <div class="sheet-obs-item"><div class="obs-dot"></div><div>Participate in Rath Yatra processions in your community</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Annotations -->
+  <div style="display:flex;flex-direction:column;gap:14px;align-self:flex-start;padding-top:40px;">
+    <div class="annotation">
+      <strong>Header gradient</strong><br>
+      8 preset gradients keyed by festival category (fire, saffron/devotion, water, earth, night, lotus, harvest, moon). Assigned in <code>FestivalDetailSheet</code> based on the canonical key. Zero added assets — pure Flutter painting.
+    </div>
+    <div class="annotation">
+      <strong>Close button</strong><br>
+      Semi-transparent pill, top-right. Returns to festivals list. No back gesture conflict needed — modal sits above nav.
+    </div>
+    <div class="annotation">
+      <strong>Date chips</strong><br>
+      Hindu date (paksha · tithi) + Gregorian date for current year, same logic as existing <code>_FestivalRow</code>.
+    </div>
+    <div class="annotation">
+      <strong>Scrollable body</strong><br>
+      Header is fixed at 200dp. Body scrolls independently. On short phones, header compresses slightly via <code>SliverAppBar</code> collapse.
+    </div>
+    <div class="annotation">
+      <strong>Hindi Devanagari example</strong><br>
+      Same sheet, same layout. Title becomes "राम नवमी", About and observances natively authored in Hindi — not translated. <code>scriptStyle()</code> dispatcher already handles font switching.
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 3 — Combined Festival Detail Sheet                     -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+
+<div class="sec-header">
+  <h2>Festival Detail Sheet — Combined Festivals</h2>
+  <p>When a canonical key contains "/" — each constituent gets its own section. Example: Gudi Padwa / Ugadi / Chaitra Navratri</p>
+</div>
+
+<div class="row" style="align-items:flex-start;">
+
+  <div class="phone-wrap">
+    <div class="phone-label">Combined detail — scrollable sections</div>
+    <div class="phone sheet" style="min-height:860px;">
+      <div class="status-bar" style="position:absolute;top:0;left:0;right:0;z-index:2;background:transparent;">
+        <span class="time" style="color:rgba(255,255,255,0.8);">9:41</span>
+        <span class="icons" style="color:rgba(255,255,255,0.6);">●●● ▲ ■</span>
+      </div>
+      <div class="detail-sheet">
+        <div class="sheet-header grad-lotus" style="height:180px;">
+          <div class="sheet-close">✕</div>
+          <div class="sheet-header-icon">🎉</div>
+          <div class="sheet-header-title">Hindu New Year</div>
+          <div class="sheet-header-subtitle">Chaitra Shukla 1 · Sat, Apr 18 2026</div>
+        </div>
+        <div class="sheet-body" style="overflow-y:auto;padding-top:14px;">
+          <div style="font-size:11.5px;color:var(--dk-ink-muted);margin-bottom:14px;line-height:1.5;">
+            The Hindu New Year falls on the first day of Chaitra Shukla paksha. It is celebrated across India under three regional names — each with its own traditions.
+          </div>
+
+          <div class="combined-section">
+            <div class="combined-region-label">Maharashtra</div>
+            <div class="combined-title">Gudi Padwa</div>
+            <div class="combined-desc">Gudi Padwa marks the Marathi new year. A gudi — a bamboo staff topped with a bright cloth, neem leaves, and an inverted pot — is erected outside homes facing the rising sun as a symbol of victory and prosperity.</div>
+            <div class="sheet-section-label" style="margin-top:10px;font-size:9px;">How to observe</div>
+            <div class="sheet-obs-item" style="font-size:11px;"><div class="obs-dot"></div><div>Erect the Gudi at sunrise facing east</div></div>
+            <div class="sheet-obs-item" style="font-size:11px;"><div class="obs-dot"></div><div>Eat neem leaves mixed with jaggery and tamarind for health</div></div>
+            <div class="sheet-obs-item" style="font-size:11px; border-bottom:none;"><div class="obs-dot"></div><div>Prepare Shrikhand and Puran Poli as festival foods</div></div>
+          </div>
+
+          <div class="combined-section">
+            <div class="combined-region-label">Karnataka · Andhra Pradesh · Telangana</div>
+            <div class="combined-title">Ugadi</div>
+            <div class="combined-desc">Ugadi ushers in the Telugu and Kannada new year. Homes are decorated with mango leaf toranams and the special Ugadi Pachadi — a dish combining six tastes — is prepared to symbolise the varied experiences of the coming year.</div>
+            <div class="sheet-section-label" style="margin-top:10px;font-size:9px;">How to observe</div>
+            <div class="sheet-obs-item" style="font-size:11px;"><div class="obs-dot"></div><div>Prepare and share Ugadi Pachadi with family</div></div>
+            <div class="sheet-obs-item" style="font-size:11px; border-bottom:none;"><div class="obs-dot"></div><div>Decorate entrance with mango leaf toranam</div></div>
+          </div>
+
+          <div class="combined-section">
+            <div class="combined-region-label">North India</div>
+            <div class="combined-title">Chaitra Navratri</div>
+            <div class="combined-desc">The nine-night festival of the goddess begins on this day. Devotees fast, observe daily aarti, and worship the nine forms of Durga (Navadurga) across nine consecutive days ending with Ram Navami.</div>
+            <div class="sheet-section-label" style="margin-top:10px;font-size:9px;">How to observe</div>
+            <div class="sheet-obs-item" style="font-size:11px;"><div class="obs-dot"></div><div>Keep a nine-day fast or phalahar (fruit) diet</div></div>
+            <div class="sheet-obs-item" style="font-size:11px; border-bottom:none;"><div class="obs-dot"></div><div>Light an akhand diya and recite Durga Saptashati</div></div>
+          </div>
+
+          <div style="height:8px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Annotations -->
+  <div style="display:flex;flex-direction:column;gap:14px;align-self:flex-start;padding-top:40px;">
+    <div class="annotation">
+      <strong>Combined key detection</strong><br>
+      When the canonical festival key contains <code>/</code>, the sheet renders a sectioned layout instead of the single-festival layout. Each segment maps to its own JSON key: <code>"Gudi Padwa"</code>, <code>"Ugadi"</code>, <code>"Chaitra Navratri"</code>.
+    </div>
+    <div class="annotation">
+      <strong>Section layout</strong><br>
+      Each constituent festival gets a card with:
+      <ul>
+        <li>Region label (small, muted)</li>
+        <li>Festival title</li>
+        <li>2–3 sentence description</li>
+        <li>Compact observances list</li>
+      </ul>
+    </div>
+    <div class="annotation">
+      <strong>Future compatibility</strong><br>
+      When regional calendar lands, <code>FestivalDetector</code> returns <code>"Gudi Padwa"</code> or <code>"Ugadi"</code> directly based on the user's region. The combined layout becomes unused — each region naturally shows its own single-festival sheet.
+    </div>
+    <div class="annotation">
+      <strong>Combined festivals in scope</strong><br>
+      · Gudi Padwa / Ugadi / Chaitra Navratri<br>
+      · Baisakhi / Vishu<br>
+      · Makar Sankranti / Pongal
+    </div>
+  </div>
+
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 4 — Ekadashi Tab with Intro Paragraph                  -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+
+<div class="sec-header">
+  <h2>Ekadashi Tab — Intro Paragraph</h2>
+  <p>A localized paragraph above the date chip grid explaining Ekadashi's significance</p>
+</div>
+
+<div class="row" style="align-items:flex-start;">
+
+  <div class="phone-wrap">
+    <div class="phone-label">Ekadashi tab — with intro</div>
+    <div class="phone tall">
+      <div class="status-bar">
+        <span class="time">9:41</span>
+        <span class="icons">●●● ▲ ■</span>
+      </div>
+      <div class="nav-bar">
+        <div class="nav-dot"></div>
+        <span class="nav-title">TITHIKA</span>
+      </div>
+      <div class="page-title-bar">
+        <div class="page-title">Festivals</div>
+        <div class="page-meta">2026</div>
+      </div>
+      <div class="pill-toggle">
+        <div class="pill-tab">Festivals</div>
+        <div class="pill-tab active">Ekadashi</div>
+      </div>
+      <div class="scroll-area">
+        <!-- Intro paragraph -->
+        <div class="ek-intro">
+          <div class="ek-intro-text">
+            Ekadashi falls on the 11th day of each lunar fortnight — twice a month, once in the waxing moon (Shukla) and once in the waning moon (Krishna). It is considered one of the most auspicious days for fasting, prayer, and devotion to Lord Vishnu. Observing Ekadashi is believed to purify the mind and accumulate merit.
+          </div>
+        </div>
+
+        <!-- Month group with chips -->
+        <div class="month-card">
+          <div class="month-header">
+            <div class="month-name">May</div>
+            <div class="month-count">3 dates</div>
+          </div>
+          <div class="ek-chip-row">
+            <div class="ek-chip"><div class="ek-moon">🌙</div>Fri, May 8</div>
+            <div class="ek-chip"><div class="ek-moon">🌙</div>Sat, May 23</div>
+          </div>
+          <div class="ek-chip-row">
+            <div class="ek-chip"><div class="ek-moon">🌙</div>Sun, May 25</div>
+            <div style="flex:1;"></div>
+          </div>
+        </div>
+
+        <div class="month-card">
+          <div class="month-header">
+            <div class="month-name">June</div>
+            <div class="month-count">2 dates</div>
+          </div>
+          <div class="ek-chip-row">
+            <div class="ek-chip"><div class="ek-moon">🌙</div>Thu, Jun 25</div>
+            <div class="ek-chip"><div class="ek-moon">🌙</div>Fri, Jun 26</div>
+          </div>
+        </div>
+
+        <div class="month-card">
+          <div class="month-header">
+            <div class="month-name">July</div>
+            <div class="month-count">2 dates</div>
+          </div>
+          <div class="ek-chip-row">
+            <div class="ek-chip"><div class="ek-moon">🌙</div>Sat, Jul 11</div>
+            <div class="ek-chip"><div class="ek-moon">🌙</div>Sun, Jul 26</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="phone-wrap">
+    <div class="phone-label">Ekadashi tab — Hindi Devanagari</div>
+    <div class="phone tall">
+      <div class="status-bar">
+        <span class="time">9:41</span>
+        <span class="icons">●●● ▲ ■</span>
+      </div>
+      <div class="nav-bar">
+        <div class="nav-dot"></div>
+        <span class="nav-title">TITHIKA</span>
+      </div>
+      <div class="page-title-bar">
+        <div class="page-title">उत्सव</div>
+        <div class="page-meta">2026</div>
+      </div>
+      <div class="pill-toggle">
+        <div class="pill-tab">उत्सव</div>
+        <div class="pill-tab active">एकादशी</div>
+      </div>
+      <div class="scroll-area">
+        <div class="ek-intro">
+          <div class="ek-intro-text">
+            एकादशी प्रत्येक पक्ष के ग्यारहवें दिन आती है — महीने में दो बार, एक शुक्ल पक्ष में और एक कृष्ण पक्ष में। यह भगवान विष्णु की भक्ति, उपवास और आराधना के लिए सबसे पवित्र दिनों में से एक माना जाता है। एकादशी का पालन करने से मन शुद्ध होता है और पुण्य की प्राप्ति होती है।
+          </div>
+        </div>
+        <div class="month-card">
+          <div class="month-header">
+            <div class="month-name">मई</div>
+            <div class="month-count">3 तिथियाँ</div>
+          </div>
+          <div class="ek-chip-row">
+            <div class="ek-chip"><div class="ek-moon">🌙</div>शु, 8 मई</div>
+            <div class="ek-chip"><div class="ek-moon">🌙</div>शनि, 23 मई</div>
+          </div>
+          <div class="ek-chip-row">
+            <div class="ek-chip"><div class="ek-moon">🌙</div>र, 25 मई</div>
+            <div style="flex:1;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Annotations -->
+  <div style="display:flex;flex-direction:column;gap:14px;align-self:flex-start;padding-top:40px;">
+    <div class="annotation">
+      <strong>Intro paragraph</strong><br>
+      One new key in <code>AppStrings</code>: <code>ekadashiIntro(language)</code>. 2–3 sentences, natively written in each language. Sits above the month chip grid, inside the scroll area so it scrolls away.
+    </div>
+    <div class="annotation">
+      <strong>No detail page for generic Ekadashi</strong><br>
+      Ekadashi date chips are not tappable — the intro paragraph provides all the context needed. Named Ekadashis (Nirjala, Devshayani, etc.) in the Festivals tab do open a detail sheet since they have their own history and specific observances.
+    </div>
+    <div class="annotation">
+      <strong>Named Ekadashis in Festivals tab</strong><br>
+      Nirjala Ekadashi, Devshayani, Devutthana, Gita Jayanti — these appear in the Festivals tab and are fully tappable with their own detail page explaining their specific significance.
+    </div>
+  </div>
+
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 5 — Gradient Header Palette                            -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+
+<div class="sec-header">
+  <h2>Gradient Header Palette</h2>
+  <p>8 category gradients, all Flutter-drawn — zero additional app size</p>
+</div>
+
+<div class="row" style="flex-wrap:wrap;gap:16px;">
+  <div style="text-align:center;">
+    <div style="width:160px;height:90px;border-radius:12px;" class="grad-fire"></div>
+    <div style="margin-top:6px;font-size:11px;color:var(--page-soft);">Fire / Dahan<br><span style="color:var(--page-muted);font-size:10px;">Holika Dahan, Maha Shivaratri</span></div>
+  </div>
+  <div style="text-align:center;">
+    <div style="width:160px;height:90px;border-radius:12px;" class="grad-saffron"></div>
+    <div style="margin-top:6px;font-size:11px;color:var(--page-soft);">Saffron / Devotion<br><span style="color:var(--page-muted);font-size:10px;">Ram Navami, Hanuman Jayanti, Guru Purnima</span></div>
+  </div>
+  <div style="text-align:center;">
+    <div style="width:160px;height:90px;border-radius:12px;" class="grad-lotus"></div>
+    <div style="margin-top:6px;font-size:11px;color:var(--page-soft);">Lotus / New Year<br><span style="color:var(--page-muted);font-size:10px;">Gudi Padwa, Navratri, Vasant Panchami</span></div>
+  </div>
+  <div style="text-align:center;">
+    <div style="width:160px;height:90px;border-radius:12px;" class="grad-water"></div>
+    <div style="margin-top:6px;font-size:11px;color:var(--page-soft);">Water / River<br><span style="color:var(--page-muted);font-size:10px;">Ganga Dussehra, Chhath, Rath Yatra</span></div>
+  </div>
+  <div style="text-align:center;">
+    <div style="width:160px;height:90px;border-radius:12px;" class="grad-earth"></div>
+    <div style="margin-top:6px;font-size:11px;color:var(--page-soft);">Harvest / Earth<br><span style="color:var(--page-muted);font-size:10px;">Baisakhi, Makar Sankranti, Govardhan</span></div>
+  </div>
+  <div style="text-align:center;">
+    <div style="width:160px;height:90px;border-radius:12px;" class="grad-night"></div>
+    <div style="margin-top:6px;font-size:11px;color:var(--page-soft);">Night / Ancestors<br><span style="color:var(--page-muted);font-size:10px;">Diwali, Mahalaya, Karva Chauth</span></div>
+  </div>
+  <div style="text-align:center;">
+    <div style="width:160px;height:90px;border-radius:12px;" class="grad-moon"></div>
+    <div style="margin-top:6px;font-size:11px;color:var(--page-soft);">Moon / Purnima<br><span style="color:var(--page-muted);font-size:10px;">Raksha Bandhan, Sharad Purnima, Ekadashi</span></div>
+  </div>
+  <div style="text-align:center;">
+    <div style="width:160px;height:90px;border-radius:12px;background:linear-gradient(160deg,#0A1A0A 0%,#1A4A1A 50%,#2A8A2A 100%);"></div>
+    <div style="margin-top:6px;font-size:11px;color:var(--page-soft);">Green / Growth<br><span style="color:var(--page-muted);font-size:10px;">Hariyali Teej, Tulsi Vivah, Nag Panchami</span></div>
+  </div>
+</div>
+
+</main>
+</body>
+</html>
