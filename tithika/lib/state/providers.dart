@@ -327,6 +327,15 @@ final yearFestivalsProvider =
           inFestivals: inFestivals,
         ));
       }
+      // Golu (Bommai Kolu) — Tamil Nadu tradition during Sharad Navratri,
+      // same start date, shown as a separate festival entry.
+      if (detectedName == 'Sharad Navratri') {
+        entries.add(FestivalEntry(
+          date: date,
+          data: adjusted.copyWith(festivalName: 'Golu'),
+          inFestivals: true,
+        ));
+      }
     }
   }
   return entries;

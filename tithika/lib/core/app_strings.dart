@@ -141,6 +141,34 @@ abstract final class AppStrings {
         _ => 'Ekadashi',
       };
 
+  static String ekadashiIntro(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari =>
+          'एकादशी प्रत्येक पक्ष के ग्यारहवें दिन पड़ती है — अर्थात महीने में दो बार। यह उपवास, प्रार्थना और भगवान विष्णु की भक्ति के लिए सबसे पवित्र दिनों में से एक है। एकादशी का व्रत मन को शुद्ध करता है और आध्यात्मिक पुण्य अर्जित करता है।',
+        AppLanguage.tamil =>
+          'ஏகாதசி ஒவ்வொரு சந்திர பக்கத்தின் பதினோராம் நாளில் வருகிறது — மாதத்தில் இருமுறை. இது உபவாசம், வழிபாடு மற்றும் திருமால் பக்திக்கான மிகவும் புனிதமான நாட்களில் ஒன்றாகும். ஏகாதசி விரதம் மனதை தூய்மைப்படுத்தி ஆன்மீக புண்ணியம் சேர்க்கும்.',
+        AppLanguage.bengali =>
+          'একাদশী প্রতিটি চন্দ্র পক্ষের একাদশ দিনে পড়ে — মাসে দুইবার। এটি উপবাস, প্রার্থনা এবং ভগবান বিষ্ণুর ভক্তির জন্য সবচেয়ে পবিত্র দিনগুলির মধ্যে একটি। একাদশী পালন মনকে শুদ্ধ করে এবং আধ্যাত্মিক পুণ্য অর্জন করে।',
+        _ =>
+          'Ekadashi falls on the 11th day of each lunar fortnight — twice a month. It is one of the most auspicious days for fasting, prayer, and devotion to Lord Vishnu. Observing Ekadashi is believed to purify the mind and accumulate spiritual merit.',
+      };
+
+  static String about(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'विवरण',
+        AppLanguage.tamil           => 'விவரம்',
+        AppLanguage.bengali         => 'বিবরণ',
+        _                           => 'ABOUT',
+      };
+
+  static String howToObserve(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'कैसे मनाएँ',
+        AppLanguage.tamil           => 'எப்படி கொண்டாடுவது',
+        AppLanguage.bengali         => 'কীভাবে পালন করবেন',
+        _                           => 'HOW TO OBSERVE',
+      };
+
   static String purnima(AppLanguage lang) =>
       switch (lang) {
         AppLanguage.hindiDevanagari => 'पूर्णिमा',

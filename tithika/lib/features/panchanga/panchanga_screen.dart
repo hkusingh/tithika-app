@@ -11,6 +11,7 @@ import '../../state/providers.dart';
 import '../shared/page_title_bar.dart';
 import '../shared/starfield_background.dart';
 import '../shared/tithika_nav_bar.dart';
+import '../shared/tithika_tab_bar.dart';
 
 class PanchaScreen extends ConsumerStatefulWidget {
   const PanchaScreen({super.key});
@@ -153,6 +154,7 @@ class _PanchaScreenState extends ConsumerState<PanchaScreen> {
                     },
                   ),
                 ),
+                const TithikaTabBar(),
               ],
             ),
           ),

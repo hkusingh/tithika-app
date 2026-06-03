@@ -9,6 +9,7 @@ import '../../models/muhurta_data.dart';
 import '../../state/providers.dart';
 import '../shared/page_title_bar.dart';
 import '../shared/tithika_nav_bar.dart';
+import '../shared/tithika_tab_bar.dart';
 
 class MuhurtaScreen extends ConsumerStatefulWidget {
   const MuhurtaScreen({super.key});
@@ -176,6 +177,7 @@ class _MuhurtaScreenState extends ConsumerState<MuhurtaScreen> {
                 },
               ),
             ),
+            const TithikaTabBar(),
           ],
         ),
       ),

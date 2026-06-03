@@ -1,0 +1,582 @@
+{
+  "Maha Shivaratri": {
+    "subtitle": "The great night of Shiva",
+    "description": "Maha Shivaratri — the great night of Shiva — falls on the fourteenth day of the dark fortnight of Phalguna, just before the new moon. It is the most sacred night in the Shaiva calendar, observed with a full night vigil, fasting, and continuous worship of the Shivalinga. The darkness of the night is considered an expression of Shiva himself, and staying awake through it in prayer is an act of deep devotion.\n\nThe night is divided into four prahar (watches), each marked by a fresh abhishek — the ritual bathing of the Shivalinga with milk, honey, curd, ghee, and water, followed by the offering of bilva leaves. It is also believed to be the night of Shiva and Parvati's sacred marriage, and the night when Shiva performed the cosmic Tandava dance from which creation, preservation, and dissolution flow.",
+    "observances": [
+      "Fast through the day, breaking only the following morning after puja",
+      "Perform abhishek of the Shivalinga with milk, honey, curd, ghee, and Ganga water during each of the four night watches",
+      "Offer bilva (bel) leaves, white flowers, and dhatura to the Shivalinga",
+      "Stay awake through the night in prayer, kirtan, or meditation — this jagran is considered the heart of the observance",
+      "Chant Om Namah Shivaya or recite the Shiva Mahimna Stotra or Rudrashtakam",
+      "Visit a Shiva temple at midnight when the main puja reaches its peak"
+    ]
+  },
+  "Vasant Panchami": {
+    "subtitle": "Saraswati Puja and the arrival of spring",
+    "description": "Vasant Panchami, observed on the fifth day of the bright fortnight of Magha, marks the first day of spring (vasant) and is devoted to Saraswati — the goddess of knowledge, learning, music, and the arts. Devotees dress in yellow, the colour of blooming mustard fields, as an offering to the season and the goddess.\n\nOn this day, young children are traditionally introduced to writing for the first time in a ceremony called Vidyarambha. Students place their books, instruments, and tools before Saraswati's idol seeking her blessings for the year ahead. Kite flying fills the sky in many parts of northern India, and the sweetness of saffron-tinged khichdi and sweet boondi marks the festive table.",
+    "observances": [
+      "Wear yellow clothing as an offering to Saraswati and the spring season",
+      "Place books, musical instruments, and tools before Saraswati's idol for her blessings",
+      "Perform Saraswati Puja at home, school, or temple with white flowers and yellow sweets",
+      "Introduce young children to their first letters in the Vidyarambha ceremony",
+      "Fly kites in the afternoon as part of the traditional spring celebration",
+      "Prepare and share saffron-coloured sweets, kheer, or boondi as prasad"
+    ]
+  },
+  "Makar Sankranti / Pongal": {
+    "subtitle": "The sun enters Capricorn",
+    "intro": "When the sun crosses into Capricorn (Makar) — falling on January 14th each year — it begins Uttarayana, the six-month northward journey. This solar transition is celebrated across India under two names: Makar Sankranti in the north and west, and Pongal in Tamil Nadu.",
+    "sections": [
+      {
+        "region": "North India · Gujarat · Maharashtra · Rajasthan",
+        "title": "Makar Sankranti",
+        "description": "Makar Sankranti marks the sun's entry into Capricorn and the start of Uttarayana — one of the most auspicious transitions in the Hindu solar calendar. In Gujarat and Maharashtra, colourful kites fill the sky from dawn to dusk, and til-gur (sesame-jaggery sweets) are shared with the greeting: 'til gul ghya, god god bola' — eat sweetness, speak sweetness. Bathing in sacred rivers at dawn, especially at Prayagraj where the Ganga, Yamuna, and Saraswati converge, is considered exceptionally meritorious on this day.",
+        "observances": [
+          "Bathe at sunrise in a sacred river and offer arghya to the sun",
+          "Share til-gur, til ladoo, or sesame-jaggery sweets with family and neighbours",
+          "Fly kites throughout the day to celebrate the sun's turn northward",
+          "Donate sesame seeds, blankets, or grain to the needy — dan on this day is especially meritorious"
+        ]
+      },
+      {
+        "region": "Tamil Nadu · Parts of Andhra Pradesh",
+        "title": "Pongal",
+        "description": "Pongal is a four-day harvest thanksgiving — the most important festival of the Tamil calendar. Its name comes from the dish at its heart: freshly harvested rice boiled in new clay pots with milk, jaggery, and cardamom until it boils over — 'pongal,' meaning 'to overflow,' is an omen of abundance. The four days honour the sun, rain, cattle, and family in sequence: Thai Pongal, Surya Pongal, Mattu Pongal, and Kanum Pongal. Homes are adorned with elaborate kolam patterns drawn in rice flour at the doorstep each morning.",
+        "observances": [
+          "Cook the pongal dish outdoors in a new clay pot — let it boil over as a symbol of abundance",
+          "Draw fresh kolam patterns at the entrance on each of the four days",
+          "On Mattu Pongal (Day 3), wash, garland, and feed sweet pongal to the cattle",
+          "On Kanum Pongal (Day 4), visit family and exchange gifts"
+        ]
+      }
+    ]
+  },
+  "Holika Dahan": {
+    "subtitle": "The burning of Holika",
+    "description": "Holika Dahan takes place on the evening of the full moon of Phalguna, the night before Holi. A large bonfire is lit in the village square or temple courtyard, commemorating the story of Prahlada — the young devotee of Vishnu who was made to sit in the lap of his demoness aunt Holika as she entered the flames. Holika wore a cloak that protected her from fire, but through Prahlada's devotion to Vishnu the cloak flew from her and wrapped around him, and she was consumed while he emerged unharmed. The fire is a symbol of the destruction of evil and the protection of the faithful.\n\nThe pyre is assembled in the days before, built around a central wooden pole. On the full moon night, at muhurta time announced in the local panchang, the fire is lit while devotees circumambulate it, offering coconut, grain, and dried dung cakes. The heat and smoke of Holika Dahan is believed to purify the atmosphere of winter's accumulated impurities and bless the household with health and prosperity in the spring ahead.",
+    "observances": [
+      "Gather around the Holika pyre at the prescribed muhurta time and light the fire",
+      "Circumambulate the fire three or seven times, offering coconut, raw grain, and dried dung cakes",
+      "Roast raw grains (new wheat, chickpeas) in the warmth of the fire as the first fruits of the spring harvest",
+      "Collect a small piece of the sacred ash the following morning and apply it to the forehead",
+      "Chant the Narasimha stotra or sing bhajans around the fire in remembrance of Prahlada's devotion"
+    ]
+  },
+  "Holi": {
+    "subtitle": "The festival of colours and spring",
+    "description": "Holi marks the arrival of spring and the triumph of good over evil, celebrated on the day following the full moon of Phalguna. It commemorates the story of Prahlada — a devoted follower of Vishnu — who survived the flames that consumed his demoness aunt Holika, whose pyre is lit the evening before in Holika Dahan.\n\nThe festival is equally bound to the legend of Krishna, who playfully drenched Radha and the gopis of Vrindavan in colours — a tradition that gave Holi its most joyful expression. By mid-morning, streets fill with revellers drenched in gulal and coloured water, the air carrying the sound of dhol and song until noon, when the revelry traditionally draws to a close.",
+    "observances": [
+      "Play with dry gulal (coloured powder) and water — preferably natural or herbal colours",
+      "Visit friends and family to exchange sweets and offer coloured abir",
+      "Prepare and share traditional Holi foods: gujiya, thandai, and puran poli",
+      "Attend Holika Dahan the evening before and offer coconut or grain into the fire",
+      "Sing and dance to Holi songs (Phag) with the community",
+      "End the revelry by noon and bathe before afternoon prayers"
+    ]
+  },
+  "Gudi Padwa / Ugadi / Chaitra Navratri": {
+    "subtitle": "Hindu New Year",
+    "intro": "The first day of Chaitra Shukla paksha marks the Hindu lunisolar New Year — celebrated across India under three regional names, each with its own traditions, foods, and rituals.",
+    "sections": [
+      {
+        "region": "Maharashtra",
+        "title": "Gudi Padwa",
+        "description": "Gudi Padwa marks the Marathi New Year. At sunrise a gudi is erected outside homes — a bamboo pole draped in silk, topped with an inverted copper vessel, crowned with neem leaves, marigold garlands, and sugar crystals. It is an emblem of victory and prosperity, rooted in the legend of Brahmadev beginning creation on this day and Shivaji Maharaj's triumphant return from battle.",
+        "observances": [
+          "Erect the gudi at sunrise facing east and lower it at sunset",
+          "Eat neem leaves mixed with jaggery and tamarind — a reminder to accept life's bitterness and sweetness together",
+          "Prepare srikhand and puran poli as the traditional Padwa feast"
+        ]
+      },
+      {
+        "region": "Karnataka · Andhra Pradesh · Telangana",
+        "title": "Ugadi",
+        "description": "Ugadi — yugadi, the start of a new age — ushers in the Telugu and Kannada New Year. Homes are adorned with fresh mango leaf toranams at the doorway. The centrepiece of the day is Ugadi Pachadi: a chutney of six tastes — sweet jaggery, sour raw mango, salty rock salt, bitter neem flowers, spicy green chilli, and astringent tamarind — eaten together as a reminder that the year ahead holds all of life's flavours.",
+        "observances": [
+          "Prepare and taste Ugadi Pachadi, all six flavours together",
+          "Decorate the entrance with a fresh mango leaf toranam",
+          "Attend the Panchanga Sravanam — a priest's reading of the year's almanac predictions for the months ahead"
+        ]
+      },
+      {
+        "region": "North India",
+        "title": "Chaitra Navratri",
+        "description": "Chaitra Navratri opens nine nights of worship of the nine forms of Goddess Durga. Each day is dedicated to one of the Navadurga — from Shailputri on the first day to Siddhidatri on the ninth — with fasting, aarti, and recitation of the Durga Saptashati. The nine nights culminate on Ram Navami, the birthday of Lord Rama.",
+        "observances": [
+          "Keep a nine-day fast or phalahar (fruit-only) diet, breaking only after the evening aarti",
+          "Light an akhand diya for all nine days and recite the Durga Saptashati or Devi Kavach daily",
+          "Worship the day's Navadurga form with flowers, sindoor, and the appropriate bhog"
+        ]
+      }
+    ]
+  },
+  "Ram Navami": {
+    "subtitle": "The birth of Lord Rama",
+    "description": "Ram Navami celebrates the birth of Lord Rama, the seventh avatar of Vishnu and the embodiment of dharma, born on the ninth day of the bright fortnight of Chaitra in Ayodhya to King Dasharatha and Queen Kaushalya. His life, as told in the Ramayana, remains the supreme guide to righteous living, devotion, and courage.\n\nThe birth moment — Madhyahna, the midpoint of the day — is considered especially sacred. Temples resonate with kirtan and recitations of the Ramayana, and processions carry elaborately decorated idols of Ram through streets. The day is observed across all traditions that revere Vishnu.",
+    "observances": [
+      "Fast from sunrise to sunset, breaking only after the evening aarti",
+      "Visit Ram temples and attend kirtan or Ramayana recitation",
+      "Offer tulsi leaves, flowers, and panchamrit to Ram's idol at noon (Madhyahna)",
+      "Read Sundarkand or Ramcharitmanas throughout the day",
+      "Participate in Rath Yatra processions carrying Ram's idol through the community",
+      "Distribute prasad — typically panjeeri, dried fruits, or panchajiri"
+    ]
+  },
+  "Hanuman Jayanti": {
+    "subtitle": "The birth of Lord Hanuman",
+    "description": "Hanuman Jayanti celebrates the birth of Hanuman — the supreme devotee, son of the wind god Vayu and Anjana — born on the full moon of Chaitra. His life in the Ramayana is an unbroken testament to what is possible through devotion: he could move mountains and cross oceans, yet his only desire was to serve Ram. His power was immeasurable and his humility absolute.\n\nTemples resonate with the chanting of the Hanuman Chalisa through the day, and red sindoor — Hanuman's signature colour — is offered at his idol. The story behind this is that when Hanuman learned Sita applies sindoor to her forehead for Ram's long life, he applied it to his entire body in devotion. Every offering of sindoor on this day carries that same love.",
+    "observances": [
+      "Recite the Hanuman Chalisa forty times, or as many times as possible through the day",
+      "Offer sindoor, red flowers, and jasmine garlands at Hanuman temples",
+      "Fast through the day and break after evening aarti with fruits or sattvic food",
+      "Read or listen to Sundarkand — the fifth chapter of the Ramayana, Hanuman's greatest chapter",
+      "Visit a Hanuman temple at sunrise and at sunset"
+    ]
+  },
+  "Baisakhi / Vishu": {
+    "subtitle": "The solar New Year",
+    "intro": "When the sun enters Mesha (Aries) — typically on April 13th or 14th — it marks the solar New Year across two of India's great regional traditions: Baisakhi in the Punjab and the Sikh calendar, and Vishu in Kerala.",
+    "sections": [
+      {
+        "region": "Punjab · Haryana · Himachal Pradesh",
+        "title": "Baisakhi",
+        "description": "Baisakhi marks the harvest of the Rabi (winter) crop in the Punjab — the fields have been cut, the granaries are filling, and the earth rewards a year of labour. It is also of profound significance to Sikhs as the day in 1699 when Guru Gobind Singh founded the Khalsa at Anandpur Sahib, asking five men to offer their heads and creating the Panj Pyare — the five beloved — who established the Khalsa's principles of courage, equality, and devotion.",
+        "observances": [
+          "Attend Amrit Vela kirtan and langar at the Gurdwara",
+          "Bathe in a sacred river at sunrise",
+          "Dance bhangra and giddha in celebration of the harvest",
+          "Prepare and share traditional Punjab foods: makki di roti with sarson da saag, sweet lassi, and pinni"
+        ]
+      },
+      {
+        "region": "Kerala",
+        "title": "Vishu",
+        "description": "Vishu is the Malayali New Year, and its defining ritual is the Vishukkani — the auspicious first sight of the year. Before dawn, the eldest member of the family prepares the Kani: a bronze uruli arranged with golden cassia flowers (kanikonna), a mirror, gold ornaments, new cloth, ripe jackfruit, golden cucumber, rice, a lit lamp, and a holy text. Family members are led to view it with eyes closed, then opened — this vision of abundance is the first thing seen on New Year's Day, and is believed to shape the year ahead.",
+        "observances": [
+          "Prepare the Vishukkani the night before and lead family members to view it at dawn with eyes closed",
+          "Distribute Vishu Kaineetam — elders give coins or currency notes to children and younger members",
+          "Wear new clothes (puthukodi) on this day",
+          "Prepare the Vishu Sadhya — a festive meal with rice, dal, payasam, and seasonal vegetables"
+        ]
+      }
+    ]
+  },
+  "Akshaya Tritiya": {
+    "subtitle": "The imperishable third",
+    "description": "Akshaya Tritiya — akshaya meaning 'that which never diminishes' — falls on the third day of the bright fortnight of Vaishakha, one of only a handful of days considered swayamsiddha muhurta: self-auspicious at every moment, requiring no further calculation. Whatever is given, sown, or begun on this day is believed to grow without depletion. The Puranas name it as the day Brahmadev created the universe, when Treta Yuga began, and when Ganesha began writing the Mahabharata at Vyasa's dictation.\n\nFarmers sow the first seeds of the season. Merchants open new account books. Gold purchased today is believed to multiply with time. In temples, Vishnu is offered tulsi with twenty-one leaves and Satyanarayan Puja is performed widely.",
+    "observances": [
+      "Donate generously — grain, water, or food — as every gift made today accrues akshaya (non-diminishing) merit",
+      "Offer a water pot (jal dan) to passersby in the summer heat",
+      "Begin a new venture, account, or undertaking — all beginnings today are swayamsiddha auspicious",
+      "Perform Satyanarayan Puja or visit a Vishnu temple and offer tulsi with twenty-one leaves",
+      "Sow seeds or plant a sapling as a symbol of that which grows without end"
+    ]
+  },
+  "Buddha Purnima": {
+    "subtitle": "Birth, enlightenment, and passing of the Buddha",
+    "description": "Buddha Purnima — Vesak — is the holiest day in the Buddhist calendar, commemorating three events in the life of Siddhartha Gautama, all said to have occurred on the same full moon of Vaishakha: his birth in the Lumbini grove, his enlightenment beneath the Bodhi tree at Bodh Gaya, and his final parinirvana at Kushinagar. In the Vaishnava tradition, the day is also sacred as Vaishakha Purnima, and the Buddha is revered as the ninth avatar of Vishnu.\n\nIn India, Bodh Gaya becomes a centre of pilgrimage as monks and devotees from across the world gather at the site of the original enlightenment. Lantern processions, the release of caged birds, and the recitation of the Dhammapada mark the day.",
+    "observances": [
+      "Visit a Buddhist temple or stupa and offer flowers, incense, and candles",
+      "Observe the five Buddhist precepts throughout the day with especial care",
+      "Meditate, listen to dharma talks, or read from the Dhammapada or Pali Canon",
+      "Release a caged bird or donate to an animal shelter as an act of karuna (compassion)",
+      "Fast or eat simply and donate food or essential items to those in need"
+    ]
+  },
+  "Vat Savitri": {
+    "subtitle": "The vow of Savitri",
+    "description": "Vat Savitri is observed on the new moon of Jyeshtha by married women for the long life and well-being of their husbands. It commemorates Savitri, a woman of extraordinary resolve who followed Yama — the god of death — into the realm of the dead when he came for her husband Satyavan. She outwitted him through three successive wishes until he had no choice but to release Satyavan's life: she asked first for her sight to be restored, then for her father-in-law's kingdom to flourish, and finally for a hundred sons — with her husband as their father.\n\nThe vat (banyan tree) is central to the ritual because Satyavan's life was said to depart from and return to a banyan. Women wind thread around its trunk while circumambulating it, offer water, and tie it with red or yellow cotton — binding their husband's life to the imperishable tree.",
+    "observances": [
+      "Fast through the day, breaking only after evening puja",
+      "Circumambulate the banyan tree 108 times (or at least 7 times) while winding red or yellow thread around the trunk",
+      "Offer water, flowers, incense, and fruit to the banyan tree and pray for your husband's long life",
+      "Listen to the story of Savitri and Satyavan",
+      "Apply sindoor and wear traditional dress as a symbol of saubhagya"
+    ]
+  },
+  "Ganga Dussehra": {
+    "subtitle": "The descent of the Ganga",
+    "description": "Ganga Dussehra marks the day the river Ganga descended from the heavens to earth, brought down by the penance of King Bhagiratha who had performed tapas for thousands of years to redeem the souls of his ancestors. Shiva received the force of the celestial river in his matted locks to break her fall, and she flowed through them to the plains. The day falls on the tenth of the bright fortnight of Jyeshtha.\n\nThe name dussehra means 'remover of ten' — bathing in the Ganga on this day is believed to wash away ten sins, one for each of the ten days since the new moon. Offerings of flowers, diyas, and coconut are floated on the river at dusk.",
+    "observances": [
+      "Bathe in the Ganga or a sacred river at dawn — ten sins are believed to be washed away",
+      "Float a diya and flowers on the river at dusk as an offering to Ma Ganga",
+      "Donate ten items — fruit, grain, or clothing — to mark the significance of the number ten",
+      "Offer Ganga water at a Shiva temple, as Shiva received the river in his locks",
+      "Recite the Ganga Stotram at the riverbank"
+    ]
+  },
+  "Nirjala Ekadashi": {
+    "subtitle": "The waterless fast",
+    "description": "Nirjala Ekadashi is the strictest of all Ekadashis, observed on the eleventh of the bright fortnight of Jyeshtha in the height of summer. On this day devotees observe a complete fast — nirjala, meaning 'without water' — neither eating nor drinking from the previous sunset through to the following morning's sunrise. The sage Vyasa told Bhima, the Pandava known for his voracious appetite, that observing just this one Ekadashi earns the merit of all twenty-four Ekadashis of the year.\n\nBreaking the fast with water and prasad the following Dwadashi morning is followed by the offering of water-pots, fans, and fruit sherbets to priests and the needy — a counterbalance to the day's extreme austerity.",
+    "observances": [
+      "Observe the nirjala fast — no water, no food — from the previous evening through to Dwadashi sunrise",
+      "Stay awake through the night in prayer and kirtan to Vishnu",
+      "On Dwadashi morning, break the fast with water, then food, after a brief puja",
+      "Donate water-pots, fans, or fruit sherbets to priests or those in need — jal dan is especially meritorious today",
+      "Visit a Vishnu temple and offer tulsi, yellow flowers, and panchamrit"
+    ]
+  },
+  "Rath Yatra": {
+    "subtitle": "The chariot procession of Lord Jagannath",
+    "description": "Rath Yatra — the chariot festival — is one of the oldest and grandest processions in Hinduism, centred at Puri in Odisha where the 12th-century Jagannath temple stands. On the second day of the bright fortnight of Ashadha, three enormous wooden chariots — Nandighosh for Jagannath, Taladhwaja for Balabhadra, and Darpadalana for Subhadra — are dragged through the main street by thousands of devotees. The sight of Jagannath outside the temple, available to all, is considered among the most potent of all darshans.\n\nJagannath — 'Lord of the Universe' — is a form of Vishnu with a distinctive form: dark-complexioned, large round eyes, no arms or legs, carved from the sacred daru brahma tree. On Rath Yatra, caste distinctions dissolve at the ropes. The simplest person pulling the chariot performs an act equal to a lifetime of pilgrimage.",
+    "observances": [
+      "Pull the rope of the chariot if attending in person — a single pull is equal to a lifetime of punya",
+      "Watch a local Rath Yatra procession — many communities hold their own smaller versions",
+      "Visit a Jagannath temple and offer flowers, coconut, and prasad",
+      "Recite the Jagannath Ashtakam or his hymns of praise",
+      "Fast through the day and donate food or grain to the poor"
+    ]
+  },
+  "Devshayani Ekadashi": {
+    "subtitle": "Vishnu enters his four-month sleep",
+    "description": "Devshayani Ekadashi marks the day Lord Vishnu enters his four-month cosmic sleep (yoga nidra) on the serpent Shesha in the primordial ocean, from which he will not awaken until Devutthana Ekadashi in Kartika. During these four months — the Chaturmas — the earth is sustained by penance rather than by the active presence of the god. Monks begin their four-month period of staying in one place, and householders take vows of simplicity, restraint, and regular study.\n\nThe period that follows is one in which certain activities — new construction, long journeys, and weddings — are traditionally avoided until Vishnu awakens. The day's bathing in sacred rivers carries particular merit.",
+    "observances": [
+      "Fast through the day and stay awake through the night in vigil before Vishnu's image",
+      "Take a Chaturmas vow — a four-month commitment to a specific practice: vegetarianism, waking before sunrise, or daily scripture reading",
+      "Visit a Vishnu temple and offer tulsi, yellow flowers, and a lamp",
+      "Bathe in a sacred river at sunrise",
+      "Recite the Vishnu Sahasranama or passages about Vishnu's rest from the Bhagavata Purana"
+    ]
+  },
+  "Guru Purnima": {
+    "subtitle": "Honouring the teacher who illuminates the way",
+    "description": "Guru Purnima is observed on the full moon of Ashadha as a day of gratitude toward one's teacher — the guru who transmits knowledge, dispels ignorance, and guides toward truth. The full moon is the perfect symbol: a reflected light, cool and illuminating, received from the sun but experienced directly. This day is also called Vyasa Purnima, commemorating the sage who composed the Mahabharata, the Puranas, and the Brahmasutras — the adi-guru of human wisdom.\n\nIn Buddhist tradition, Guru Purnima marks the day the Buddha gave his first discourse at Sarnath, turning the wheel of dharma for his five disciples. In the yogic tradition, it is the day Adiyogi (Shiva) began transmitting the science of yoga to the Saptarishis.",
+    "observances": [
+      "Visit your guru or teacher and offer flowers, fruit, and a namaskara",
+      "If your guru has passed, sit in meditation or prayer in their memory",
+      "Read from a key text associated with your lineage or practice",
+      "Fast or eat simply, dedicating the day to study and reflection",
+      "Attend satsang, kirtan, or a dharma talk to mark the day in community"
+    ]
+  },
+  "Hariyali Teej": {
+    "subtitle": "Parvati and Shiva's reunion in the green season",
+    "description": "Hariyali Teej — the green teej — is observed on the third day of the bright fortnight of Shravana, when the monsoon is at its height and the earth has turned a vivid, celebrating green. It marks the reunion of Goddess Parvati with Lord Shiva after her long penance, and is primarily observed by women — married and unmarried — who fast and pray for marital happiness and the well-being of their husbands.\n\nThe festival is a celebration of nature's abundance as much as divine love. Women dress in green and glass bangles, swing on flower-decked jhulas hung from trees, sing Teej geet, and celebrate with mehndi and sweets. In Rajasthan, processions carry elaborately dressed idols of Parvati through the streets.",
+    "observances": [
+      "Observe a day-long fast from sunrise to the following morning's sunrise for marital well-being",
+      "Dress in green clothing and apply mehndi on hands and feet",
+      "Swing on a decorated jhula and sing Teej songs as part of the festive celebration",
+      "Offer green sindoor, green bangles, and green flowers to Goddess Parvati",
+      "Perform Teej Puja — worship Parvati and Shiva together as the ideal of conjugal union"
+    ]
+  },
+  "Nag Panchami": {
+    "subtitle": "The worship of serpents",
+    "description": "Nag Panchami, on the fifth day of the bright fortnight of Shravana, is the day dedicated to serpent worship across India. Snakes are associated with Shiva (who wears the serpent Vasuki), Vishnu (who rests on Shesha), and the earth itself — protectors of grain stores, bringers of rain, guardians of hidden wisdom. Clay or silver images of Naga deities are installed and worshipped, and in some regions live cobras are offered milk and flowers.\n\nThe festival carries a message of respect for all living creatures — the forces of nature that can harm must be propitiated with reverence rather than fear. In agricultural communities snakes are respected as guardians of the fields against rodents, and Nag Panchami is that gratitude woven into ritual.",
+    "observances": [
+      "Offer milk, turmeric, and flowers to a Naga image or at an anthill",
+      "Do not dig the earth, cut trees, or cook on a hot iron tawa today — the earth is the domain of serpents",
+      "Visit a temple where Naga idols or reliefs are enshrined and offer abhishek",
+      "Recite the Nag Gayatri or Nag Panchami mantra for protection",
+      "Fast through the day or eat only once, without fried foods"
+    ]
+  },
+  "Raksha Bandhan": {
+    "subtitle": "The bond of protection between siblings",
+    "description": "Raksha Bandhan — the bond of protection — is celebrated on the full moon of Shravana, when sisters tie a rakhi (a sacred thread of silk and gold) on their brothers' wrists and brothers pledge to protect and care for them. The rakhi is not merely ornamental: it is a ritual of intention, an embodiment of the relationship itself.\n\nThe roots run deep. Indra's wife Sachi tied a sacred thread on Indra's wrist before his battle with the asuras. Draupadi tore a strip from her sari and tied it on Krishna's bleeding wrist; Krishna repaid the debt by protecting her honour during the dice game. The thread is small but its meaning is the whole fabric of mutual love and obligation.",
+    "observances": [
+      "Sisters tie the rakhi on their brothers' right wrist after performing a short aarti with a lamp and sweets",
+      "Brothers offer a gift and make a pledge of care and protection",
+      "Prepare or share traditional sweets — kheer, ladoo, or ghewar",
+      "Bathe and wear new or clean clothes before the ceremony",
+      "If separated by distance, send the rakhi by post — the thread carries the intention regardless of miles"
+    ]
+  },
+  "Hartalika Teej": {
+    "subtitle": "Parvati's ultimate penance",
+    "description": "Hartalika Teej is the strictest of the Teej festivals, observed on the third day of the bright fortnight of Bhadrapada. The name comes from 'harit' (to abduct) and 'aalika' (companion) — Parvati's friends took her into the forest to prevent her father from arranging an unwanted marriage, allowing her to continue her penance for Shiva. She made a clay image of Shiva in the forest and worshipped it through the night — and Shiva appeared and accepted her.\n\nThe fast is the most austere of the Teej observances: women observe a nirjala fast (no water, no food) through the entire day and night, sleeping on the floor and keeping a nightlong vigil. The festival is predominantly observed in Maharashtra, Chhattisgarh, Jharkhand, and parts of Uttar Pradesh.",
+    "observances": [
+      "Observe the nirjala fast — no food, no water — through the day and night until the following morning",
+      "Keep a nightlong jagran in prayer and singing of Teej geet",
+      "Make or procure clay images of Parvati and Shiva and perform Hartalika Puja through the night",
+      "Apply mehndi, wear green clothing, and adorn with full jewellery as an expression of devotion",
+      "Break the fast on Chaturthi morning with water, then food, after puja"
+    ]
+  },
+  "Ganesh Chaturthi": {
+    "subtitle": "The birth of Ganesha",
+    "description": "Ganesh Chaturthi celebrates the birth of Ganesha — the elephant-headed son of Parvati, remover of obstacles, lord of beginnings and patron of scholars and artists — on the fourth day of the bright fortnight of Bhadrapada. The festival lasts ten days, culminating in the immersion (visarjan) of Ganesha's clay image. Bal Gangadhar Tilak transformed it in 1893 from a household observation into a great public festival as a means of uniting people across caste in the face of colonial rule.\n\nIn Maharashtra the Chaturthi is the largest festival of the year. Elaborate clay figures — some reaching thirty feet — are installed in neighbourhood pandals. Each morning and evening, artis ring out to the sound of dhol-tasha, and the final day's immersion procession draws millions.",
+    "observances": [
+      "Install a clay Ganesha idol and perform Pranapratishtha (inviting the deity into the image)",
+      "Offer modak — steamed or fried rice-flour dumplings, Ganesha's favourite — along with durva grass and red flowers",
+      "Perform Chaturthi Puja at Madhyahna (midday), the prescribed time for the main worship",
+      "Observe the festival for 1.5, 5, 7, or 10 days before performing visarjan",
+      "Do not view the moon on this night — seeing the moon on Ganesh Chaturthi is said to invite false accusation"
+    ]
+  },
+  "Krishna Janmashtami": {
+    "subtitle": "The birth of Lord Krishna",
+    "description": "Krishna Janmashtami celebrates the birth of Krishna — the eighth avatar of Vishnu, divine cowherd, lover of Radha, charioteer of Arjuna, teacher of the Bhagavad Gita — born at midnight on the eighth day of the dark fortnight of Bhadrapada in the prison cell of Mathura. His birth was miraculous: chains fell from his parents' wrists, prison guards slept, and the Yamuna parted to allow his father to carry him across to safety in Gokul.\n\nThe midnight hour of his birth is the axis of the festival. Temples resonate with bhajans until midnight, when the ceremony reaches its peak — the rocking of a small cradle containing Krishna's image, and the shattering of a pot of buttermilk (Dahi Handi) as devotees climb human pyramids, re-enacting his childhood mischief of stealing butter from Yashoda.",
+    "observances": [
+      "Fast through the day, breaking only after midnight puja",
+      "Stay awake until midnight singing bhajans and kirtan, and rock Krishna's cradle at the birth moment",
+      "Decorate the mandir with flowers and a small jhula (cradle) for the infant Krishna",
+      "Offer panchamrit abhishek with makhan (fresh butter) and mishri to Krishna's idol",
+      "Read the Bhagavata Purana's tenth canto, which contains Krishna's birth story in full"
+    ]
+  },
+  "Anant Chaturdashi": {
+    "subtitle": "The vow of the infinite Vishnu",
+    "description": "Anant Chaturdashi falls on the fourteenth day of the bright fortnight of Bhadrapada and is dedicated to Ananta — the infinite form of Vishnu who rests on the endless serpent Shesha. The central ritual is the tying of the anant sutra — a sacred thread of fourteen knots, dyed yellow or saffron, tied on the right wrist after puja — symbolising a connection to the infinite and a prayer for protection and abundance.\n\nAnant Chaturdashi is also the tenth and final day of Ganesh Chaturthi, when Ganesha's clay image is carried in procession to the river for visarjan. The convergence of Ganesha's departure and Vishnu's observance gives the day a specially significant character.",
+    "observances": [
+      "Tie the anant sutra — a yellow thread with fourteen knots — on the right wrist after puja to Ananta Vishnu",
+      "Perform Satyanarayan Puja or recite the Anant Vrat Katha",
+      "If observing Ganesh Chaturthi, participate in the visarjan procession on this tenth day",
+      "Fast through the day and break with sattvic prasad",
+      "Offer yellow flowers, tulsi, and sesame seeds to Vishnu"
+    ]
+  },
+  "Jivitputrika Vrat (Jitiya)": {
+    "subtitle": "A mother's fast for her children's long life",
+    "description": "Jivitputrika Vrat — known as Jitiya in Bihar, Jharkhand, and Nepal — is observed by mothers on the eighth day of the dark fortnight of Ashwina for the long life, health, and protection of their children. It is a three-day observance: Nahai-Khai (bathing and eating), the nirjala vrat day (no food, no water through the day and night), and Paaran (the breaking of the fast). It is one of the most rigorous maternal fasts in the Hindu calendar.\n\nThe central story is of Jimutvahana, a prince who sacrificed his own body to save a serpent from Garuda's daily hunt, and whose selfless act was rewarded with the restoration of all Garuda's past victims. Mothers identify with his willingness to give everything for the life of another.",
+    "observances": [
+      "On Nahai-Khai (Day 1), bathe at dawn and eat an auspicious meal — the last food before the fast",
+      "On the vrat day (Day 2), observe a complete nirjala fast — no food, no water — through day and night",
+      "Listen to the Jitiya Katha through the day of the fast",
+      "On Paaran (Day 3), bathe at dawn and break the fast with a sattvic meal after puja",
+      "Offer food and gifts to your children as a blessing and completion of the vow"
+    ]
+  },
+  "Mahalaya Amavasya": {
+    "subtitle": "The great new moon of the ancestors",
+    "description": "Mahalaya Amavasya is the most significant day of Pitru Paksha — the sixteen-day period in the dark fortnight of Ashwina dedicated to the ancestors. On this new moon, the souls of all ancestors — not just those for whom one knows the specific tithi — are believed to receive the offerings made on their behalf. It is the final day of the ancestral fortnight, after which the Goddess descends for Navratri.\n\nIn Bengal, Mahalaya marks the awakening of Goddess Durga, who descends from Kailash to earth at dawn. The recitation of Mahishasura Mardini at dawn — broadcast by All India Radio since 1931 — has become one of Bengal's most beloved cultural rituals. Rivers are visited at dawn for tarpan: the offering of water with sesame seeds to the ancestors.",
+    "observances": [
+      "Perform tarpan at the river or at home — offer water mixed with sesame seeds, kusha grass, and rice while chanting the ancestors' names",
+      "Cook kheer or the favourite food of ancestors who have passed, and offer it with a lit lamp",
+      "Donate food, clothing, and sesame seeds in the name of your ancestors",
+      "Listen to the Mahishasura Mardini at dawn (especially significant in Bengal)",
+      "Light a lamp facing south — the direction of Yama and the ancestors — in the evening"
+    ]
+  },
+  "Sharad Navratri": {
+    "subtitle": "Nine nights of the Goddess",
+    "description": "Sharad Navratri — the autumnal nine nights — is the most widely observed Navratri, beginning on the first day of the bright fortnight of Ashwina. For nine consecutive nights, Goddess Durga is worshipped in her nine forms (the Navadurga): Shailputri, Brahmacharini, Chandraghanta, Kushmanda, Skandamata, Katyayani, Kalaratri, Mahagauri, and Siddhidatri. The nine nights culminate in Maha Ashtami, Maha Navami, and Vijayadashami.\n\nIn Gujarat, the nine nights ring with garba and dandiya-raas — circular devotional dances performed around the Goddess, building in intensity through the night. In West Bengal, the last four days are Durga Puja, when elaborate clay idols of the ten-armed Durga slaying Mahishasura are installed in public pandals and worshipped with elaborate ceremony.",
+    "observances": [
+      "Keep a nine-day fast or sattvic diet — many observe fruit-only (phalahar) through all nine days",
+      "Light an akhand diya at the opening of Navratri and keep it burning through all nine nights",
+      "Worship the day's specific Navadurga form with fresh flowers, sindoor, and the appropriate bhog",
+      "Recite the Durga Saptashati over the nine days — one or more chapters per day",
+      "Perform garba or dandiya-raas in the evenings as communal devotional practice"
+    ]
+  },
+  "Golu": {
+    "subtitle": "The doll display of Tamil Nadu",
+    "description": "Golu — also called Bommai Kolu, meaning 'doll assembly' — is the Tamil Nadu tradition of displaying dolls and figurines on a stepped wooden frame (the padi) during Sharad Navratri. The padi is always built with an odd number of tiers — three, five, seven, or nine — and the display is arranged with deities at the top, mythological figures in the middle, and craft dolls and miniature village scenes on the lower steps.\n\nFamilies bring out their collection of inherited kolu dolls, supplemented with new additions each year. Women invite neighbours to see the display, offering them turmeric-kumkum, betel leaf and areca nut, and sweet sundal. A fresh sundal — spiced boiled legumes — is prepared daily as prasad. The tradition celebrates the abundance of creation and the presence of the divine in all forms of life.",
+    "observances": [
+      "Set up the padi on an odd number of tiers on the first day of Navratri; arrange deities at the top and craft dolls below",
+      "Display family heirloom kolu dolls alongside new additions — adding at least one new pair each year is traditional",
+      "Invite women neighbours to view the golu and offer them turmeric-kumkum, betel leaf, and small gifts",
+      "Prepare a different sundal (spiced boiled legumes or pulses) each day as naivedyam and distribute to visitors",
+      "Dismantle the display reverently on Vijayadashami after prayers and pack the dolls away carefully for next year"
+    ]
+  },
+  "Maha Ashtami": {
+    "subtitle": "The great eighth night",
+    "description": "Maha Ashtami falls on the eighth day of the bright fortnight of Ashwina during Sharad Navratri — or the eighth of Chaitra during Chaitra Navratri — and is one of the three most powerful days of the nine-night festival. It is dedicated to Durga's fiercer forms and is marked by Sandhi Puja: an offering performed at the precise junction between the eighth and ninth tithis, when the Goddess is believed to be most actively present.\n\nIn the Bengali Durga Puja tradition, Ashtami is the day of the great Pushpanjali — the offering of flowers in the triple handful, performed three times while reciting Sanskrit hymns. The day culminates at the sandhi hour in the Sandhi Puja, with 108 lamps and 108 lotus flowers offered in a ceremony of extraordinary beauty.",
+    "observances": [
+      "Perform Kanya Puja: invite and worship nine young girls as embodiments of the nine Durgas, offering them food, new clothes, and dakshina",
+      "Observe Sandhi Puja at the precise junction of Ashtami and Navami with 108 lamps",
+      "Fast through Ashtami, breaking only after the evening aarti",
+      "Offer blue or purple flowers to the Goddess and recite the Devi Kavach",
+      "Participate in Pushpanjali — the group flower offering with Sanskrit recitation (Durga Puja tradition)"
+    ]
+  },
+  "Maha Navami": {
+    "subtitle": "The ninth — victory on the threshold",
+    "description": "Maha Navami is the ninth day of Sharad Navratri, dedicated to Goddess Siddhidatri — the giver of all siddhis — and is the penultimate day before Vijayadashami. In South India the same day is Ayudha Puja: all tools, weapons, vehicles, and instruments are worshipped and decorated with flowers in recognition that the divine is present in the instruments through which one earns one's livelihood.\n\nIn North Indian households, the Navami feast (navami bhoj) is prepared and served to the nine young girls worshipped on Ashtami, concluding the Kanya Puja with a shared meal. The nine-day reading of the Durga Saptashati is completed with the final chapters and closing prayers.",
+    "observances": [
+      "Perform Ayudha Puja — clean, decorate, and worship your tools, instruments, and vehicle with flowers and vermilion",
+      "Complete the nine-day Durga Saptashati reading with its final chapters and closing stotras",
+      "Conclude Kanya Puja with the feeding of young girls and a gift of new clothes",
+      "Offer Navami bhog to the Goddess and share it as prasad with the household",
+      "Fast through Navami or eat only prasad"
+    ]
+  },
+  "Vijayadashami": {
+    "subtitle": "The victory of dharma",
+    "description": "Vijayadashami — the tenth day of victory — marks the culmination of Sharad Navratri and one of the most auspicious days in the Hindu calendar. It commemorates two great victories on the same day: Rama's defeat of Ravana after nine days of battle, and Durga's slaying of Mahishasura at the end of her nine-night battle. Both stories embody the same truth: that righteousness, however tested, ultimately prevails.\n\nAcross North India, effigies of Ravana, Kumbhakarna, and Meghanada — towering figures stuffed with firecrackers — are set ablaze to shouts of 'Jai Shri Ram.' In Bengal, the end of Durga Puja brings the deeply moving immersion of Durga's clay image into the river, with the farewell ululation of women and the sound of dhol.",
+    "observances": [
+      "Attend the burning of Ravana's effigy at the local Dussehra ground in the evening",
+      "Begin a new undertaking, skill, or journey — Vijayadashami is the most auspicious day for new beginnings",
+      "Perform Aparajita Puja — worship of the undefeated Goddess — in the afternoon",
+      "Exchange shami or apta leaves with family as a symbol of gold and good wishes",
+      "In Bengal, bid farewell to Goddess Durga with sindoor dan and the visarjan procession"
+    ]
+  },
+  "Sharad Purnima": {
+    "subtitle": "The nectar moon",
+    "description": "Sharad Purnima — the full moon of autumn — is considered the most beautiful full moon of the year. On this night the moon is believed to pour amrit (divine nectar) from its rays onto everything left outdoors, and all sixteen kalas (phases of beauty and energy) of the moon are fully manifest simultaneously — a singular night.\n\nIn the Vaishnava tradition, Sharad Purnima is the night of Krishna's Maharaas — the great circular dance he performed with the gopis on the banks of the Yamuna in Vrindavan. For them the night stretched beyond time. In many households, kheer is left in the moonlight overnight and distributed the following morning as prasad infused with the moon's healing rays.",
+    "observances": [
+      "Prepare kheer and leave it in an open vessel in the moonlight through the night — eat it the following morning as amrit-infused prasad",
+      "Stay awake through the night singing bhajans or listening to the Maharaas story",
+      "Sit outdoors in the moonlight — this night's moonbathing is considered healing",
+      "Offer white flowers and kheer to Vishnu and Lakshmi in the evening puja",
+      "Recite the Rasa Panchadhyayi — the five Bhagavata chapters describing the Maharaas"
+    ]
+  },
+  "Karva Chauth": {
+    "subtitle": "A wife's fast for her husband's long life",
+    "description": "Karva Chauth is observed on the fourth day of the dark fortnight of Kartika by married women — a full-day fast from sunrise to moonrise for the long life, health, and well-being of their husbands. The fast is strict: no water, no food from the predawn sargi meal through to the first sight of the moon. Women dress in bridal finery and gather in groups during the afternoon to listen to the Karva Chauth Katha.\n\nAt moonrise, women perform a ritual of great beauty: they view the moon through a sieve, then view their husband's face through the same sieve, then receive water from his hand — and the fast is broken. The ceremony has made Karva Chauth one of the most observed and beloved of North Indian festivals.",
+    "observances": [
+      "Eat the sargi (predawn meal) before sunrise — the only food allowed until moonrise",
+      "Dress in bridal finery: red or orange clothing, full jewellery, mehndi, and sindoor",
+      "Gather in the afternoon to listen to the Karva Chauth Katha with other fasting women",
+      "At moonrise, view the moon through a sieve, then your husband's face through the same sieve",
+      "Receive water from your husband's hand to break the fast, then offer him water in return"
+    ]
+  },
+  "Ahoi Ashtami": {
+    "subtitle": "A mother's fast for her children",
+    "description": "Ahoi Ashtami is observed on the eighth day of the dark fortnight of Kartika by mothers who fast from sunrise to the appearance of stars for the long life and well-being of their children. The Ahoi Mata — a goddess depicted with stars — is drawn on the wall in fresh clay and worshipped in the evening. The observance is most prevalent in Uttar Pradesh, Punjab, and Haryana, and falls eight days before Diwali.\n\nThe Ahoi Katha tells of a woman who accidentally injured the young of a wild animal while digging clay, and who observed this fast as atonement and received the blessing that all her children would live long and prosper.",
+    "observances": [
+      "Fast from sunrise to the appearance of stars in the evening",
+      "Draw or display the Ahoi Mata image on the wall and perform the evening puja",
+      "Listen to the Ahoi Ashtami Katha in the company of other fasting mothers",
+      "View the stars through a sieve before breaking the fast",
+      "Offer puri, halwa, and kheer as prasad to Ahoi Mata and distribute to children"
+    ]
+  },
+  "Dhanteras": {
+    "subtitle": "The wealth of Dhanvantari",
+    "description": "Dhanteras falls two days before Diwali on the thirteenth day of the dark fortnight of Kartika. It marks the appearance of Dhanvantari — physician of the gods and an avatar of Vishnu — who emerged from the churning of the primordial ocean carrying a pot of amrita and the science of Ayurveda. The day is auspicious for purchases: gold, silver, and metal utensils bought today are believed to multiply and bring prosperity.\n\nThe evening is marked by the lighting of lamps at the threshold — thirteen diyas placed facing south to ward off Yama, for the day also carries associations with protection from untimely death. Lakshmi is invoked at sunset and her footprints are drawn in rice flour leading into the house.",
+    "observances": [
+      "Purchase gold, silver, or metal utensils — all purchases on Dhanteras bring auspiciousness",
+      "Light thirteen diyas in the evening, one facing south for protection",
+      "Draw Lakshmi's footprints in rice flour at the threshold and invite her into the home",
+      "Perform Dhanvantari Puja and Lakshmi Puja in the evening",
+      "Donate medicines or to a health charity — connecting to Dhanvantari's gift of healing"
+    ]
+  },
+  "Naraka Chaturdashi": {
+    "subtitle": "The slaying of Narakasura",
+    "description": "Naraka Chaturdashi — Chhoti Diwali, Roop Chaturdashi — falls the day before Diwali on the fourteenth of the dark fortnight of Kartika. It commemorates Krishna's dawn battle against the demon Narakasura, who had imprisoned sixteen thousand women and stolen divine treasures. Krishna (aided by his wife Satyabhama) killed Narakasura at dawn, freed the captives, and returned home before sunrise to celebrate with an oil bath.\n\nThe oil bath before sunrise is the central ritual: waking before dawn and applying sesame or coconut oil to the body before bathing is believed to wash away all sins and ward off Yama. In the evening, a diya is lit facing south. Firecrackers and lamps are lit across the country in anticipation of Diwali.",
+    "observances": [
+      "Wake before sunrise, apply sesame oil to the body, and bathe before dawn — this ritual bath removes sin",
+      "Light the Narak Chaturdashi diya facing south in the evening",
+      "Light firecrackers and decorate the entrance with diyas and rangoli",
+      "Apply ubtan (fragrant powder) and wear new clothes after the dawn bath",
+      "Visit Krishna temples and offer thanks for the defeat of Narakasura"
+    ]
+  },
+  "Diwali": {
+    "subtitle": "The festival of lights",
+    "description": "Diwali — the festival of lights — falls on the new moon of Kartika, the darkest night of the autumn. Rows of diyas are lit at every threshold and window, and firecrackers paint the sky with light, celebrating the victory of light over darkness. The festival marks the return of Rama to Ayodhya after fourteen years of exile — the people lit lamps to welcome him home.\n\nDiwali is also the night of Lakshmi Puja: the goddess of wealth is believed to visit homes that are clean, well-lit, and welcoming. The evening puja begins at Pradosh — the two hours after sunset — with Lakshmi and Ganesha worshipped together. For merchants, this is the final day of the financial year and new account books are opened after puja.",
+    "observances": [
+      "Light diyas in every room, at the threshold, and along windows at dusk",
+      "Perform Lakshmi-Ganesha Puja at the Pradosh muhurta — the first two hours after sunset",
+      "Distribute sweets and gifts to family, friends, and neighbours",
+      "Merchants: open the new account book (Chopda Puja) after puja as the new financial year begins",
+      "Clean and decorate the home thoroughly in the days before — Lakshmi does not enter a home that is unclean",
+      "Light firecrackers with consideration for neighbours, children, and animals"
+    ]
+  },
+  "Govardhan Puja": {
+    "subtitle": "Krishna lifts the hill",
+    "description": "Govardhan Puja — Annakut — falls on the first day of the bright fortnight of Kartika, the day after Diwali. It commemorates Krishna's lifting of the Govardhan hill on his little finger for seven days to shelter the people of Gokul from torrential rain sent by a wrathful Indra. When Indra relented, he acknowledged Krishna as the community's true protector.\n\nThe central ritual is the preparation of Annakut — literally 'mountain of food' — a vast offering of vegetarian dishes piled in the shape of Govardhan hill, offered to Krishna and then distributed as prasad. In Mathura and Vrindavan, thousands perform the Govardhan parikrama (circumambulation) on this day.",
+    "observances": [
+      "Prepare a wide variety of vegetarian dishes and pile them into an Annakut offering to Krishna",
+      "Draw or build a model of Govardhan hill from cow dung and worship it with flowers and diyas",
+      "Perform the parikrama of the Govardhan hill, or walk around the home's Annakut offering",
+      "Offer the Annakut prasad first to Krishna and then distribute to the household",
+      "Bring cattle to be blessed — farmers decorate their cows with flowers on this day"
+    ]
+  },
+  "Bhai Dooj": {
+    "subtitle": "The bond between brother and sister",
+    "description": "Bhai Dooj — Bhai Beej, Yama Dwitiya — falls on the second day of the bright fortnight of Kartika, two days after Diwali. Sisters welcome their brothers for a meal, apply tilak to their forehead, perform aarti, and pray for their long life. Brothers offer gifts and pledges of care.\n\nThe festival's origin story is Yama visiting his sister Yamuna on this day — she received him with great joy, applied tilak to his forehead, and they ate together. Yama announced that any brother who receives his sister's tilak and shares a meal with her on this day will be protected from untimely death.",
+    "observances": [
+      "Sisters apply tilak to their brothers' forehead with rice, curd, and sindoor",
+      "Perform aarti for the brother and pray for his long life and good health",
+      "Prepare a home-cooked meal and eat together — this shared meal is the heart of the festival",
+      "Brothers offer gifts and pledge their love and care",
+      "If separated by distance, send a gift and acknowledge the bond — the intention carries across miles"
+    ]
+  },
+  "Chhath — Nahay Khay": {
+    "subtitle": "Chhath Puja Day 1 — the purifying bath",
+    "description": "Chhath Puja is the four-day worship of Surya (the sun god) and Chhathi Maiya, observed primarily in Bihar, Jharkhand, Uttar Pradesh, and among the diaspora. It is one of the oldest solar rituals in continuous practice, with no priest — every rite is performed personally by the vratin (devotee). Nahay Khay — 'bathe and eat' — is the first day, in which the vratin takes a ritual bath in a sacred river or lake, returns home to cook a single sattvic meal in new earthen vessels, and eats only this.\n\nChhath is observed by women and increasingly by men, for the health of children and the family, and in fulfilment of vows made in times of difficulty. The purity established on this first day continues through all four.",
+    "observances": [
+      "Bathe in a river, lake, or pond at dawn",
+      "Cook bottle gourd and chana dal in earthen or copper vessels — no onion, garlic, or oil",
+      "Eat this single sattvic meal in a purified state",
+      "Begin preparing the bamboo baskets (sup) and prasad items — thekua and seasonal fruits — for the offerings ahead"
+    ]
+  },
+  "Chhath — Kharna": {
+    "subtitle": "Chhath Puja Day 2 — the evening fast-break",
+    "description": "Kharna — 'lohanda and kheer' — is the second day of Chhath Puja and marks the beginning of the most intensive part of the fast. The vratin fasts without water all day, then in the evening prepares kheer (rice pudding with jaggery) and roti on a clay chulha using mango wood. After sunset, the vratin eats this kheer — and then begins a 36-hour nirjala fast that will last through the Usha Arghya the following morning.\n\nThe Kharna kheer is offered first to Chhathi Maiya, then the neighbourhood is invited to share the prasad, and the house fills with warmth before the long fast begins.",
+    "observances": [
+      "Fast without water through the day until the evening offering",
+      "Cook kheer and roti on a clay stove using mango wood in a freshly cleaned kitchen",
+      "Offer the kheer to Chhathi Maiya before eating",
+      "Invite neighbours and family to share the prasad",
+      "Begin the 36-hour nirjala fast after eating — no food or water until the morning arghya"
+    ]
+  },
+  "Chhath — Sandhya Arghya": {
+    "subtitle": "Chhath Puja Day 3 — the evening offering to the setting sun",
+    "description": "Sandhya Arghya — 'the evening offering' — is the heart of Chhath Puja. Devotees go to the river in the late afternoon and stand in the water as the sun sets, offering arghya (water from cupped hands) to the setting sun while holding bamboo baskets (sup) filled with prasad: thekua (fried wheat-jaggery biscuits), sugarcane, coconut, and seasonal fruits.\n\nThe riverbank at Chhath evening transforms into a festival of extraordinary beauty — thousands of diyas glow in the water, families gather in prayer, and the air carries Chhath geet (traditional songs of the sun). The 36-hour nirjala fast continues through the night.",
+    "observances": [
+      "Reach the river or water body before sunset and prepare the prasad baskets",
+      "Stand in the water facing west and offer arghya to the setting sun",
+      "Offer thekua, sugarcane, coconut, and seasonal fruits in the bamboo baskets",
+      "Sing Chhath geet through the evening",
+      "The 36-hour nirjala fast continues — no food or water through the night"
+    ]
+  },
+  "Chhath — Usha Arghya": {
+    "subtitle": "Chhath Puja Day 4 — the dawn offering and breaking of the fast",
+    "description": "Usha Arghya — 'the dawn offering' — is the fourth and final day of Chhath Puja. Devotees return to the water before sunrise and offer arghya to the rising sun as it first appears above the horizon. This dawn offering, made as the nirjala fast enters its 36th hour, is the culmination of the entire observance — the exhausted vratin standing in cold river water, watching the sun rise while offering water with cupped hands.\n\nAfter the offering, the fast is broken. The household erupts in celebration and prasad — the thekua and fruits blessed by the sun's touch over three days — is distributed widely to neighbours and the community.",
+    "observances": [
+      "Arrive at the water before sunrise and stand facing east",
+      "Offer arghya to the rising sun as it first appears above the horizon",
+      "Present the bamboo baskets of prasad as on the previous evening",
+      "Return home and break the fast — first with ginger water or Kharna kheer, then with a meal",
+      "Distribute prasad generously — the thekua and fruit of Chhath are considered especially blessed"
+    ]
+  },
+  "Devutthana Ekadashi": {
+    "subtitle": "Vishnu awakens from his four-month sleep",
+    "description": "Devutthana Ekadashi — Prabodhini Ekadashi, the awakening Ekadashi — marks the end of Chaturmas: Lord Vishnu awakens on this day in Kartika. With his awakening, the auspicious season resumes: marriages, celebrations, and new ventures that were suspended through the monsoon months begin again. Monks who stayed in one place are free to travel; the sound of wedding drums returns.\n\nThe day also opens the Tulsi Vivah season — the sacred marriage of Tulsi (an earthly form of Vishnu's consort) with Vishnu in the form of Shaligrama. This brief season runs through Kartik Purnima.",
+    "observances": [
+      "Fast through the day and stay awake through the night in vigil for Vishnu's awakening",
+      "Perform a lamp-lighting ceremony at Vishnu's image or Shaligrama at the auspicious hour",
+      "Recite the Vishnu Sahasranama and offer tulsi, yellow flowers, and panchamrit",
+      "Begin planning auspicious occasions — marriages or griha pravesh — now that Vishnu is awake",
+      "Visit a Vishnu temple and participate in the community celebration of the Lord's awakening"
+    ]
+  },
+  "Tulsi Vivah": {
+    "subtitle": "The sacred marriage of Tulsi and Vishnu",
+    "description": "Tulsi Vivah is the ceremonial marriage of the holy basil plant to Lord Vishnu in the form of Shaligrama or Bal Krishna, performed on the twelfth day of the bright fortnight of Kartika. The ceremony follows the full ritual of a Hindu wedding: the tulsi plant is decorated with a red border, jewellery, and a wedding canopy of sugarcane, while the Shaligrama or Krishna image is dressed as a groom. Vivah mantras are recited and the ceremony officiated by a priest.\n\nTulsi was a woman named Vrinda in a previous life whose piety earned her the honour of becoming Vishnu's most sacred plant. Performing or witnessing a Tulsi Vivah is considered equivalent to the merit of conducting one's own daughter's wedding, and after this day the season of human weddings opens.",
+    "observances": [
+      "Decorate the tulsi plant with a red border, flowers, and jewellery, and place a sugarcane canopy above it",
+      "Perform the Tulsi Vivah ceremony following the rites of a Hindu marriage",
+      "Offer sweets, fruits, and coconut as wedding prasad",
+      "Invite the community — witnessing Tulsi Vivah brings the merit of attending a daughter's wedding",
+      "Light diyas around the tulsi plant through the night"
+    ]
+  },
+  "Kartik Purnima": {
+    "subtitle": "Tripuri Purnima — the full moon of Kartika",
+    "description": "Kartik Purnima is one of the most sacred full moons of the year. It is Tripuri Purnima — the day Shiva destroyed the three flying cities of the asuras (the Tripura) with a single arrow made of the earth, sky, and sun. It is also the day Vishnu celebrated his awakening with a great illumination, and the day Guru Nanak, the founder of Sikhism, was born.\n\nThe lighting of the akash deep — a lamp elevated on a tall bamboo pole directed toward the sky — is a signature ritual of this full moon. In Varanasi, the entire river front is transformed on Dev Deepawali into the most spectacular night of the year, as hundreds of thousands of diyas illuminate every ghat from top to water's edge.",
+    "observances": [
+      "Bathe in a sacred river at dawn — Kartik Purnima bathing is among the most meritorious of all tirthas",
+      "Light the akash deep — a lamp elevated on a tall pole directed toward the sky — at dusk",
+      "Float diyas on the river or a water body in the evening",
+      "Visit a Shiva temple and offer bilva leaves in remembrance of the destruction of Tripura",
+      "In Varanasi: witness or participate in Dev Deepawali, the illumination of all the ghats with earthen lamps"
+    ]
+  },
+  "Gita Jayanti": {
+    "subtitle": "The day the Bhagavad Gita was spoken",
+    "description": "Gita Jayanti marks the day Lord Krishna spoke the Bhagavad Gita to Arjuna on the battlefield of Kurukshetra, on the eleventh day of the bright fortnight of Margashirsha, before the first arrow of the Mahabharata war was fired. The eighteen chapters — spoken in a single morning — contain the complete philosophy of dharma, action, knowledge, and devotion that forms the core of Hindu thought.\n\nMargashirsha is the month described by Krishna in the Gita as the one among months that is him: 'mAsinAm mArgashIrShoham.' Temples conduct continuous recitations through the day, and the text is read aloud in homes and community gatherings across India.",
+    "observances": [
+      "Read all eighteen chapters of the Bhagavad Gita, or at least Chapter 11 (Vishwarupa Darshana) today",
+      "Attend a satsang or dharma talk on the Gita's teachings",
+      "Fast or eat simply, dedicating the day to study",
+      "Recite the Gita Dhyanam and Gita Mahatmya",
+      "Gift a copy of the Bhagavad Gita to someone for whom it might open a door"
+    ]
+  }
+}

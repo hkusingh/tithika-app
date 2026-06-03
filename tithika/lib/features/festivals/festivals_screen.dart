@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/app_strings.dart';
 import '../../core/festival_names.dart';
 import '../../core/theme.dart';
+import '../../models/app_settings.dart';
 import '../../state/providers.dart';
 import '../shared/starfield_background.dart';
 import '../shared/page_title_bar.dart';
 import '../shared/tithika_nav_bar.dart';
+import '../shared/tithika_tab_bar.dart';
+import 'festival_detail_sheet.dart';
 
 const _weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const _monthNames = [
@@ -77,6 +81,7 @@ IconData _festivalIcon(String name) {
   if (n.contains('anant')) return Icons.all_inclusive_rounded;
   if (n.contains('gita')) return Icons.menu_book_rounded;
   if (n.contains('rath yatra')) return Icons.directions_boat_rounded;
+  if (n.contains('golu') || n.contains('kolu')) return Icons.auto_awesome_rounded;
   if (n.contains('ekadashi')) return Icons.brightness_3_rounded;
   if (n.contains('purnima')) return Icons.brightness_5_rounded;
   if (n.contains('ashtami') || n.contains('navami')) {
@@ -107,17 +112,23 @@ class _FestivalsScreenState extends ConsumerState<FestivalsScreen> {
   void _scrollToCurrentMonth() {
     if (_scrolledToMonth) return;
     _scrolledToMonth = true;
-    // Two post-frame callbacks: the first waits for the ListView to build,
-    // the second waits for it to complete layout so off-screen items have
-    // valid render objects and Scrollable.ensureVisible can find them.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) return;
-        final ctx = _currentMonthKey.currentContext;
-        if (ctx != null) {
-          Scrollable.ensureVisible(ctx, alignment: 0.0, duration: Duration.zero);
+      if (!mounted) return;
+      final ctx = _currentMonthKey.currentContext;
+      if (ctx != null && _scrollController.hasClients) {
+        final renderObject = ctx.findRenderObject();
+        if (renderObject != null) {
+          final viewport = RenderAbstractViewport.maybeOf(renderObject);
+          if (viewport != null) {
+            final pos = _scrollController.position;
+            final offset = viewport
+                .getOffsetToReveal(renderObject, 0.0)
+                .offset
+                .clamp(pos.minScrollExtent, pos.maxScrollExtent);
+            _scrollController.jumpTo(offset);
+          }
         }
-      });
+      }
     });
   }
 
@@ -221,6 +232,9 @@ class _FestivalsScreenState extends ConsumerState<FestivalsScreen> {
                       final months = byMonth.keys.toList()..sort();
 
                       final items = <Widget>[];
+                      if (_showEkadashi) {
+                        items.add(_EkadashiIntro(language: language));
+                      }
                       for (final m in months) {
                         items.add(_MonthCard(
                           key: m == currentMonth ? _currentMonthKey : null,
@@ -257,12 +271,17 @@ class _FestivalsScreenState extends ConsumerState<FestivalsScreen> {
 
                       return ListView(
                         controller: _scrollController,
+                        // Ensure all month cards are rendered on first layout
+                        // so the GlobalKey lookup for the current month
+                        // succeeds before the user has scrolled at all.
+                        scrollCacheExtent: const ScrollCacheExtent.pixels(9999),
                         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
                         children: items,
                       );
                     },
                   ),
                 ),
+                const TithikaTabBar(),
               ],
             ),
           ),
@@ -441,74 +460,123 @@ class _FestivalRow extends ConsumerWidget {
     final mo = _monthNamesShort[date.month - 1];
     final gregDate = '$wd, $mo ${date.day}';
 
-    return Container(
-      decoration: BoxDecoration(
-        border: showDivider
-            ? Border(bottom: BorderSide(color: colors.line))
-            : null,
-      ),
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
-      child: Row(
-        children: [
-          // Icon chip
-          Container(
-            width: 34,
-            height: 34,
-            decoration: BoxDecoration(
-              color: colors.festival.withValues(alpha: 0.14),
-              borderRadius: BorderRadius.circular(10),
+    return GestureDetector(
+      onTap: () => showFestivalDetail(context, entry),
+      child: Container(
+        decoration: BoxDecoration(
+          border: showDivider
+              ? Border(bottom: BorderSide(color: colors.line))
+              : null,
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
+        child: Row(
+          children: [
+            // Icon chip
+            Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                color: colors.festival.withValues(alpha: 0.14),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                _festivalIcon(canonical),
+                color: colors.festival,
+                size: 18,
+              ),
             ),
-            child: Icon(
-              _festivalIcon(canonical),
-              color: colors.festival,
-              size: 18,
-            ),
-          ),
-          const SizedBox(width: 11),
-          // Name (+ Ekadashi tag when applicable)
-          Expanded(
-            child: Row(
-              children: [
-                Flexible(
-                  child: Text(
-                    name,
-                    style: scriptStyle(
-                      language,
-                      Theme.of(context).textTheme.bodyMedium,
-                      fontWeight: FontWeight.w600,
-                      color: colors.ink,
-                    ),
-                  ),
-                ),
-                if (entry.isEkadashi) ...[
-                  const SizedBox(width: 6),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                    decoration: BoxDecoration(
-                      color: colors.krishna.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
+            const SizedBox(width: 11),
+            // Name (+ Ekadashi tag when applicable)
+            Expanded(
+              child: Row(
+                children: [
+                  Flexible(
                     child: Text(
-                      AppStrings.ekadashi(language),
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: colors.krishna,
-                            fontSize: 9,
-                            fontWeight: FontWeight.w700,
-                          ),
+                      name,
+                      style: scriptStyle(
+                        language,
+                        Theme.of(context).textTheme.bodyMedium,
+                        fontWeight: FontWeight.w600,
+                        color: colors.ink,
+                      ),
                     ),
                   ),
+                  if (entry.isEkadashi) ...[
+                    const SizedBox(width: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 1),
+                      decoration: BoxDecoration(
+                        color: colors.krishna.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        AppStrings.ekadashi(language),
+                        style:
+                            Theme.of(context).textTheme.labelSmall?.copyWith(
+                                  color: colors.krishna,
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                      ),
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
+            const SizedBox(width: 8),
+            Text(
+              gregDate,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: colors.inkSoft,
+                    fontSize: 11.5,
+                  ),
+            ),
+            const SizedBox(width: 4),
+            Icon(Icons.chevron_right_rounded,
+                size: 16, color: colors.inkMuted),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Ekadashi intro paragraph ──────────────────────────────────────────────────
+
+class _EkadashiIntro extends StatelessWidget {
+  final AppLanguage language;
+  const _EkadashiIntro({required this.language});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = TithikaColors.of(context);
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+      decoration: BoxDecoration(
+        color: colors.krishna.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: colors.krishna.withValues(alpha: 0.20)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Icon(Icons.brightness_3_rounded,
+                color: colors.krishna, size: 15),
           ),
-          const SizedBox(width: 8),
-          Text(
-            gregDate,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: colors.inkSoft,
-                  fontSize: 11.5,
-                ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              AppStrings.ekadashiIntro(language),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: colors.inkSoft,
+                    fontSize: 13,
+                    height: 1.6,
+                  ),
+            ),
           ),
         ],
       ),

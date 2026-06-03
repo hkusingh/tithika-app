@@ -9,6 +9,7 @@ import '../../models/hora_data.dart';
 import '../../state/providers.dart';
 import '../shared/page_title_bar.dart';
 import '../shared/tithika_nav_bar.dart';
+import '../shared/tithika_tab_bar.dart';
 
 class HoraScreen extends ConsumerStatefulWidget {
   const HoraScreen({super.key});
@@ -163,6 +164,7 @@ class _HoraScreenState extends ConsumerState<HoraScreen> {
                 },
               ),
             ),
+            const TithikaTabBar(),
           ],
         ),
       ),
