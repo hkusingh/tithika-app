@@ -5,7 +5,7 @@ import 'notification_settings.dart';
 
 export 'notification_settings.dart';
 
-enum AppLanguage { english, hindiLatin, hindiDevanagari, tamil, bengali }
+enum AppLanguage { english, hindiLatin, hindiDevanagari, tamil, bengali, odia, telugu, malayalam, kannada }
 
 enum MonthSystem { purnimanta, amanta }
 

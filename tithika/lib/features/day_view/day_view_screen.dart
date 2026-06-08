@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/app_strings.dart';
 import '../../core/festival_names.dart';
+import '../../core/router.dart';
 import '../../core/theme.dart';
 import '../../core/time_format.dart';
 import '../../models/app_settings.dart';
@@ -14,6 +15,7 @@ import '../../models/paksha.dart';
 import '../../services/festival_detector.dart';
 import '../../services/providers.dart' as svc;
 import '../../state/providers.dart';
+import '../festivals/festival_detail_sheet.dart';
 import '../shared/starfield_background.dart';
 import '../shared/tithika_nav_bar.dart';
 import '../shared/tithika_tab_bar.dart';
@@ -238,28 +240,15 @@ class _DayContent extends ConsumerWidget {
 
     final baseStyle = Theme.of(context).textTheme.titleLarge;
     final tithiNameStyle = scriptStyle(language, baseStyle, fontSize: 22);
-    final tithiFullName = switch (language) {
-      AppLanguage.hindiDevanagari => data.tithi.fullNameDeva,
-      AppLanguage.tamil           => data.tithi.fullNameTamil,
-      AppLanguage.bengali         => data.tithi.fullNameBengali,
-      _                           => data.tithi.fullNameEn,
-    };
-    final adhikaPrefix  = data.isAdhika ? AppStrings.adhikaPrefix(language) : '';
-    final monthName     = switch (language) {
-      AppLanguage.hindiDevanagari => data.lunarMonth.nameDeva,
-      AppLanguage.tamil           => data.lunarMonth.nameTamil,
-      AppLanguage.bengali         => data.lunarMonth.nameBengali,
-      _                           => data.lunarMonth.nameEn.toUpperCase(),
-    };
+    final tithiFullName  = data.tithi.fullName(language);
+    final adhikaPrefix   = data.isAdhika ? AppStrings.adhikaPrefix(language) : '';
+    final monthBase      = data.lunarMonth.nameFor(language);
+    final monthName      = (language == AppLanguage.english || language == AppLanguage.hindiLatin)
+        ? monthBase.toUpperCase() : monthBase;
     final lunarMonthLabel =
         '$adhikaPrefix$monthName  ·  ${AppStrings.pakshaUpper(data.tithi.paksha, language)} ${AppStrings.pakshaWord(language)}';
     final nakshatraLabel = AppStrings.nakshatra(language);
-    final nakshatraName  = switch (language) {
-      AppLanguage.hindiDevanagari => data.nakshatra.nameDeva,
-      AppLanguage.tamil           => data.nakshatra.nameTamil,
-      AppLanguage.bengali         => data.nakshatra.nameBengali,
-      _                           => data.nakshatra.nameEn,
-    };
+    final nakshatraName  = data.nakshatra.nameFor(language);
 
     return SingleChildScrollView(
       child: Padding(
@@ -305,7 +294,13 @@ class _DayContent extends ConsumerWidget {
           Text(tithiFullName, style: tithiNameStyle),
           if (data.festivalName != null) ...[
             const SizedBox(height: 6),
-            _FestivalBadge(name: FestivalNames.localize(data.festivalName!, language)!),
+            _FestivalBadge(
+              name: FestivalNames.localize(data.festivalName!, language)!,
+              onTap: () => showFestivalDetail(
+                context,
+                FestivalEntry(date: date, data: data, isEkadashi: false, inFestivals: true),
+              ),
+            ),
           ],
           const SizedBox(height: 6),
           Text(
@@ -319,12 +314,7 @@ class _DayContent extends ConsumerWidget {
             const SizedBox(height: 3),
             Text(
               AppStrings.secondaryTithiBegins(
-                switch (language) {
-                  AppLanguage.hindiDevanagari => data.secondaryTithi!.fullNameDeva,
-                  AppLanguage.tamil           => data.secondaryTithi!.fullNameTamil,
-                  AppLanguage.bengali         => data.secondaryTithi!.fullNameBengali,
-                  _                           => data.secondaryTithi!.fullNameEn,
-                },
+                data.secondaryTithi!.fullName(language),
                 formatLocalTime(data.secondaryTithi!.start, tz),
                 language,
               ),
@@ -362,25 +352,30 @@ class _DayContent extends ConsumerWidget {
           const SizedBox(height: 4),
           _HoraCard(date: date, tz: tz),
           const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.location_on_rounded,
-                  size: 16, color: colors.inkSoft),
-              const SizedBox(width: 4),
-              Flexible(
-                child: Text(
-                  [location.cityName, if (location.country.isNotEmpty) location.country]
-                      .join(', '),
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: colors.inkSoft,
-                        fontSize: 15,
-                      ),
+          GestureDetector(
+            onTap: () => context.go(Routes.settings),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.location_on_rounded,
+                    size: 16, color: colors.inkSoft),
+                const SizedBox(width: 4),
+                Flexible(
+                  child: Text(
+                    [location.cityName, if (location.country.isNotEmpty) location.country]
+                        .join(', '),
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: colors.inkSoft,
+                          fontSize: 15,
+                        ),
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(width: 3),
+                Icon(Icons.tune_rounded, size: 13, color: colors.inkMuted),
+              ],
+            ),
           ),
         ],
       ),
@@ -391,25 +386,29 @@ class _DayContent extends ConsumerWidget {
 
 class _FestivalBadge extends StatelessWidget {
   final String name;
+  final VoidCallback? onTap;
 
-  const _FestivalBadge({required this.name});
+  const _FestivalBadge({required this.name, this.onTap});
 
   @override
   Widget build(BuildContext context) {
     final colors = TithikaColors.of(context);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-      decoration: BoxDecoration(
-        color: colors.festival.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: colors.festival.withValues(alpha: 0.4)),
-      ),
-      child: Text(
-        name,
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: colors.festival,
-              fontSize: 13,
-            ),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+        decoration: BoxDecoration(
+          color: colors.festival.withValues(alpha: 0.15),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: colors.festival.withValues(alpha: 0.4)),
+        ),
+        child: Text(
+          name,
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: colors.festival,
+                fontSize: 13,
+              ),
+        ),
       ),
     );
   }

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../core/app_strings.dart';
 import '../../core/festival_names.dart';
+import '../../core/router.dart';
 import '../../core/theme.dart';
 import '../../models/app_settings.dart';
 import '../../models/festival_content.dart';
@@ -274,6 +276,12 @@ class _FestivalDetailPageState extends ConsumerState<_FestivalDetailPage> {
                         colors: colors,
                         language: lang,
                         bottomPad: bottomPad,
+                        onGoToDate: () {
+                          Navigator.of(context).pop();
+                          ref.read(selectedDateProvider.notifier).state =
+                              widget.entry.date;
+                          context.go(Routes.dayView);
+                        },
                       ),
           ),
         ],
@@ -291,6 +299,7 @@ class _Body extends StatelessWidget {
   final TithikaColors colors;
   final AppLanguage language;
   final double bottomPad;
+  final VoidCallback onGoToDate;
 
   const _Body({
     required this.content,
@@ -299,22 +308,55 @@ class _Body extends StatelessWidget {
     required this.colors,
     required this.language,
     required this.bottomPad,
+    required this.onGoToDate,
   });
 
   @override
   Widget build(BuildContext context) {
-    final chips = Wrap(
-      spacing: 8,
-      runSpacing: 6,
+    final chips = Row(
       children: [
-        _DateChip(
-            label: hinduDate,
-            bg: colors.shukla.withValues(alpha: 0.15),
-            fg: colors.shukla),
-        _DateChip(
-            label: gregDate,
-            bg: colors.ink.withValues(alpha: 0.07),
-            fg: colors.inkSoft),
+        Wrap(
+          spacing: 8,
+          runSpacing: 6,
+          children: [
+            _DateChip(
+                label: hinduDate,
+                bg: colors.shukla.withValues(alpha: 0.15),
+                fg: colors.shukla),
+            _DateChip(
+                label: gregDate,
+                bg: colors.ink.withValues(alpha: 0.07),
+                fg: colors.inkSoft),
+          ],
+        ),
+        const Spacer(),
+        GestureDetector(
+          onTap: onGoToDate,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              color: colors.krishna.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: colors.krishna.withValues(alpha: 0.35)),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.calendar_today_rounded,
+                    size: 11, color: colors.krishna),
+                const SizedBox(width: 4),
+                Text(
+                  'Go to date',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: colors.krishna,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ],
     );
 

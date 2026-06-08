@@ -1,3 +1,5 @@
+import 'app_settings.dart';
+
 /// The 12 Purnimanta lunar months, keyed by the sidereal sun sign at Purnima.
 ///
 /// The moon is in the nakshatra that names the month at each Full Moon; the sun
@@ -47,6 +49,41 @@ extension LunarMonthName on LunarMonth {
         'ভাদ্র', 'আশ্বিন', 'কার্তিক', 'অগ্রহায়ণ',
         'পৌষ', 'মাঘ', 'ফাল্গুন', 'চৈত্র',
       ][index];
+
+  String get nameOdia => const [
+        'ବୈଶାଖ', 'ଜ୍ୟେଷ୍ଠ', 'ଆଷାଢ଼', 'ଶ୍ରାବଣ',
+        'ଭାଦ୍ରବ', 'ଆଶ୍ୱିନ', 'କାର୍ତ୍ତିକ', 'ମାର୍ଗଶୀର',
+        'ପୌଷ', 'ମାଘ', 'ଫାଲ୍ଗୁନ', 'ଚୈତ୍ର',
+      ][index];
+
+  String get nameTelugu => const [
+        'వైశాఖ', 'జ్యేష్ఠ', 'ఆషాఢ', 'శ్రావణ',
+        'భాద్రపద', 'ఆశ్వయుజ', 'కార్తీక', 'మార్గశిర',
+        'పుష్య', 'మాఘ', 'ఫాల్గుణ', 'చైత్ర',
+      ][index];
+
+  String get nameMalayalam => const [
+        'വൈശാഖം', 'ജ്യേഷ്ഠം', 'ആഷാഢം', 'ശ്രാവണം',
+        'ഭാദ്രം', 'ആശ്വിനം', 'കാർത്തിക', 'മാർഗ്ഗശീർഷം',
+        'പൗഷം', 'മാഘം', 'ഫാൽഗുനം', 'ചൈത്രം',
+      ][index];
+
+  String get nameKannada => const [
+        'ವೈಶಾಖ', 'ಜ್ಯೇಷ್ಠ', 'ಆಷಾಢ', 'ಶ್ರಾವಣ',
+        'ಭಾದ್ರಪದ', 'ಆಶ್ವಿನ', 'ಕಾರ್ತೀಕ', 'ಮಾರ್ಗಶಿರ',
+        'ಪುಷ್ಯ', 'ಮಾಘ', 'ಫಾಲ್ಗುಣ', 'ಚೈತ್ರ',
+      ][index];
+
+  String nameFor(AppLanguage lang) => switch (lang) {
+    AppLanguage.hindiDevanagari => nameDeva,
+    AppLanguage.tamil           => nameTamil,
+    AppLanguage.bengali         => nameBengali,
+    AppLanguage.odia            => nameOdia,
+    AppLanguage.telugu          => nameTelugu,
+    AppLanguage.malayalam       => nameMalayalam,
+    AppLanguage.kannada         => nameKannada,
+    _                           => nameEn,
+  };
 
   // 4-char abbreviation for the month-grid cell label.
   // ASHA=Ashadha, ASHW=Ashwina (unique pair).

@@ -1,3 +1,5 @@
+import 'app_settings.dart';
+
 /// A nakshatra instance — which nakshatra and when it ends.
 class NakshatraInfo {
   /// 1–27 (Ashwini = 1, Revati = 27).
@@ -8,10 +10,25 @@ class NakshatraInfo {
 
   const NakshatraInfo({required this.number, required this.end});
 
-  String get nameEn => _namesEn[number - 1];
-  String get nameDeva => _namesDeva[number - 1];
-  String get nameTamil => _namesTamil[number - 1];
-  String get nameBengali => _namesBengali[number - 1];
+  String get nameEn       => _namesEn[number - 1];
+  String get nameDeva     => _namesDeva[number - 1];
+  String get nameTamil    => _namesTamil[number - 1];
+  String get nameBengali  => _namesBengali[number - 1];
+  String get nameOdia     => _namesOdia[number - 1];
+  String get nameTelugu   => _namesTelugu[number - 1];
+  String get nameMalayalam => _namesMalayalam[number - 1];
+  String get nameKannada  => _namesKannada[number - 1];
+
+  String nameFor(AppLanguage lang) => switch (lang) {
+    AppLanguage.hindiDevanagari => nameDeva,
+    AppLanguage.tamil           => nameTamil,
+    AppLanguage.bengali         => nameBengali,
+    AppLanguage.odia            => nameOdia,
+    AppLanguage.telugu          => nameTelugu,
+    AppLanguage.malayalam       => nameMalayalam,
+    AppLanguage.kannada         => nameKannada,
+    _                           => nameEn,
+  };
 }
 
 const _namesEn = [
@@ -48,4 +65,40 @@ const _namesBengali = [
   'বিশাখা', 'অনুরাধা', 'জ্যেষ্ঠা', 'মূলা', 'পূর্বাষাঢ়া',
   'উত্তরাষাঢ়া', 'শ্রবণা', 'ধনিষ্ঠা', 'শতভিষা',
   'পূর্বভাদ্রপদা', 'উত্তরভাদ্রপদা', 'রেবতী',
+];
+
+const _namesOdia = [
+  'ଅଶ୍ୱିନୀ', 'ଭରଣୀ', 'କୃତ୍ତିକା', 'ରୋହିଣୀ', 'ମୃଗଶିରା',
+  'ଆର୍ଦ୍ରା', 'ପୁନର୍ବସୁ', 'ପୁଷ୍ୟ', 'ଆଶ୍ଲେଷା', 'ମଘା',
+  'ପୂର୍ବ ଫାଲ୍ଗୁନୀ', 'ଉତ୍ତର ଫାଲ୍ଗୁନୀ', 'ହସ୍ତ', 'ଚିତ୍ରା', 'ସ୍ୱାତୀ',
+  'ବିଶାଖା', 'ଅନୁରାଧା', 'ଜ୍ୟେଷ୍ଠା', 'ମୂଳ', 'ପୂର୍ବାଷାଢ଼',
+  'ଉତ୍ତରାଷାଢ଼', 'ଶ୍ରବଣ', 'ଧନିଷ୍ଠା', 'ଶତଭିଷା',
+  'ପୂର୍ବ ଭାଦ୍ରପଦ', 'ଉତ୍ତର ଭାଦ୍ରପଦ', 'ରେବତୀ',
+];
+
+const _namesTelugu = [
+  'అశ్విని', 'భరణి', 'కృత్తిక', 'రోహిణి', 'మృగశిర',
+  'ఆర్ద్ర', 'పునర్వసు', 'పుష్యమి', 'ఆశ్లేష', 'మఘ',
+  'పూర్వ ఫల్గుణి', 'ఉత్తర ఫల్గుణి', 'హస్త', 'చిత్ర', 'స్వాతి',
+  'విశాఖ', 'అనూరాధ', 'జ్యేష్ఠ', 'మూల', 'పూర్వాషాఢ',
+  'ఉత్తరాషాఢ', 'శ్రవణం', 'ధనిష్ఠ', 'శతభిష',
+  'పూర్వాభాద్ర', 'ఉత్తరాభాద్ర', 'రేవతి',
+];
+
+const _namesMalayalam = [
+  'അശ്വതി', 'ഭരണി', 'കാർത്തിക', 'രോഹിണി', 'മകയിരം',
+  'തിരുവാതിര', 'പുനർതം', 'പൂയം', 'ആയില്യം', 'മകം',
+  'പൂരം', 'ഉത്രം', 'അത്തം', 'ചിത്തിര', 'ചോതി',
+  'വിശാഖം', 'അനിഴം', 'തൃക്കേട്ട', 'മൂലം', 'പൂരാടം',
+  'ഉത്രാടം', 'തിരുവോണം', 'അവിട്ടം', 'ചതയം',
+  'പൂരുരുട്ടാതി', 'ഉത്രട്ടാതി', 'രേവതി',
+];
+
+const _namesKannada = [
+  'ಅಶ್ವಿನಿ', 'ಭರಣಿ', 'ಕೃತ್ತಿಕ', 'ರೋಹಿಣಿ', 'ಮೃಗಶಿರ',
+  'ಆರ್ದ್ರ', 'ಪುನರ್ವಸು', 'ಪುಷ್ಯ', 'ಆಶ್ಲೇಷ', 'ಮಘ',
+  'ಪೂರ್ವ ಫಲ್ಗುಣಿ', 'ಉತ್ತರ ಫಲ್ಗುಣಿ', 'ಹಸ್ತ', 'ಚಿತ್ರ', 'ಸ್ವಾತಿ',
+  'ವಿಶಾಖ', 'ಅನುರಾಧ', 'ಜ್ಯೇಷ್ಠ', 'ಮೂಲ', 'ಪೂರ್ವಾಷಾಢ',
+  'ಉತ್ತರಾಷಾಢ', 'ಶ್ರವಣ', 'ಧನಿಷ್ಠ', 'ಶತಭಿಷ',
+  'ಪೂರ್ವಭಾದ್ರಪದ', 'ಉತ್ತರಭಾದ್ರಪದ', 'ರೇವತಿ',
 ];

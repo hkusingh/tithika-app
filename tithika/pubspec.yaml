@@ -2,7 +2,7 @@ name: tithika
 description: "Tithika — Hindu lunar calendar with tithi-accurate moon phases."
 publish_to: 'none'
 
-version: 1.6.0+21
+version: 1.6.1+22
 
 environment:
   sdk: ^3.11.5
@@ -85,3 +85,15 @@ flutter:
     - family: NotoSansBengali
       fonts:
         - asset: assets/fonts/NotoSansBengali.ttf
+    - family: NotoSansOriya
+      fonts:
+        - asset: assets/fonts/NotoSansOriya.ttf
+    - family: NotoSansTelugu
+      fonts:
+        - asset: assets/fonts/NotoSansTelugu.ttf
+    - family: NotoSansMalayalam
+      fonts:
+        - asset: assets/fonts/NotoSansMalayalam.ttf
+    - family: NotoSansKannada
+      fonts:
+        - asset: assets/fonts/NotoSansKannada.ttf

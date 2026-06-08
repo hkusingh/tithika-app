@@ -12,6 +12,10 @@ class FestivalContentService {
         AppLanguage.hindiDevanagari => 'assets/festival_content/hi.json',
         AppLanguage.tamil           => 'assets/festival_content/ta.json',
         AppLanguage.bengali         => 'assets/festival_content/bn.json',
+        AppLanguage.odia            => 'assets/festival_content/or.json',
+        AppLanguage.telugu          => 'assets/festival_content/te.json',
+        AppLanguage.malayalam       => 'assets/festival_content/ml.json',
+        AppLanguage.kannada         => 'assets/festival_content/kn.json',
         _                           => 'assets/festival_content/en.json',
       };
 
@@ -29,6 +33,11 @@ class FestivalContentService {
         _cache[path] = {};
       }
     }
-    return _cache[path]![canonicalKey];
+    final content = _cache[path]![canonicalKey];
+    if (content != null) return content;
+
+    // Fall back to English when the key is missing from the language file.
+    if (lang == AppLanguage.english) return null;
+    return load(canonicalKey, AppLanguage.english);
   }
 }

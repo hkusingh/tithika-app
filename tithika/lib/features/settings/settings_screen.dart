@@ -217,28 +217,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       const SizedBox(height: 20),
 
                       _SectionLabel('LANGUAGE'),
-                      _RadioGroup(
-                        options: const ['English', 'Hindi (Latin)', 'हिन्दी', 'தமிழ்', 'বাংলা'],
-                        selected: language.index,
-                        onChanged: (i) => ref
+                      _LanguagePickerRow(
+                        selected: language,
+                        onChanged: (lang) => ref
                             .read(appSettingsProvider.notifier)
-                            .setLanguage(AppLanguage.values[i]),
-                        itemStyles: [
-                          null,
-                          null,
-                          devanagariStyle(
-                            Theme.of(context).textTheme.bodyMedium,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          tamilStyle(
-                            Theme.of(context).textTheme.bodyMedium,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          bengaliStyle(
-                            Theme.of(context).textTheme.bodyMedium,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ],
+                            .setLanguage(lang),
                       ),
 
                       const SizedBox(height: 20),
@@ -495,13 +478,11 @@ class _RadioGroup extends StatelessWidget {
   final List<String> options;
   final int selected;
   final ValueChanged<int> onChanged;
-  final List<TextStyle?>? itemStyles;
 
   const _RadioGroup({
     required this.options,
     required this.selected,
     required this.onChanged,
-    this.itemStyles,
   });
 
   @override
@@ -523,9 +504,7 @@ class _RadioGroup extends StatelessWidget {
           final i = entry.key;
           final label = entry.value;
           final isLast = i == options.length - 1;
-          final style = itemStyles != null && i < itemStyles!.length
-              ? itemStyles![i]
-              : defaultStyle;
+          final style = defaultStyle;
           return InkWell(
             onTap: () => onChanged(i),
             child: Container(
@@ -549,6 +528,132 @@ class _RadioGroup extends StatelessWidget {
             ),
           );
         }).toList(),
+      ),
+    );
+  }
+}
+
+// ── Language picker ───────────────────────────────────────────────────────────
+
+class _LanguagePickerRow extends StatelessWidget {
+  final AppLanguage selected;
+  final ValueChanged<AppLanguage> onChanged;
+
+  const _LanguagePickerRow({required this.selected, required this.onChanged});
+
+  static const _labels = [
+    'English', 'Hindi (Latin)', 'हिन्दी',
+    'தமிழ்', 'বাংলা', 'ଓଡ଼ିଆ',
+    'తెలుగు', 'മലയാളം', 'ಕನ್ನಡ',
+  ];
+
+  TextStyle? _styleFor(int i, TextStyle? base) => switch (i) {
+    2 => devanagariStyle(base, fontWeight: FontWeight.w500),
+    3 => tamilStyle(base, fontWeight: FontWeight.w500),
+    4 => bengaliStyle(base, fontWeight: FontWeight.w500),
+    5 => odiaStyle(base, fontWeight: FontWeight.w500),
+    6 => teluguStyle(base, fontWeight: FontWeight.w500),
+    7 => malayalamStyle(base, fontWeight: FontWeight.w500),
+    8 => kannadaStyle(base, fontWeight: FontWeight.w500),
+    _ => base?.copyWith(fontWeight: FontWeight.w500),
+  };
+
+  void _showSheet(BuildContext context) {
+    final colors = TithikaColors.of(context);
+    final base = Theme.of(context).textTheme.bodyMedium;
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: colors.panel,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (sheetCtx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 12),
+            Container(
+              width: 36, height: 4,
+              decoration: BoxDecoration(
+                color: colors.lineStrong,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 4),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 220),
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: AppLanguage.values.length,
+                itemBuilder: (_, i) {
+                  final lang = AppLanguage.values[i];
+                  final isSelected = lang == selected;
+                  final isLast = i == AppLanguage.values.length - 1;
+                  return InkWell(
+                    onTap: () {
+                      onChanged(lang);
+                      Navigator.pop(sheetCtx);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 15),
+                      decoration: isLast
+                          ? null
+                          : BoxDecoration(
+                              border: Border(
+                                  bottom: BorderSide(color: colors.line))),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(_labels[i], style: _styleFor(i, base)),
+                          if (isSelected)
+                            Icon(Icons.check_rounded,
+                                color: colors.shukla, size: 18),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = TithikaColors.of(context);
+    final base   = Theme.of(context).textTheme.bodyMedium;
+    final idx    = selected.index;
+    return GestureDetector(
+      onTap: () => _showSheet(context),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+        decoration: BoxDecoration(
+          color: colors.card,
+          border: Border.all(color: colors.line),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('Language',
+                style: base?.copyWith(fontWeight: FontWeight.w500)),
+            Row(children: [
+              Text(
+                _labels[idx],
+                style: _styleFor(idx, base)
+                    ?.copyWith(color: colors.inkSoft),
+              ),
+              const SizedBox(width: 6),
+              Icon(Icons.chevron_right_rounded,
+                  color: colors.inkMuted, size: 18),
+            ]),
+          ],
+        ),
       ),
     );
   }

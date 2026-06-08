@@ -20,6 +20,7 @@ class TithikaTabBar extends ConsumerWidget {
     final isMuhurta   = location.startsWith('/muhurta');
     final isHora      = location.startsWith('/hora');
     final isPanchanga = location.startsWith('/panchanga');
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(8, 6, 8, 8),
@@ -27,14 +28,25 @@ class TithikaTabBar extends ConsumerWidget {
         decoration: BoxDecoration(
           color: colors.card,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: colors.lineStrong),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.08),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
+          border: Border.all(
+            color: isDark
+                ? colors.krishna.withValues(alpha: 0.50)
+                : Colors.white.withValues(alpha: 0.75),
+          ),
+          boxShadow: isDark
+              ? [
+                  BoxShadow(
+                    color: colors.krishna.withValues(alpha: 0.22),
+                    blurRadius: 18,
+                    spreadRadius: 1,
+                  ),
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.35),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ]
+              : null,
         ),
         child: Row(
           children: [
@@ -105,14 +117,14 @@ class _TabItem extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 18, color: active ? colors.shukla : colors.inkMuted),
+              Icon(icon, size: 18, color: active ? colors.shukla : colors.ink),
               const SizedBox(height: 2),
               Text(
                 label,
                 style: TextStyle(
                   fontSize: 9,
                   fontWeight: active ? FontWeight.w700 : FontWeight.w600,
-                  color: active ? colors.shukla : colors.inkMuted,
+                  color: active ? colors.shukla : colors.ink,
                   letterSpacing: 0.02,
                 ),
                 maxLines: 1,

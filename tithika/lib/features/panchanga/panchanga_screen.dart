@@ -600,19 +600,8 @@ class _FiveElementsCard extends StatelessWidget {
     final karanaIsAusp = !currentKarana.type.isFixed && !karanaIsInausp;
     final karanaColor = currentKarana.type.dotColor;
 
-    final tithiName = switch (language) {
-      AppLanguage.hindiDevanagari => dayData.tithi.fullNameDeva,
-      AppLanguage.tamil           => dayData.tithi.fullNameTamil,
-      AppLanguage.bengali         => dayData.tithi.fullNameBengali,
-      _ => dayData.tithi.fullNameEn,
-    };
-
-    final nakshatraName = switch (language) {
-      AppLanguage.hindiDevanagari => dayData.nakshatra.nameDeva,
-      AppLanguage.tamil           => dayData.nakshatra.nameTamil,
-      AppLanguage.bengali         => dayData.nakshatra.nameBengali,
-      _ => dayData.nakshatra.nameEn,
-    };
+    final tithiName     = dayData.tithi.fullName(language);
+    final nakshatraName = dayData.nakshatra.nameFor(language);
 
     final yogaBg = yogaColor.withValues(alpha: 0.07);
     final karanaBg = karanaIsInausp

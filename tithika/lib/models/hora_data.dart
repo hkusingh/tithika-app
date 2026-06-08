@@ -55,11 +55,55 @@ extension HoraPlanetExt on HoraPlanet {
     HoraPlanet.mars    => 'মঙ্গল',
   };
 
+  String get _nameOdia => switch (this) {
+    HoraPlanet.sun     => 'ସୂର୍ଯ୍ୟ',
+    HoraPlanet.venus   => 'ଶୁକ୍ର',
+    HoraPlanet.mercury => 'ବୁଧ',
+    HoraPlanet.moon    => 'ଚନ୍ଦ୍ର',
+    HoraPlanet.saturn  => 'ଶନି',
+    HoraPlanet.jupiter => 'ବୃହସ୍ପତି',
+    HoraPlanet.mars    => 'ମଙ୍ଗଳ',
+  };
+
+  String get _nameTelugu => switch (this) {
+    HoraPlanet.sun     => 'సూర్య',
+    HoraPlanet.venus   => 'శుక్ర',
+    HoraPlanet.mercury => 'బుధ',
+    HoraPlanet.moon    => 'చంద్ర',
+    HoraPlanet.saturn  => 'శని',
+    HoraPlanet.jupiter => 'బృహస్పతి',
+    HoraPlanet.mars    => 'మంగళ',
+  };
+
+  String get _nameMalayalam => switch (this) {
+    HoraPlanet.sun     => 'സൂര്യ',
+    HoraPlanet.venus   => 'ശുക്ര',
+    HoraPlanet.mercury => 'ബുധ',
+    HoraPlanet.moon    => 'ചന്ദ്ര',
+    HoraPlanet.saturn  => 'ശനി',
+    HoraPlanet.jupiter => 'ഗുരു',
+    HoraPlanet.mars    => 'ചൊവ്വ',
+  };
+
+  String get _nameKannada => switch (this) {
+    HoraPlanet.sun     => 'ಸೂರ್ಯ',
+    HoraPlanet.venus   => 'ಶುಕ್ರ',
+    HoraPlanet.mercury => 'ಬುಧ',
+    HoraPlanet.moon    => 'ಚಂದ್ರ',
+    HoraPlanet.saturn  => 'ಶನಿ',
+    HoraPlanet.jupiter => 'ಗುರು',
+    HoraPlanet.mars    => 'ಮಂಗಳ',
+  };
+
   String name(AppLanguage lang) => switch (lang) {
     AppLanguage.hindiDevanagari => _nameDeva,
     AppLanguage.hindiLatin      => _nameHindiLatin,
     AppLanguage.tamil           => _nameTamil,
     AppLanguage.bengali         => _nameBengali,
+    AppLanguage.odia            => _nameOdia,
+    AppLanguage.telugu          => _nameTelugu,
+    AppLanguage.malayalam       => _nameMalayalam,
+    AppLanguage.kannada         => _nameKannada,
     _                           => nameEn,
   };
 

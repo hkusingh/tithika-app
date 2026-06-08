@@ -161,12 +161,48 @@ TextStyle bengaliStyle(TextStyle? base, {Color? color, double? fontSize, FontWei
   );
 }
 
+TextStyle odiaStyle(TextStyle? base, {Color? color, double? fontSize, FontWeight? fontWeight}) {
+  return (base ?? const TextStyle()).copyWith(
+    fontFamily: 'NotoSansOriya',
+    fontFamilyFallback: const ['Noto Sans Oriya'],
+    color: color, fontSize: fontSize, fontWeight: fontWeight, letterSpacing: 0,
+  );
+}
+
+TextStyle teluguStyle(TextStyle? base, {Color? color, double? fontSize, FontWeight? fontWeight}) {
+  return (base ?? const TextStyle()).copyWith(
+    fontFamily: 'NotoSansTelugu',
+    fontFamilyFallback: const ['Telugu MN', 'Telugu Sangam MN'],
+    color: color, fontSize: fontSize, fontWeight: fontWeight, letterSpacing: 0,
+  );
+}
+
+TextStyle malayalamStyle(TextStyle? base, {Color? color, double? fontSize, FontWeight? fontWeight}) {
+  return (base ?? const TextStyle()).copyWith(
+    fontFamily: 'NotoSansMalayalam',
+    fontFamilyFallback: const ['Malayalam MN', 'Malayalam Sangam MN'],
+    color: color, fontSize: fontSize, fontWeight: fontWeight, letterSpacing: 0,
+  );
+}
+
+TextStyle kannadaStyle(TextStyle? base, {Color? color, double? fontSize, FontWeight? fontWeight}) {
+  return (base ?? const TextStyle()).copyWith(
+    fontFamily: 'NotoSansKannada',
+    fontFamilyFallback: const ['Kannada MN', 'Kannada Sangam MN'],
+    color: color, fontSize: fontSize, fontWeight: fontWeight, letterSpacing: 0,
+  );
+}
+
 TextStyle scriptStyle(AppLanguage lang, TextStyle? base,
     {Color? color, double? fontSize, FontWeight? fontWeight}) =>
     switch (lang) {
       AppLanguage.hindiDevanagari => devanagariStyle(base, color: color, fontSize: fontSize, fontWeight: fontWeight),
       AppLanguage.tamil           => tamilStyle(base, color: color, fontSize: fontSize, fontWeight: fontWeight),
       AppLanguage.bengali         => bengaliStyle(base, color: color, fontSize: fontSize, fontWeight: fontWeight),
+      AppLanguage.odia            => odiaStyle(base, color: color, fontSize: fontSize, fontWeight: fontWeight),
+      AppLanguage.telugu          => teluguStyle(base, color: color, fontSize: fontSize, fontWeight: fontWeight),
+      AppLanguage.malayalam       => malayalamStyle(base, color: color, fontSize: fontSize, fontWeight: fontWeight),
+      AppLanguage.kannada         => kannadaStyle(base, color: color, fontSize: fontSize, fontWeight: fontWeight),
       _                           => (base ?? const TextStyle()).copyWith(color: color, fontSize: fontSize, fontWeight: fontWeight),
     };
 

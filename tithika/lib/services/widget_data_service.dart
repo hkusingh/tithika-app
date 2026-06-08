@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../core/app_strings.dart';
 import '../core/time_format.dart';
 import '../models/app_settings.dart';
 import '../models/day_data.dart';
@@ -205,37 +206,15 @@ class WidgetDataService {
 
   // ── Localisation helpers ─────────────────────────────────────────────────────
 
-  static String _tithiName(dynamic tithi, AppLanguage lang) => switch (lang) {
-        AppLanguage.hindiDevanagari => tithi.fullNameDeva,
-        AppLanguage.tamil => tithi.fullNameTamil,
-        AppLanguage.bengali => tithi.fullNameBengali,
-        _ => tithi.fullNameEn,
-      };
+  static String _tithiName(dynamic tithi, AppLanguage lang) =>
+      tithi.fullName(lang) as String;
 
   static String _nakshatraName(dynamic nakshatra, AppLanguage lang) =>
-      switch (lang) {
-        AppLanguage.hindiDevanagari => nakshatra.nameDeva,
-        AppLanguage.tamil => nakshatra.nameTamil,
-        AppLanguage.bengali => nakshatra.nameBengali,
-        _ => nakshatra.nameEn,
-      };
+      nakshatra.nameFor(lang) as String;
 
   static String _lunarMonthLabel(DayData dayData, AppLanguage lang) {
-    final month = dayData.lunarMonth;
-    final tithi = dayData.tithi;
-    final isShukla = tithi.paksha == Paksha.shukla;
-    final monthName = switch (lang) {
-      AppLanguage.hindiDevanagari => month.nameDeva,
-      AppLanguage.tamil => month.nameTamil,
-      AppLanguage.bengali => month.nameBengali,
-      _ => month.nameEn,
-    };
-    final pakshaStr = switch (lang) {
-      AppLanguage.hindiDevanagari => isShukla ? 'शुक्ल' : 'कृष्ण',
-      AppLanguage.tamil => isShukla ? 'வளர்' : 'தேய்',
-      AppLanguage.bengali => isShukla ? 'শুক্ল' : 'কৃষ্ণ',
-      _ => isShukla ? 'Shukla' : 'Krishna',
-    };
-    return '$monthName · $pakshaStr ${tithi.pakshaNumber}';
+    final monthName  = dayData.lunarMonth.nameFor(lang);
+    final pakshaStr  = AppStrings.paksha(dayData.tithi.paksha, lang);
+    return '$monthName · $pakshaStr ${dayData.tithi.pakshaNumber}';
   }
 }

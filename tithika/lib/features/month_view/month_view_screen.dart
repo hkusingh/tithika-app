@@ -75,12 +75,9 @@ class _MonthViewScreenState extends ConsumerState<MonthViewScreen> {
     ({LunarMonth? month, bool isAdhika}) lastSeen = (month: null, isAdhika: false);
     for (final data in (monthAsync.valueOrNull?.values ?? const <DayData>[])) {
       if (data.lunarMonth != lastSeen.month || data.isAdhika != lastSeen.isAdhika) {
-        final base = switch (language) {
-          AppLanguage.hindiDevanagari => data.lunarMonth.nameDeva,
-          AppLanguage.tamil           => data.lunarMonth.nameTamil,
-          AppLanguage.bengali         => data.lunarMonth.nameBengali,
-          _                           => data.lunarMonth.nameEn.toUpperCase(),
-        };
+        final raw  = data.lunarMonth.nameFor(language);
+        final base = (language == AppLanguage.english || language == AppLanguage.hindiLatin)
+            ? raw.toUpperCase() : raw;
         hinduMonthNames.add(
           data.isAdhika ? '${AppStrings.adhikaPrefixShort(language)}$base' : base,
         );
@@ -690,12 +687,7 @@ class _NextHinduMonthNote extends ConsumerWidget {
               final wd   = AppStrings.weekdayShort(info.date.weekday, language);
               final mo   = AppStrings.gregMonthShort(info.date.month, language);
               final time = formatLocalTime(info.startUtc, info.tzOffset);
-              final monthName = switch (language) {
-                AppLanguage.hindiDevanagari => info.month.nameDeva,
-                AppLanguage.tamil           => info.month.nameTamil,
-                AppLanguage.bengali         => info.month.nameBengali,
-                _                           => info.month.nameEn,
-              };
+              final monthName = info.month.nameFor(language);
               return Text(
                 AppStrings.hinduMonthBegins(monthName, wd, mo, info.date.day, time, language),
                 style: scriptStyle(
