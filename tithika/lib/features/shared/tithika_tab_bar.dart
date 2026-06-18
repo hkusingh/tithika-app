@@ -52,6 +52,7 @@ class TithikaTabBar extends ConsumerWidget {
           children: [
             _TabItem(
               icon: Icons.auto_awesome,
+              emojiIcon: 'ॐ',
               label: AppStrings.festivals(language),
               active: isFestivals,
               onTap: () => context.go(Routes.festivals),
@@ -87,6 +88,7 @@ class TithikaTabBar extends ConsumerWidget {
 
 class _TabItem extends StatelessWidget {
   final IconData icon;
+  final String? emojiIcon;
   final String label;
   final bool active;
   final VoidCallback onTap;
@@ -94,6 +96,7 @@ class _TabItem extends StatelessWidget {
 
   const _TabItem({
     required this.icon,
+    this.emojiIcon,
     required this.label,
     required this.active,
     required this.onTap,
@@ -117,7 +120,16 @@ class _TabItem extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 18, color: active ? colors.shukla : colors.ink),
+              emojiIcon != null
+                  ? Text(
+                      emojiIcon!,
+                      style: TextStyle(
+                        fontSize: 17,
+                        height: 1,
+                        color: active ? colors.shukla : colors.ink,
+                      ),
+                    )
+                  : Icon(icon, size: 18, color: active ? colors.shukla : colors.ink),
               const SizedBox(height: 2),
               Text(
                 label,

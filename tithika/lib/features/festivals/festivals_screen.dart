@@ -99,13 +99,24 @@ class FestivalsScreen extends ConsumerStatefulWidget {
 
 class _FestivalsScreenState extends ConsumerState<FestivalsScreen> {
   final _scrollController = ScrollController();
+  final _searchController = TextEditingController();
   final _currentMonthKey = GlobalKey();
   bool _scrolledToMonth = false;
   bool _showEkadashi = false;
+  String _searchQuery = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController.addListener(() {
+      setState(() => _searchQuery = _searchController.text.trim().toLowerCase());
+    });
+  }
 
   @override
   void dispose() {
     _scrollController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -213,18 +224,66 @@ class _FestivalsScreenState extends ConsumerState<FestivalsScreen> {
                           ? entries.where((e) => e.isEkadashi).toList()
                           : entries.where((e) => e.inFestivals).toList();
 
+                      // ── Active search: flat result list ──────────────────
+                      if (_searchQuery.isNotEmpty) {
+                        final results = _applySearch(filtered, language);
+                        Widget body;
+                        if (results.isEmpty) {
+                          body = Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(32),
+                              child: Text(
+                                'No results for "${_searchController.text.trim()}".',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(color: colors.inkMuted),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          );
+                        } else {
+                          body = ListView.builder(
+                            padding:
+                                const EdgeInsets.fromLTRB(16, 8, 16, 32),
+                            itemCount: results.length,
+                            itemBuilder: (_, i) => _showEkadashi
+                                ? Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 4),
+                                    child: _EkadashiChip(
+                                        date: results[i].date,
+                                        colors: colors),
+                                  )
+                                : _FestivalRow(
+                                    entry: results[i],
+                                    showDivider: i < results.length - 1,
+                                  ),
+                          );
+                        }
+                        return Column(children: [
+                          _buildSearchBar(colors),
+                          Expanded(child: body),
+                        ]);
+                      }
+
                       if (filtered.isEmpty) {
-                        return Center(
-                          child: Text(
-                            _showEkadashi
-                                ? 'No Ekadashi dates found for $year.'
-                                : 'No festivals found for $year.',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodySmall
-                                ?.copyWith(color: colors.inkMuted),
+                        return Column(children: [
+                          _buildSearchBar(colors),
+                          Expanded(
+                            child: Center(
+                              child: Text(
+                                _showEkadashi
+                                    ? 'No Ekadashi dates found for $year.'
+                                    : 'No festivals found for $year.',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(color: colors.inkMuted),
+                              ),
+                            ),
                           ),
-                        );
+                        ]);
                       }
 
                       // Group current year by Gregorian month.
@@ -269,15 +328,22 @@ class _FestivalsScreenState extends ConsumerState<FestivalsScreen> {
 
                       _scrollToCurrentMonth();
 
-                      return ListView(
-                        controller: _scrollController,
-                        // Ensure all month cards are rendered on first layout
-                        // so the GlobalKey lookup for the current month
-                        // succeeds before the user has scrolled at all.
-                        scrollCacheExtent: const ScrollCacheExtent.pixels(9999),
-                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
-                        children: items,
-                      );
+                      return Column(children: [
+                        _buildSearchBar(colors),
+                        Expanded(
+                          child: ListView(
+                            controller: _scrollController,
+                            // Ensure all month cards are rendered on first layout
+                            // so the GlobalKey lookup for the current month
+                            // succeeds before the user has scrolled at all.
+                            scrollCacheExtent:
+                                const ScrollCacheExtent.pixels(9999),
+                            padding:
+                                const EdgeInsets.fromLTRB(16, 8, 16, 32),
+                            children: items,
+                          ),
+                        ),
+                      ]);
                     },
                   ),
                 ),
@@ -288,6 +354,79 @@ class _FestivalsScreenState extends ConsumerState<FestivalsScreen> {
         ],
       ),
     );
+  }
+
+  Widget _buildSearchBar(TithikaColors colors) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 6, 16, 4),
+      child: Container(
+        height: 40,
+        decoration: BoxDecoration(
+          color: colors.ink.withValues(alpha: 0.06),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: colors.line),
+        ),
+        child: TextField(
+          controller: _searchController,
+          textInputAction: TextInputAction.search,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: colors.ink,
+                fontSize: 14,
+              ),
+          decoration: InputDecoration(
+            hintText:
+                _showEkadashi ? 'Search Ekadashi…' : 'Search festivals…',
+            hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: colors.inkMuted,
+                  fontSize: 14,
+                ),
+            prefixIcon: Padding(
+              padding: const EdgeInsets.only(left: 10, right: 6),
+              child: Icon(Icons.search_rounded,
+                  color: colors.inkMuted, size: 18),
+            ),
+            prefixIconConstraints:
+                const BoxConstraints(minWidth: 0, minHeight: 0),
+            suffixIcon: _searchQuery.isNotEmpty
+                ? GestureDetector(
+                    onTap: () => _searchController.clear(),
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 10),
+                      child: Icon(Icons.close_rounded,
+                          color: colors.inkMuted, size: 18),
+                    ),
+                  )
+                : null,
+            suffixIconConstraints:
+                const BoxConstraints(minWidth: 0, minHeight: 0),
+            border: InputBorder.none,
+            contentPadding: const EdgeInsets.symmetric(vertical: 10),
+            isDense: true,
+          ),
+        ),
+      ),
+    );
+  }
+
+  List<FestivalEntry> _applySearch(
+      List<FestivalEntry> list, AppLanguage language) {
+    final q = _searchQuery;
+    return list.where((e) {
+      final canonical = e.data.festivalName ?? 'Ekadashi';
+      final localized =
+          (FestivalNames.localize(canonical, language) ?? canonical)
+              .toLowerCase();
+      if (localized.contains(q) || canonical.toLowerCase().contains(q)) {
+        return true;
+      }
+      if (_showEkadashi) {
+        final date = e.date;
+        final mo = _monthNamesShort[date.month - 1].toLowerCase();
+        final moFull = _monthNames[date.month - 1].toLowerCase();
+        return mo.contains(q) || moFull.contains(q);
+      }
+      return false;
+    }).toList();
   }
 
   Map<int, List<FestivalEntry>> _groupByMonth(List<FestivalEntry> list) {
