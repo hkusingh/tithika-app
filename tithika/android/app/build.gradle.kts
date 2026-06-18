@@ -17,7 +17,7 @@ if (keyPropertiesFile.exists()) {
 android {
     namespace = "app.tithika"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "27.0.12077973"  // NDK r27b — required for 16 KB page-size alignment
 
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
