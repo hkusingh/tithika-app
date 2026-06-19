@@ -246,6 +246,8 @@ class _FestivalsScreenState extends ConsumerState<FestivalsScreen> {
                           body = ListView.builder(
                             padding:
                                 const EdgeInsets.fromLTRB(16, 8, 16, 32),
+                            keyboardDismissBehavior:
+                                ScrollViewKeyboardDismissBehavior.onDrag,
                             itemCount: results.length,
                             itemBuilder: (_, i) => _showEkadashi
                                 ? Padding(
@@ -333,6 +335,8 @@ class _FestivalsScreenState extends ConsumerState<FestivalsScreen> {
                         Expanded(
                           child: ListView(
                             controller: _scrollController,
+                            keyboardDismissBehavior:
+                                ScrollViewKeyboardDismissBehavior.onDrag,
                             // Ensure all month cards are rendered on first layout
                             // so the GlobalKey lookup for the current month
                             // succeeds before the user has scrolled at all.
@@ -369,6 +373,7 @@ class _FestivalsScreenState extends ConsumerState<FestivalsScreen> {
         child: TextField(
           controller: _searchController,
           textInputAction: TextInputAction.search,
+          onSubmitted: (_) => FocusScope.of(context).unfocus(),
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: colors.ink,
                 fontSize: 14,
