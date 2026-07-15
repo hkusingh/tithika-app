@@ -202,9 +202,19 @@ class _DayPageContent extends ConsumerWidget {
           lon: location.lon,
           tzOffset: location.tzOffsetAt(date),
         );
+        final tomorrow = date.add(const Duration(days: 1));
+        final rawTomorrow = tithiSvc.calculateForDate(
+          localDate: tomorrow,
+          lat: location.lat,
+          lon: location.lon,
+          tzOffset: location.tzOffsetAt(tomorrow),
+        );
         final adjusted = _applyMonthSystem(raw, monthSystem);
         final purnimanta = _applyMonthSystem(raw, MonthSystem.purnimanta);
-        final data = adjusted.copyWith(festivalName: FestivalDetector.detect(purnimanta));
+        final purnimantaTomorrow = _applyMonthSystem(rawTomorrow, MonthSystem.purnimanta);
+        final data = adjusted.copyWith(
+          festivalNames: FestivalDetector.detectAll(purnimanta, purnimantaTomorrow),
+        );
         return _DayContent(data: data, date: date);
       },
     );
@@ -292,14 +302,27 @@ class _DayContent extends ConsumerWidget {
           ),
           const SizedBox(height: 10),
           Text(tithiFullName, style: tithiNameStyle),
-          if (data.festivalName != null) ...[
+          if (data.festivalNames.isNotEmpty) ...[
             const SizedBox(height: 6),
-            _FestivalBadge(
-              name: FestivalNames.localize(data.festivalName!, language)!,
-              onTap: () => showFestivalDetail(
-                context,
-                FestivalEntry(date: date, data: data, isEkadashi: false, inFestivals: true),
-              ),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              alignment: WrapAlignment.center,
+              children: [
+                for (final canonical in data.festivalNames)
+                  _FestivalBadge(
+                    name: FestivalNames.localize(canonical, language)!,
+                    onTap: () => showFestivalDetail(
+                      context,
+                      FestivalEntry(
+                        date: date,
+                        data: data.copyWith(festivalName: canonical),
+                        isEkadashi: false,
+                        inFestivals: true,
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ],
           const SizedBox(height: 6),

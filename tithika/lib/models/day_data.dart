@@ -30,8 +30,17 @@ class DayData {
   /// previous sunrise and this sunrise (i.e. Sankranti day).
   final bool sunZodiacEntryToday;
 
-  /// Festival name for this day, or null.
-  final String? festivalName;
+  /// All festival names for this day. Empty when the day is ordinary.
+  /// When more than one entry is present, they are unrelated festivals that
+  /// both matched this calendar day — render/link each as a separate item,
+  /// never join them into a single string (each has its own localization and
+  /// description keyed by its own canonical name).
+  final List<String> festivalNames;
+
+  /// The first festival name for this day, or null. Convenience accessor for
+  /// call sites that only care whether/what the primary festival is; use
+  /// [festivalNames] when rendering or linking to festival details.
+  String? get festivalName => festivalNames.isEmpty ? null : festivalNames.first;
 
   /// A second tithi that begins after sunrise but before the next sunrise.
   /// Null on most days.
@@ -69,7 +78,7 @@ class DayData {
     required this.lunarMonth,
     required this.sunZodiacSign,
     this.sunZodiacEntryToday = false,
-    this.festivalName,
+    this.festivalNames = const [],
     this.secondaryTithi,
     this.secondaryIsKshaya = false,
     this.isAdhika = false,
@@ -78,8 +87,12 @@ class DayData {
     this.tropElongDeg,
   });
 
+  /// [festivalName] sets a single-name [festivalNames] list (shorthand for
+  /// the common single-festival case). Pass [festivalNames] directly when a
+  /// day carries more than one independent festival.
   DayData copyWith({
     String? festivalName,
+    List<String>? festivalNames,
     TithiInfo? secondaryTithi,
     bool? secondaryIsKshaya,
     bool? isAdhika,
@@ -96,7 +109,8 @@ class DayData {
       lunarMonth: lunarMonth ?? this.lunarMonth,
       sunZodiacSign: sunZodiacSign,
       sunZodiacEntryToday: sunZodiacEntryToday,
-      festivalName: festivalName ?? this.festivalName,
+      festivalNames: festivalNames ??
+          (festivalName != null ? [festivalName] : this.festivalNames),
       secondaryTithi: secondaryTithi ?? this.secondaryTithi,
       secondaryIsKshaya: secondaryIsKshaya ?? this.secondaryIsKshaya,
       isAdhika: isAdhika ?? this.isAdhika,

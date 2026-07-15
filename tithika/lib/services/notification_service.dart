@@ -199,30 +199,28 @@ class NotificationService {
         localDate: date, lat: location.lat, lon: location.lon,
         tzOffset: location.tzOffsetAt(date),
       );
+      final nextDate = date.add(const Duration(days: 1));
+      final nextRaw = tithiService.calculateForDate(
+        localDate: nextDate, lat: location.lat, lon: location.lon,
+        tzOffset: location.tzOffsetAt(nextDate),
+      );
 
       String body = '${raw.tithi.fullNameEn} · ${raw.nakshatra.nameEn}';
 
-      if (raw.sunriseUtc != null && raw.sunsetUtc != null) {
-        final nextDate = date.add(const Duration(days: 1));
-        final nextRaw = tithiService.calculateForDate(
-          localDate: nextDate, lat: location.lat, lon: location.lon,
-          tzOffset: location.tzOffsetAt(nextDate),
+      if (raw.sunriseUtc != null && raw.sunsetUtc != null && nextRaw.sunriseUtc != null) {
+        final muhurta = MuhurtaService.calculate(
+          sunriseUtc: raw.sunriseUtc!,
+          sunsetUtc: raw.sunsetUtc!,
+          nextSunriseUtc: nextRaw.sunriseUtc!,
+          weekday: date.weekday,
         );
-        if (nextRaw.sunriseUtc != null) {
-          final muhurta = MuhurtaService.calculate(
-            sunriseUtc: raw.sunriseUtc!,
-            sunsetUtc: raw.sunsetUtc!,
-            nextSunriseUtc: nextRaw.sunriseUtc!,
-            weekday: date.weekday,
-          );
-          final rahuStart = tz.TZDateTime.from(muhurta.rahuKaal.start, tzLocation);
-          final rahuEnd = tz.TZDateTime.from(muhurta.rahuKaal.end, tzLocation);
-          body += ' · Rahu Kaal ${_fmtTime(rahuStart)}–${_fmtTime(rahuEnd)}';
-        }
+        final rahuStart = tz.TZDateTime.from(muhurta.rahuKaal.start, tzLocation);
+        final rahuEnd = tz.TZDateTime.from(muhurta.rahuKaal.end, tzLocation);
+        body += ' · Rahu Kaal ${_fmtTime(rahuStart)}–${_fmtTime(rahuEnd)}';
       }
 
-      final festival = FestivalDetector.detect(_purnimanta(raw));
-      if (festival != null) body += ' · $festival';
+      final festivals = FestivalDetector.detectAll(_purnimanta(raw), _purnimanta(nextRaw));
+      if (festivals.isNotEmpty) body += ' · ${festivals.join(', ')}';
 
       await _plugin.zonedSchedule(
         i,
@@ -263,19 +261,27 @@ class NotificationService {
         localDate: date, lat: location.lat, lon: location.lon,
         tzOffset: location.tzOffsetAt(date),
       );
-      final festivalName = FestivalDetector.detect(_purnimanta(raw));
-      if (festivalName == null) continue;
-
-      await _plugin.zonedSchedule(
-        notifId++,
-        '$festivalName tomorrow',
-        'Wishing you a blessed celebration!',
-        scheduleTime,
-        _eventDetails,
-        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime,
+      final nextDate = date.add(const Duration(days: 1));
+      final nextRaw = tithiService.calculateForDate(
+        localDate: nextDate, lat: location.lat, lon: location.lon,
+        tzOffset: location.tzOffsetAt(nextDate),
       );
+      final festivalNames =
+          FestivalDetector.detectAll(_purnimanta(raw), _purnimanta(nextRaw));
+
+      for (final festivalName in festivalNames) {
+        if (notifId > 119) break;
+        await _plugin.zonedSchedule(
+          notifId++,
+          '$festivalName tomorrow',
+          'Wishing you a blessed celebration!',
+          scheduleTime,
+          _eventDetails,
+          androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+          uiLocalNotificationDateInterpretation:
+              UILocalNotificationDateInterpretation.absoluteTime,
+        );
+      }
     }
   }
 

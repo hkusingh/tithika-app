@@ -2,24 +2,29 @@ import '../models/day_data.dart';
 import '../models/lunar_month.dart';
 
 abstract final class FestivalDetector {
-  /// Returns the English festival name for [day], or null if it is an ordinary day.
-  ///
-  /// Detection priority:
-  ///   1. Solar festivals (Sankranti) — sun crosses a sign boundary today.
-  ///   2. Special-window festivals — prescribed for a moment other than sunrise
-  ///      (sunset or Madhyahna).  See [_specialWindowFestival].
-  ///   3. Sunrise-rule festivals — tithi active at local sunrise.
+  /// Returns the English festival name(s) for [day], or an empty list if it
+  /// is an ordinary day. Each entry is an independent, individually
+  /// localizable/linkable canonical festival name — when more than one is
+  /// returned, they are unrelated festivals whose rules both matched the
+  /// same calendar day (e.g. a sunrise-rule festival and a special-window
+  /// festival), NOT a single combined festival, so callers must render and
+  /// link them as separate items rather than joining the strings.
   ///
   /// Tithi numbers use the continuous 1–30 scale: Shukla 1–15 = 1–15,
   /// Krishna 1–14 = 16–29, Amavasya = 30.
   ///
-  /// The returned string is always English and serves as the canonical key.
+  /// Each returned string is always English and serves as the canonical key.
   /// Use FestivalNames.localize() in the display layer to get a localized name.
   ///
   /// When a kshaya (skipped) tithi falls entirely between two sunrises it
   /// becomes [DayData.secondaryTithi].  This method checks both tithis so
   /// the festival is never silently dropped for western time-zones.
-  static String? detect(DayData day) {
+  ///
+  /// [tomorrow] is tomorrow's [DayData] at the same location, used to resolve
+  /// vruddhi (expanded) tithis — see the comment below.  Pass null only when
+  /// tomorrow's data is genuinely unavailable; the vruddhi check is then
+  /// skipped and the festival may be reported a day early.
+  static List<String> detectAll(DayData day, [DayData? tomorrow]) {
     // ── Solar festivals ──────────────────────────────────────────────────────
     if (day.sunZodiacEntryToday) {
       final solar = switch (day.sunZodiacSign) {
@@ -27,36 +32,55 @@ abstract final class FestivalDetector {
         9 => 'Makar Sankranti / Pongal',   // Sun enters Makara
         _ => null,
       };
-      if (solar != null) return solar;
+      if (solar != null) return [solar];
       // Other sign crossings have no named festival — fall through to tithi check.
     }
 
     // ── Tithi-based festivals ────────────────────────────────────────────────
     // No tithi-based festivals in Adhika (intercalary) months.
-    if (day.isAdhika) return null;
+    if (day.isAdhika) return const [];
 
-    // Special-window festivals are checked first; they take priority over the
-    // sunrise rule so the correct calendar day is always chosen.
+    // Special-window festivals are computed alongside the sunrise rule (not as
+    // an early return) so a special-window festival and a sunrise-rule
+    // festival landing on the same calendar day are both reported — this
+    // previously caused Ganesh Chaturthi (Madhyahna rule) to silently shadow
+    // Hartalika Teej (sunrise rule) whenever both tithis fell on one day.
     final special = _specialWindowFestival(day);
-    if (special != null) return special;
-
-    // Vruddhi (expanded) tithi: when secondaryTithi is null the primary tithi
-    // continues past the next sunrise, meaning today is the FIRST of two
-    // consecutive days with this tithi as primary.  Drik panchang observes the
-    // festival on the LAST such day, so suppress here and it will appear
-    // naturally tomorrow when the tithi ends before the next sunrise.
-    if (day.secondaryTithi == null) return null;
 
     final m = day.lunarMonth;
     final primary   = _byTithi(m, day.tithi.number);
+
+    // Vruddhi (expanded) tithi: when secondaryTithi is null, TODAY's tithi
+    // continues past the next sunrise, meaning it will also rule tomorrow.
+    // Drik panchang observes the festival on the LAST such day, so suppress
+    // primary here — but only when a sunrise-rule festival actually matched
+    // today's tithi; an unrelated vruddhi tithi elsewhere in the day must not
+    // blank out the whole day (this previously caused sunrise-rule festivals
+    // like Hartalika Teej to disappear whenever the sunrise tithi happened to
+    // be vruddhi, even though the festival's own tithi was unaffected).
+    var effectivePrimary = primary;
+    if (primary != null && day.secondaryTithi == null) {
+      final tomorrowStillSame = tomorrow?.tithi.number == day.tithi.number;
+      if (tomorrowStillSame) effectivePrimary = null;
+    }
+
     // Only check secondary for festivals when it is a true kshaya tithi —
     // i.e. it never becomes the primary on any calendar day.
     final secondary = (day.secondaryTithi != null && day.secondaryIsKshaya)
         ? _byTithi(m, day.secondaryTithi!.number)
         : null;
 
-    if (primary != null && secondary != null) return '$primary / $secondary';
-    return primary ?? secondary;
+    return [special, effectivePrimary, secondary].whereType<String>().toSet().toList();
+  }
+
+  /// Convenience wrapper for callers that only need a single name (e.g. to
+  /// test "is this day a festival day at all"). Returns the first name from
+  /// [detectAll], or null. Prefer [detectAll] wherever the UI renders or
+  /// links festival names, so multiple same-day festivals are never merged
+  /// into one unlinkable string.
+  static String? detect(DayData day, [DayData? tomorrow]) {
+    final all = detectAll(day, tomorrow);
+    return all.isEmpty ? null : all.first;
   }
 
   // ── Special-window festivals ───────────────────────────────────────────────

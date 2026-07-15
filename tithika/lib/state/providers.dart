@@ -69,11 +69,19 @@ final dayDataProvider = FutureProvider<DayData?>((ref) async {
     lon: location.lon,
     tzOffset: location.tzOffsetAt(date),
   );
+  final tomorrow = date.add(const Duration(days: 1));
+  final rawTomorrow = tithiSvc.calculateForDate(
+    localDate: tomorrow,
+    lat: location.lat,
+    lon: location.lon,
+    tzOffset: location.tzOffsetAt(tomorrow),
+  );
 
   final adjusted = _applyMonthSystem(raw, monthSystem);
   final purnimanta = _applyMonthSystem(raw, MonthSystem.purnimanta);
-  final festivalName = FestivalDetector.detect(purnimanta);
-  return adjusted.copyWith(festivalName: festivalName);
+  final purnimantaTomorrow = _applyMonthSystem(rawTomorrow, MonthSystem.purnimanta);
+  final festivalNames = FestivalDetector.detectAll(purnimanta, purnimantaTomorrow);
+  return adjusted.copyWith(festivalNames: festivalNames);
 });
 
 // ── Day strip (4 days: selected−1, selected, selected+1, selected+2) ──────────
@@ -92,9 +100,19 @@ final stripDaysProvider = FutureProvider<List<DayData>>((ref) async {
       lon: location.lon,
       tzOffset: location.tzOffsetAt(date),
     );
+    final tomorrow = date.add(const Duration(days: 1));
+    final rawTomorrow = tithiSvc.calculateForDate(
+      localDate: tomorrow,
+      lat: location.lat,
+      lon: location.lon,
+      tzOffset: location.tzOffsetAt(tomorrow),
+    );
     final adjusted = _applyMonthSystem(raw, monthSystem);
     final purnimanta = _applyMonthSystem(raw, MonthSystem.purnimanta);
-    return adjusted.copyWith(festivalName: FestivalDetector.detect(purnimanta));
+    final purnimantaTomorrow = _applyMonthSystem(rawTomorrow, MonthSystem.purnimanta);
+    return adjusted.copyWith(
+      festivalNames: FestivalDetector.detectAll(purnimanta, purnimantaTomorrow),
+    );
   });
 });
 
@@ -129,9 +147,19 @@ final monthDataProvider =
           lon: location.lon,
           tzOffset: location.tzOffsetAt(date),
         );
+        final tomorrow = date.add(const Duration(days: 1));
+        final rawTomorrow = tithiSvc.calculateForDate(
+          localDate: tomorrow,
+          lat: location.lat,
+          lon: location.lon,
+          tzOffset: location.tzOffsetAt(tomorrow),
+        );
         final adjusted = _applyMonthSystem(raw, monthSystem);
         final purnimanta = _applyMonthSystem(raw, MonthSystem.purnimanta);
-        return adjusted.copyWith(festivalName: FestivalDetector.detect(purnimanta));
+        final purnimantaTomorrow = _applyMonthSystem(rawTomorrow, MonthSystem.purnimanta);
+        return adjusted.copyWith(
+          festivalNames: FestivalDetector.detectAll(purnimanta, purnimantaTomorrow),
+        );
       }(),
   };
 });
@@ -297,6 +325,14 @@ final yearFestivalsProvider =
       );
       final adjusted = _applyMonthSystem(raw, monthSystem);
       final purnimanta = _applyMonthSystem(raw, MonthSystem.purnimanta);
+      final tomorrow = date.add(const Duration(days: 1));
+      final rawTomorrow = tithiSvc.calculateForDate(
+        localDate: tomorrow,
+        lat: location.lat,
+        lon: location.lon,
+        tzOffset: location.tzOffsetAt(tomorrow),
+      );
+      final purnimantaTomorrow = _applyMonthSystem(rawTomorrow, MonthSystem.purnimanta);
       final primaryIsEkadashi = raw.tithi.special == SpecialTithi.ekadashi;
       final kshayaIsEkadashi = raw.secondaryIsKshaya &&
           raw.secondaryTithi?.special == SpecialTithi.ekadashi;
@@ -305,35 +341,36 @@ final yearFestivalsProvider =
       // is Day 1 and should be suppressed (observe on Day 2).  Lookahead is
       // more robust than secondaryTithi == null alone, which can miss the case
       // where Ekadashi ends minutes before the next sunrise.
-      final isVruddhiFirstDay = primaryIsEkadashi && () {
-        final tomorrow = date.add(const Duration(days: 1));
-        return tithiSvc.calculateForDate(
-          localDate: tomorrow,
-          lat: location.lat,
-          lon: location.lon,
-          tzOffset: location.tzOffsetAt(tomorrow),
-        ).tithi.special == SpecialTithi.ekadashi;
-      }();
-      final detectedName = FestivalDetector.detect(purnimanta);
+      final isVruddhiFirstDay =
+          primaryIsEkadashi && rawTomorrow.tithi.special == SpecialTithi.ekadashi;
+      final detectedNames = FestivalDetector.detectAll(purnimanta, purnimantaTomorrow);
       final isObservedEkadashi = isEkadashiDay && !isVruddhiFirstDay;
-      final inFestivals = detectedName != null;
-      final festivalName = detectedName ?? (isObservedEkadashi ? 'Ekadashi' : null);
-      final enriched = adjusted.copyWith(festivalName: festivalName);
-      if (inFestivals || isObservedEkadashi) {
+
+      // One FestivalEntry per detected name — each links to its own
+      // description, so unrelated same-day festivals must never be merged.
+      for (final name in detectedNames) {
         entries.add(FestivalEntry(
           date: date,
-          data: enriched,
+          data: adjusted.copyWith(festivalName: name),
           isEkadashi: isObservedEkadashi,
-          inFestivals: inFestivals,
+          inFestivals: true,
         ));
+        // Golu (Bommai Kolu) — Tamil Nadu tradition during Sharad Navratri,
+        // same start date, shown as a separate festival entry.
+        if (name == 'Sharad Navratri') {
+          entries.add(FestivalEntry(
+            date: date,
+            data: adjusted.copyWith(festivalName: 'Golu'),
+            inFestivals: true,
+          ));
+        }
       }
-      // Golu (Bommai Kolu) — Tamil Nadu tradition during Sharad Navratri,
-      // same start date, shown as a separate festival entry.
-      if (detectedName == 'Sharad Navratri') {
+      if (detectedNames.isEmpty && isObservedEkadashi) {
         entries.add(FestivalEntry(
           date: date,
-          data: adjusted.copyWith(festivalName: 'Golu'),
-          inFestivals: true,
+          data: adjusted.copyWith(festivalName: 'Ekadashi'),
+          isEkadashi: true,
+          inFestivals: false,
         ));
       }
     }

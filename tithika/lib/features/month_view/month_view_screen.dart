@@ -13,6 +13,7 @@ import '../../models/paksha.dart';
 import '../../models/special_tithi.dart';
 import '../../state/providers.dart';
 import '../day_view/moon_phase_widget.dart';
+import '../festivals/festival_detail_sheet.dart';
 import '../shared/starfield_background.dart';
 import '../shared/tithika_nav_bar.dart';
 
@@ -402,44 +403,35 @@ class _MonthCell extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Hindu month label — bold gold on first day of new lunar month
-          if (isHinduMonthStart)
-            Padding(
-              padding: const EdgeInsets.only(top: 2),
-              child: Text(
-                hinduMonthLabel!,
-                style: TextStyle(
-                  fontSize: 7.5,
-                  fontWeight: FontWeight.w700,
-                  color: colors.shukla,
-                  letterSpacing: 0.3,
-                ),
-              ),
-            )
-          else
-            const SizedBox(height: 4),
+          const SizedBox(height: 2),
 
           // Date number
-          Container(
-            width: 20,
+          SizedBox(
+            width: 26,
             height: 20,
-            decoration: (isToday && !isSelected)
-                ? BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: colors.shukla,
-                  )
-                : null,
-            alignment: Alignment.center,
-            child: Text(
-              '$day',
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: isSelected
-                    ? colors.shukla
-                    : isToday
-                        ? colors.moonDark
-                        : colors.ink,
+            child: Container(
+              decoration: (isToday && !isSelected)
+                  ? BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: colors.shukla,
+                    )
+                  : null,
+              alignment: Alignment.center,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  '$day',
+                  softWrap: false,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: isSelected
+                        ? colors.shukla
+                        : isToday
+                            ? colors.moonDark
+                            : colors.ink,
+                  ),
+                ),
               ),
             ),
           ),
@@ -479,6 +471,24 @@ class _MonthCell extends StatelessWidget {
                 color: colors.festival,
               ),
             ),
+
+          // Hindu month label — bold gold on first day of new lunar month.
+          // Shown at the bottom so cells without a label aren't misaligned
+          // (this row is the last, variable-height element in the column).
+          if (isHinduMonthStart)
+            Padding(
+              padding: const EdgeInsets.only(top: 1),
+              child: Text(
+                hinduMonthLabel!,
+                style: TextStyle(
+                  fontSize: 7,
+                  fontWeight: FontWeight.w700,
+                  color: colors.shukla,
+                  letterSpacing: 0.2,
+                  height: 1.0,
+                ),
+              ),
+            ),
         ],
         ),
       ),
@@ -505,7 +515,7 @@ class _MonthFestivalList extends ConsumerWidget {
     final language = ref.watch(appSettingsProvider).language;
     final daysInMonth = DateTime(year, month + 1, 0).day;
 
-    final festivals = <({int day, String name})>[];
+    final festivals = <({int day, String canonical, String name})>[];
     final ekadashis = <int>[];
 
     for (var d = 1; d <= daysInMonth; d++) {
@@ -517,60 +527,74 @@ class _MonthFestivalList extends ConsumerWidget {
       final isEkadashiDay = primaryIsEk || kshayaIsEk;
       final tomorrowIsEk = monthData[d + 1]?.tithi.special == SpecialTithi.ekadashi;
       final isVruddhiFirstDay = primaryIsEk && tomorrowIsEk;
+      // One row per detected name — unrelated same-day festivals must never
+      // be merged into a single row, or the detail-sheet link breaks.
+      for (final canonical in data.festivalNames) {
+        festivals.add((
+          day: d,
+          canonical: canonical,
+          name: FestivalNames.localize(canonical, language)!,
+        ));
+      }
       if (!isVruddhiFirstDay && isEkadashiDay) {
-        if (data.festivalName != null) {
-          festivals.add((day: d, name: FestivalNames.localize(data.festivalName, language)!));
-        }
         ekadashis.add(d);
-      } else if (data.festivalName != null) {
-        festivals.add((day: d, name: FestivalNames.localize(data.festivalName, language)!));
       }
     }
 
     if (festivals.isEmpty && ekadashis.isEmpty) return const SizedBox.shrink();
 
     Iterable<Widget> buildRows(
-      List<({int day, String name})> items,
+      List<({int day, String canonical, String name})> items,
       Color dotColor,
     ) =>
         items.map((f) {
           final date = DateTime(year, month, f.day);
           final wd = AppStrings.weekdayShort(date.weekday, language);
           final mo = AppStrings.gregMonthShort(month, language);
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            child: Row(
-              children: [
-                SizedBox(
-                  width: 54,
-                  child: Text(
-                    '$wd ${f.day} $mo',
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: colors.inkSoft,
-                          fontSize: 10,
-                        ),
+          return GestureDetector(
+            onTap: () => showFestivalDetail(
+              context,
+              FestivalEntry(
+                date: date,
+                data: monthData[f.day]!.copyWith(festivalName: f.canonical),
+                inFestivals: true,
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 54,
+                    child: Text(
+                      '$wd ${f.day} $mo',
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            color: colors.inkSoft,
+                            fontSize: 10,
+                          ),
+                    ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                Container(
-                  width: 3,
-                  height: 3,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: dotColor,
+                  const SizedBox(width: 8),
+                  Container(
+                    width: 3,
+                    height: 3,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: dotColor,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    f.name,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      f.name,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         });

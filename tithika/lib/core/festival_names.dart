@@ -1,7 +1,7 @@
 import '../models/app_settings.dart';
 
 /// Translates a canonical English festival key (as returned by
-/// [FestivalDetector.detect]) into the user's display language.
+/// [FestivalDetector.detectAll]) into the user's display language.
 ///
 /// The English name is the single source of truth. Adding a new language
 /// means adding one new map here — no other files need to change.
