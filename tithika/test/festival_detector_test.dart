@@ -107,6 +107,67 @@ void main() {
     });
   });
 
+  group('FestivalDetector.detect — Purnima Purvahna/Madhyahna exception', () {
+    // Real Fremont, CA data for Guru Purnima 2026 (all times PDT, UTC-7):
+    //   Jul 28 sunrise 06:08:55, Purnima active 05:49:28 (Jul 28) – 07:35:43 (Jul 29)
+    //   Jul 29 sunrise 06:09:44, Purnima still ruling at sunrise but ends before Madhyahna
+    // Generic vruddhi-last-day logic would (incorrectly) suppress Jul 28 and
+    // report Jul 29 instead. Purnima must follow the Madhyahna-prevails rule:
+    // observed on Jul 28, since Purnima has already ended by Jul 29's Madhyahna.
+    test(
+      'Guru Purnima is reported on the FIRST day of a two-day Purnima span '
+      'when Purnima does not survive to the second day\'s Madhyahna',
+      () {
+        final jul28 = _day(
+          lunarMonth: LunarMonth.ashadha,
+          tithi: _tithi(15, DateTime.utc(2026, 7, 28, 12, 49, 28),
+              DateTime.utc(2026, 7, 29, 14, 35, 43)),
+          secondaryTithi: null,
+          sunriseUtc: DateTime.utc(2026, 7, 28, 13, 8, 55),
+          sunsetUtc: DateTime.utc(2026, 7, 29, 3, 30),
+        );
+        final jul29 = _day(
+          lunarMonth: LunarMonth.ashadha,
+          tithi: _tithi(15, DateTime.utc(2026, 7, 28, 12, 49, 28),
+              DateTime.utc(2026, 7, 29, 14, 35, 43)),
+          secondaryTithi: _tithi(16, DateTime.utc(2026, 7, 29, 14, 35, 43),
+              DateTime.utc(2026, 7, 30, 16, 0, 48)),
+          sunriseUtc: DateTime.utc(2026, 7, 29, 13, 9, 44),
+          sunsetUtc: DateTime.utc(2026, 7, 30, 3, 31),
+        );
+
+        expect(FestivalDetector.detect(jul28, jul29), 'Guru Purnima');
+        expect(FestivalDetector.detect(jul29, null), isNull);
+      },
+    );
+
+    test(
+      'Purnima with no vruddhi (starts after day 1 sunrise, so day 1 is '
+      "still tithi 14) is reported on day 2, when it becomes day 2's sunrise "
+      'tithi and survives to Madhyahna',
+      () {
+        final day1 = _day(
+          lunarMonth: LunarMonth.ashadha,
+          tithi: _tithi(14, DateTime.utc(2026, 7, 27, 14), DateTime.utc(2026, 7, 28, 16)),
+          secondaryTithi: _tithi(15, DateTime.utc(2026, 7, 28, 16), DateTime.utc(2026, 7, 29, 22)),
+          secondaryIsKshaya: false,
+          sunriseUtc: DateTime.utc(2026, 7, 28, 13),
+          sunsetUtc: DateTime.utc(2026, 7, 29, 3),
+        );
+        final day2 = _day(
+          lunarMonth: LunarMonth.ashadha,
+          tithi: _tithi(15, DateTime.utc(2026, 7, 28, 16), DateTime.utc(2026, 7, 29, 22)),
+          secondaryTithi: null,
+          sunriseUtc: DateTime.utc(2026, 7, 29, 13),
+          sunsetUtc: DateTime.utc(2026, 7, 30, 3),
+        );
+
+        expect(FestivalDetector.detect(day1, day2), isNull);
+        expect(FestivalDetector.detect(day2, null), 'Guru Purnima');
+      },
+    );
+  });
+
   group('FestivalDetector.detectAll — special-window / sunrise-rule collision', () {
     test(
       'Hartalika Teej (sunrise-rule, primary=Tritiya) and Ganesh Chaturthi '
