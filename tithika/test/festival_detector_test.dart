@@ -166,6 +166,51 @@ void main() {
         expect(FestivalDetector.detect(day2, null), 'Guru Purnima');
       },
     );
+
+    // Real India data for Raksha Bandhan 2026 (all times IST, UTC+5:30):
+    //   Aug 27 sunrise 05:28, Purnima active 09:09 (Aug 27) – 09:49 (Aug 28)
+    //   Aug 28 sunrise 05:28, Purnima ruling at sunrise but ends well before
+    //   that day's Madhyahna (~11:50) — an ordinary (non-vruddhi) single-
+    //   sunrise Purnima day: secondaryTithi is set on Aug 28, since tithi 16
+    //   begins later the same day. The Madhyahna override must NOT apply
+    //   here — it previously fired unconditionally on any tithi-15 day and
+    //   incorrectly suppressed the correct sunrise-rule day (Aug 28).
+    test(
+      'Raksha Bandhan is reported via the plain sunrise rule on an ordinary '
+      '(non-vruddhi) single-sunrise Purnima day, even though it fails the '
+      "Madhyahna check for that day",
+      () {
+        final aug27 = _day(
+          lunarMonth: LunarMonth.shravana,
+          tithi: _tithi(14, DateTime.utc(2026, 8, 26, 20, 0),
+              DateTime.utc(2026, 8, 27, 3, 39)),
+          secondaryTithi: _tithi(15, DateTime.utc(2026, 8, 27, 3, 39),
+              DateTime.utc(2026, 8, 28, 4, 19)),
+          sunriseUtc: DateTime.utc(2026, 8, 26, 23, 58),
+          sunsetUtc: DateTime.utc(2026, 8, 27, 12, 43),
+        );
+        final aug28 = _day(
+          lunarMonth: LunarMonth.shravana,
+          tithi: _tithi(15, DateTime.utc(2026, 8, 27, 3, 39),
+              DateTime.utc(2026, 8, 28, 4, 19)),
+          secondaryTithi: _tithi(16, DateTime.utc(2026, 8, 28, 4, 19),
+              DateTime.utc(2026, 8, 29, 8, 30)),
+          sunriseUtc: DateTime.utc(2026, 8, 27, 23, 58),
+          sunsetUtc: DateTime.utc(2026, 8, 28, 12, 43),
+        );
+        final aug29 = _day(
+          lunarMonth: LunarMonth.bhadrapada,
+          tithi: _tithi(16, DateTime.utc(2026, 8, 28, 4, 19),
+              DateTime.utc(2026, 8, 29, 8, 30)),
+          secondaryTithi: null,
+          sunriseUtc: DateTime.utc(2026, 8, 28, 23, 58),
+          sunsetUtc: DateTime.utc(2026, 8, 29, 12, 42),
+        );
+
+        expect(FestivalDetector.detect(aug27, aug28), isNull);
+        expect(FestivalDetector.detect(aug28, aug29), 'Raksha Bandhan');
+      },
+    );
   });
 
   group('FestivalDetector.detectAll — special-window / sunrise-rule collision', () {
