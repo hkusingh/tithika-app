@@ -116,6 +116,12 @@ class _StubEphemeris implements EphemerisService {
 
   @override
   DateTime? moonset(DateTime utcMidnight, double lat, double lon) => null;
+
+  @override
+  RawEclipse? nextSolarEclipse(DateTime afterUtc, double lat, double lon) => null;
+
+  @override
+  RawEclipse? nextLunarEclipse(DateTime afterUtc, double lat, double lon) => null;
 }
 
 // ── Reference anchors ─────────────────────────────────────────────────────────

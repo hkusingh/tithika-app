@@ -1,4 +1,5 @@
 import '../models/app_settings.dart';
+import '../models/eclipse_info.dart';
 import '../models/muhurta_data.dart';
 import '../models/paksha.dart';
 import '../models/pancha_data.dart';
@@ -232,6 +233,181 @@ abstract final class AppStrings {
         AppLanguage.kannada         => 'ವಿವರಣ',
         _                           => 'ABOUT',
       };
+
+  // ── Eclipses (Grahan) ────────────────────────────────────────────────
+
+  static String eclipses(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'ग्रहण',
+        AppLanguage.tamil           => 'கிரகணங்கள்',
+        AppLanguage.bengali         => 'গ্রহণ',
+        AppLanguage.odia            => 'ଗ୍ରହଣ',
+        AppLanguage.telugu          => 'గ్రహణాలు',
+        AppLanguage.malayalam       => 'ഗ്രഹണങ്ങൾ',
+        AppLanguage.kannada         => 'ಗ್ರಹಣಗಳು',
+        _ => 'ECLIPSES',
+      };
+
+  static String solarEclipse(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'सूर्य ग्रहण',
+        AppLanguage.tamil           => 'சூரிய கிரகணம்',
+        AppLanguage.bengali         => 'সূর্যগ্রহণ',
+        AppLanguage.odia            => 'ସୂର୍ଯ୍ୟ ଗ୍ରହଣ',
+        AppLanguage.telugu          => 'సూర్య గ్రహణం',
+        AppLanguage.malayalam       => 'സൂര്യഗ്രഹണം',
+        AppLanguage.kannada         => 'ಸೂರ್ಯಗ್ರಹಣ',
+        _ => 'Solar Eclipse',
+      };
+
+  static String lunarEclipse(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'चंद्र ग्रहण',
+        AppLanguage.tamil           => 'சந்திர கிரகணம்',
+        AppLanguage.bengali         => 'চন্দ্রগ্রহণ',
+        AppLanguage.odia            => 'ଚନ୍ଦ୍ର ଗ୍ରହଣ',
+        AppLanguage.telugu          => 'చంద్ర గ్రహణం',
+        AppLanguage.malayalam       => 'ചന്ദ്രഗ്രഹണം',
+        AppLanguage.kannada         => 'ಚಂದ್ರಗ್ರಹಣ',
+        _ => 'Lunar Eclipse',
+      };
+
+  static String eclipseSubtype(EclipseSubtype subtype, AppLanguage lang) =>
+      switch (subtype) {
+        EclipseSubtype.total => switch (lang) {
+            AppLanguage.hindiDevanagari => 'पूर्ण',
+            AppLanguage.tamil           => 'முழு',
+            AppLanguage.bengali         => 'পূর্ণ',
+            AppLanguage.odia            => 'ପୂର୍ଣ୍ଣ',
+            AppLanguage.telugu          => 'పూర్ణ',
+            AppLanguage.malayalam       => 'പൂർണ്ണ',
+            AppLanguage.kannada         => 'ಪೂರ್ಣ',
+            _ => 'Total',
+          },
+        EclipseSubtype.annular => switch (lang) {
+            AppLanguage.hindiDevanagari => 'वलयाकार',
+            AppLanguage.tamil           => 'வளையக்',
+            AppLanguage.bengali         => 'বলয়গ্রাস',
+            AppLanguage.odia            => 'କଙ୍କଣାକାର',
+            AppLanguage.telugu          => 'వలయాకార',
+            AppLanguage.malayalam       => 'വലയ',
+            AppLanguage.kannada         => 'ಕಂಕಣ',
+            _ => 'Annular',
+          },
+        EclipseSubtype.partial => switch (lang) {
+            AppLanguage.hindiDevanagari => 'आंशिक',
+            AppLanguage.tamil           => 'பகுதி',
+            AppLanguage.bengali         => 'আংশিক',
+            AppLanguage.odia            => 'ଆଂଶିକ',
+            AppLanguage.telugu          => 'పాక్షిక',
+            AppLanguage.malayalam       => 'ഭാഗിക',
+            AppLanguage.kannada         => 'ಭಾಗಶಃ',
+            _ => 'Partial',
+          },
+        EclipseSubtype.penumbral => switch (lang) {
+            AppLanguage.hindiDevanagari => 'उपच्छाया',
+            AppLanguage.tamil           => 'மங்கல்',
+            AppLanguage.bengali         => 'উপচ্ছায়া',
+            AppLanguage.odia            => 'ଉପଚ୍ଛାୟା',
+            AppLanguage.telugu          => 'ఉపచ్ఛాయ',
+            AppLanguage.malayalam       => 'ഉപച്ഛായ',
+            AppLanguage.kannada         => 'ಉಪಚ್ಛಾಯೆ',
+            _ => 'Penumbral',
+          },
+      };
+
+  static String eclipseVisible(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'यहाँ दिखाई देगा',
+        AppLanguage.tamil           => 'இங்கு தெரியும்',
+        AppLanguage.bengali         => 'এখানে দৃশ্যমান',
+        AppLanguage.odia            => 'ଏଠାରେ ଦୃଶ୍ୟମାନ',
+        AppLanguage.telugu          => 'ఇక్కడ కనిపిస్తుంది',
+        AppLanguage.malayalam       => 'ഇവിടെ ദൃശ്യമാകും',
+        AppLanguage.kannada         => 'ಇಲ್ಲಿ ಗೋಚರಿಸುತ್ತದೆ',
+        _ => 'Visible here',
+      };
+
+  static String eclipseNotVisible(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'यहाँ दिखाई नहीं देगा',
+        AppLanguage.tamil           => 'இங்கு தெரியாது',
+        AppLanguage.bengali         => 'এখানে দৃশ্যমান নয়',
+        AppLanguage.odia            => 'ଏଠାରେ ଦୃଶ୍ୟମାନ ନୁହେଁ',
+        AppLanguage.telugu          => 'ఇక్కడ కనిపించదు',
+        AppLanguage.malayalam       => 'ഇവിടെ ദൃശ്യമല്ല',
+        AppLanguage.kannada         => 'ಇಲ್ಲಿ ಗೋಚರಿಸುವುದಿಲ್ಲ',
+        _ => 'Not visible here',
+      };
+
+  static String sutakBegins(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'सूतक काल प्रारंभ',
+        AppLanguage.tamil           => 'சூதக காலம் தொடங்கும்',
+        AppLanguage.bengali         => 'সূতক কাল শুরু',
+        AppLanguage.odia            => 'ସୂତକ କାଳ ଆରମ୍ଭ',
+        AppLanguage.telugu          => 'సూతక కాలం ప్రారంభం',
+        AppLanguage.malayalam       => 'സൂതക കാലം ആരംഭം',
+        AppLanguage.kannada         => 'ಸೂತಕ ಕಾಲ ಪ್ರಾರಂಭ',
+        _ => 'Sutak begins',
+      };
+
+  static String eclipseStart(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'प्रारंभ',
+        AppLanguage.tamil           => 'தொடக்கம்',
+        AppLanguage.bengali         => 'শুরু',
+        AppLanguage.odia            => 'ଆରମ୍ଭ',
+        AppLanguage.telugu          => 'ప్రారంభం',
+        AppLanguage.malayalam       => 'ആരംഭം',
+        AppLanguage.kannada         => 'ಪ್ರಾರಂಭ',
+        _ => 'Start',
+      };
+
+  static String eclipseMax(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'चरम',
+        AppLanguage.tamil           => 'உச்சம்',
+        AppLanguage.bengali         => 'সর্বোচ্চ',
+        AppLanguage.odia            => 'ସର୍ବାଧିକ',
+        AppLanguage.telugu          => 'గరిష్ఠం',
+        AppLanguage.malayalam       => 'പരമാവധി',
+        AppLanguage.kannada         => 'ಗರಿಷ್ಠ',
+        _ => 'Maximum',
+      };
+
+  static String eclipseEnd(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'समाप्त',
+        AppLanguage.tamil           => 'முடிவு',
+        AppLanguage.bengali         => 'শেষ',
+        AppLanguage.odia            => 'ସମାପ୍ତ',
+        AppLanguage.telugu          => 'ముగింపు',
+        AppLanguage.malayalam       => 'അവസാനം',
+        AppLanguage.kannada         => 'ಅಂತ್ಯ',
+        _ => 'End',
+      };
+
+  /// Shown above the time list when the eclipse isn't visible at the user's
+  /// location — clarifies that the times below are global reference times
+  /// (UTC), not local observation times, since nothing is observable here.
+  static String eclipseTimesInUtc(AppLanguage lang) =>
+      switch (lang) {
+        AppLanguage.hindiDevanagari => 'समय UTC में (यहाँ अदृश्य)',
+        AppLanguage.tamil           => 'நேரங்கள் UTC-ல் (இங்கு காணப்படாது)',
+        AppLanguage.bengali         => 'সময় UTC-তে (এখানে অদৃশ্য)',
+        AppLanguage.odia            => 'ସମୟ UTC ରେ (ଏଠାରେ ଅଦୃଶ୍ୟ)',
+        AppLanguage.telugu          => 'సమయాలు UTCలో (ఇక్కడ కనిపించదు)',
+        AppLanguage.malayalam       => 'സമയങ്ങൾ UTC-യിൽ (ഇവിടെ ദൃശ്യമല്ല)',
+        AppLanguage.kannada         => 'ಸಮಯಗಳು UTC ನಲ್ಲಿ (ಇಲ್ಲಿ ಗೋಚರಿಸುವುದಿಲ್ಲ)',
+        _ => 'Times shown in UTC (not visible here)',
+      };
+
+  /// e.g. "Total Solar Eclipse" / "आंशिक चंद्र ग्रहण".
+  static String eclipseFullName(EclipseKind kind, EclipseSubtype subtype, AppLanguage lang) {
+    final kindName = kind == EclipseKind.solar ? solarEclipse(lang) : lunarEclipse(lang);
+    return '${eclipseSubtype(subtype, lang)} $kindName';
+  }
 
   static String howToObserve(AppLanguage lang) =>
       switch (lang) {

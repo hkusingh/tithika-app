@@ -15,6 +15,7 @@ class TithikaColors extends ThemeExtension<TithikaColors> {
     required this.krishna,
     required this.krishnaGlow,
     required this.festival,
+    required this.eclipse,
     required this.ink,
     required this.inkSoft,
     required this.inkMuted,
@@ -33,6 +34,10 @@ class TithikaColors extends ThemeExtension<TithikaColors> {
   final Color krishna;
   final Color krishnaGlow;
   final Color festival;
+  /// Deep maroon/red used for solar and lunar eclipse (Grahan) markers —
+  /// distinct from [festival] since eclipses are a different, cautionary
+  /// category of calendar event.
+  final Color eclipse;
   final Color ink;
   final Color inkSoft;
   final Color inkMuted;
@@ -52,6 +57,7 @@ class TithikaColors extends ThemeExtension<TithikaColors> {
     krishna:     Color(0xFF7D8DF0),
     krishnaGlow: Color(0x2E7D8DF0),
     festival:    Color(0xFFFF8C42),
+    eclipse:     Color(0xFFB33A5E),
     ink:         Color(0xFFF3EEDF),
     inkSoft:     Color(0xFFAAB0C5),
     inkMuted:    Color(0xFF6C7290),
@@ -71,6 +77,7 @@ class TithikaColors extends ThemeExtension<TithikaColors> {
     krishna:     Color(0xFF5A6BD8),
     krishnaGlow: Color(0x2E5A6BD8),
     festival:    Color(0xFFD46A1E),
+    eclipse:     Color(0xFF9A2E4C),
     ink:         Color(0xFF1A1F3C),
     inkSoft:     Color(0xFF4A5070),
     inkMuted:    Color(0xFF8890A8),
@@ -90,7 +97,7 @@ class TithikaColors extends ThemeExtension<TithikaColors> {
     Color? background, Color? panel, Color? card,
     Color? shukla, Color? shuklaGlow,
     Color? krishna, Color? krishnaGlow,
-    Color? festival,
+    Color? festival, Color? eclipse,
     Color? ink, Color? inkSoft, Color? inkMuted,
     Color? moonLight, Color? moonDark,
     Color? line, Color? lineStrong,
@@ -104,6 +111,7 @@ class TithikaColors extends ThemeExtension<TithikaColors> {
     krishna:     krishna     ?? this.krishna,
     krishnaGlow: krishnaGlow ?? this.krishnaGlow,
     festival:    festival    ?? this.festival,
+    eclipse:     eclipse     ?? this.eclipse,
     ink:         ink         ?? this.ink,
     inkSoft:     inkSoft     ?? this.inkSoft,
     inkMuted:    inkMuted    ?? this.inkMuted,
@@ -124,6 +132,7 @@ class TithikaColors extends ThemeExtension<TithikaColors> {
     krishna:     Color.lerp(krishna,     other.krishna,     t)!,
     krishnaGlow: Color.lerp(krishnaGlow, other.krishnaGlow, t)!,
     festival:    Color.lerp(festival,    other.festival,    t)!,
+    eclipse:     Color.lerp(eclipse,     other.eclipse,     t)!,
     ink:         Color.lerp(ink,         other.ink,         t)!,
     inkSoft:     Color.lerp(inkSoft,     other.inkSoft,     t)!,
     inkMuted:    Color.lerp(inkMuted,    other.inkMuted,    t)!,

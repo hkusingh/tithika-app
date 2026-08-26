@@ -136,6 +136,110 @@ class SwephEphemerisService implements EphemerisService {
     );
     return resultJd == null ? null : utcFromJulianDay(resultJd);
   }
+
+  @override
+  RawEclipse? nextSolarEclipse(DateTime afterUtc, double lat, double lon) {
+    assert(afterUtc.isUtc);
+    final jd = julianDayFromUtc(afterUtc);
+    // Global search first — unlike swe_sol_eclipse_when_loc (which silently
+    // SKIPS any eclipse not visible from geoPos), swe_sol_eclipse_when_glob
+    // finds every solar eclipse worldwide, so a not-visible-here eclipse is
+    // still returned (and reported as such) rather than disappearing.
+    final glob = Sweph.swe_sol_eclipse_when_glob(
+      jd,
+      SwephFlag.SEFLG_SWIEPH,
+      EclipseFlag(0), // any type
+      false,
+    );
+    final globTimes = glob.times;
+    final globType = glob.eclipseType;
+    if (globTimes == null || globType == null) return null;
+    final maxJd = globTimes[0];
+
+    // swe_sol_eclipse_how reports the LOCAL type flags and (via
+    // SE_ECL_VISIBLE) whether this eclipse is visible from geoPos at
+    // maximum. Per its own doc comment, the returned flag is 0 — no
+    // SE_ECL_TOTAL/ANNULAR/PARTIAL bits set — when nothing is visible here,
+    // so its type is only meaningful when [visible] is true.
+    final how = Sweph.swe_sol_eclipse_how(
+      maxJd,
+      SwephFlag.SEFLG_SWIEPH,
+      GeoPosition(lon, lat),
+    );
+    final howType = how.eclipseType;
+    if (howType == null) return null;
+    final visible = (howType & EclipseFlag.SE_ECL_VISIBLE).value != 0;
+    // When not visible here, fall back to the eclipse's true global type
+    // (from the worldwide search) rather than the meaningless local flags —
+    // otherwise a not-visible eclipse would be mislabeled "Partial" by
+    // default even when it's actually total/annular elsewhere on Earth.
+    final type = visible ? howType : globType;
+
+    // Only when visible here can swe_sol_eclipse_when_loc give true local
+    // contact times — anchored just before the already-known max so it
+    // resolves this same event rather than searching for a different one.
+    double startJd = globTimes[2];
+    double endJd = globTimes[3];
+    if (visible) {
+      final loc = Sweph.swe_sol_eclipse_when_loc(
+        maxJd - 1.0,
+        SwephFlag.SEFLG_SWIEPH,
+        GeoPosition(lon, lat),
+        false,
+      );
+      final locTimes = loc.times;
+      if (locTimes != null) {
+        startJd = locTimes[2];
+        endJd = locTimes[3];
+      }
+    }
+
+    return RawEclipse(
+      maxUtc: utcFromJulianDay(maxJd),
+      startUtc: utcFromJulianDay(startJd),
+      endUtc: utcFromJulianDay(endJd),
+      isTotal: (type & EclipseFlag.SE_ECL_TOTAL).value != 0,
+      isAnnular: (type & EclipseFlag.SE_ECL_ANNULAR).value != 0,
+      isPartial: (type & EclipseFlag.SE_ECL_PARTIAL).value != 0,
+      isPenumbral: false,
+      visibleAtLocation: visible,
+    );
+  }
+
+  @override
+  RawEclipse? nextLunarEclipse(DateTime afterUtc, double lat, double lon) {
+    assert(afterUtc.isUtc);
+    final jd = julianDayFromUtc(afterUtc);
+    final when = Sweph.swe_lun_eclipse_when(
+      jd,
+      SwephFlag.SEFLG_SWIEPH,
+      EclipseFlag.SE_ECL_ALLTYPES_LUNAR,
+      false,
+    );
+    final times = when.times;
+    final type = when.eclipseType;
+    if (times == null || type == null) return null;
+    // Lunar eclipses are visible from an entire hemisphere, not a narrow
+    // path — swe_lun_eclipse_when is global. Visibility at [lat]/[lon] is
+    // determined separately via swe_lun_eclipse_how's apparent altitude of
+    // the Moon at maximum eclipse (attr[6] > 0 means above horizon).
+    final how = Sweph.swe_lun_eclipse_how(
+      times[0],
+      SwephFlag.SEFLG_SWIEPH,
+      GeoPosition(lon, lat),
+    );
+    final apparentAltitude = how.attributes?[6] ?? -1.0;
+    return RawEclipse(
+      maxUtc: utcFromJulianDay(times[0]),
+      startUtc: utcFromJulianDay(times[2]),
+      endUtc: utcFromJulianDay(times[3]),
+      isTotal: (type & EclipseFlag.SE_ECL_TOTAL).value != 0,
+      isAnnular: false,
+      isPartial: (type & EclipseFlag.SE_ECL_PARTIAL).value != 0,
+      isPenumbral: (type & EclipseFlag.SE_ECL_PENUMBRAL).value != 0,
+      visibleAtLocation: apparentAltitude > 0,
+    );
+  }
 }
 
 /// Loads Flutter asset bytes using [rootBundle].

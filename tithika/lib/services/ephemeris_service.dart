@@ -38,4 +38,42 @@ abstract class EphemerisService {
   /// UTC time of moonset for the same date/location. Returns null if the
   /// moon never sets.
   DateTime? moonset(DateTime utcMidnight, double lat, double lon);
+
+  /// Finds the next solar eclipse (globally, of any type) after [afterUtc].
+  /// Returns raw contact/visibility data evaluated for [lat]/[lon]; null if
+  /// none is found (should not happen within any realistic search window).
+  RawEclipse? nextSolarEclipse(DateTime afterUtc, double lat, double lon);
+
+  /// Finds the next lunar eclipse (globally, of any type) after [afterUtc].
+  /// Returns raw contact/visibility data evaluated for [lat]/[lon]; null if
+  /// none is found (should not happen within any realistic search window).
+  RawEclipse? nextLunarEclipse(DateTime afterUtc, double lat, double lon);
+}
+
+/// Raw eclipse contact times and type flags for a single eclipse event,
+/// as reported by the ephemeris engine — not yet interpreted into app-level
+/// [EclipseSubtype]/visibility semantics (that's [EclipseService]'s job).
+class RawEclipse {
+  final DateTime maxUtc;
+  final DateTime startUtc;
+  final DateTime endUtc;
+  final bool isTotal;
+  final bool isAnnular;
+  final bool isPartial;
+  final bool isPenumbral;
+
+  /// True if the eclipse is visible (body above horizon) from the location
+  /// passed to the search call, at maximum eclipse.
+  final bool visibleAtLocation;
+
+  const RawEclipse({
+    required this.maxUtc,
+    required this.startUtc,
+    required this.endUtc,
+    required this.isTotal,
+    required this.isAnnular,
+    required this.isPartial,
+    required this.isPenumbral,
+    required this.visibleAtLocation,
+  });
 }

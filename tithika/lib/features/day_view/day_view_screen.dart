@@ -7,14 +7,17 @@ import '../../core/festival_names.dart';
 import '../../core/router.dart';
 import '../../core/theme.dart';
 import '../../core/time_format.dart';
+import '../../models/app_location.dart';
 import '../../models/app_settings.dart';
 import '../../models/day_data.dart';
+import '../../models/eclipse_info.dart';
 import '../../models/hora_data.dart';
 import '../../models/lunar_month.dart';
 import '../../models/paksha.dart';
 import '../../services/festival_detector.dart';
 import '../../services/providers.dart' as svc;
 import '../../state/providers.dart';
+import '../eclipses/eclipse_detail_sheet.dart';
 import '../festivals/festival_detail_sheet.dart';
 import '../shared/starfield_background.dart';
 import '../shared/tithika_nav_bar.dart';
@@ -236,6 +239,18 @@ class _DayContent extends ConsumerWidget {
     final language = ref.watch(appSettingsProvider).language;
 
     final tz = location.tzOffsetAt(date);
+    final yearEclipses = ref.watch(yearEclipsesProvider(date.year)).valueOrNull;
+    EclipseInfo? dayEclipse;
+    if (yearEclipses != null) {
+      for (final e in yearEclipses) {
+        if (e.localDate.year == date.year &&
+            e.localDate.month == date.month &&
+            e.localDate.day == date.day) {
+          dayEclipse = e;
+          break;
+        }
+      }
+    }
     final isShukla = data.tithi.paksha == Paksha.shukla;
     final pakshaColor = isShukla ? colors.shukla : colors.krishna;
     final glowColor = isShukla ? colors.shuklaGlow : colors.krishnaGlow;
@@ -374,6 +389,14 @@ class _DayContent extends ConsumerWidget {
           ),
           const SizedBox(height: 4),
           _HoraCard(date: date, tz: tz),
+          if (dayEclipse != null) ...[
+            const SizedBox(height: 4),
+            _EclipseCard(
+              eclipse: dayEclipse,
+              language: language,
+              location: location,
+            ),
+          ],
           const SizedBox(height: 12),
           GestureDetector(
             onTap: () => context.go(Routes.settings),
@@ -502,6 +525,71 @@ class _DetailCard extends StatelessWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _EclipseCard extends StatelessWidget {
+  final EclipseInfo eclipse;
+  final AppLanguage language;
+  final AppLocation location;
+
+  const _EclipseCard({
+    required this.eclipse,
+    required this.language,
+    required this.location,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = TithikaColors.of(context);
+    // tzOffsetAt expects a local calendar date, not a UTC instant —
+    // approximate via the fixed fallback offset to land on the right
+    // calendar date, then re-resolve the precise DST-aware offset for it.
+    Duration offsetFor(DateTime utc) {
+      final approx = utc.add(Duration(minutes: location.tzOffsetMinutes));
+      return location.tzOffsetAt(DateTime(approx.year, approx.month, approx.day));
+    }
+    final window =
+        '${formatLocalTime(eclipse.startUtc, offsetFor(eclipse.startUtc))} '
+        '– ${formatLocalTime(eclipse.endUtc, offsetFor(eclipse.endUtc))}';
+    return GestureDetector(
+      onTap: () => showEclipseDetail(context, eclipse, language, location),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: colors.eclipse.withValues(alpha: 0.08),
+          border: Border.all(color: colors.eclipse.withValues(alpha: 0.4)),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.brightness_2_rounded, size: 16, color: colors.eclipse),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    AppStrings.eclipseFullName(eclipse.kind, eclipse.subtype, language),
+                    style: TextStyle(
+                      color: colors.eclipse,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 13,
+                    ),
+                  ),
+                  Text(
+                    eclipse.visible ? window : AppStrings.eclipseNotVisible(language),
+                    style: TextStyle(color: colors.inkSoft, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right_rounded, size: 18, color: colors.inkMuted),
+          ],
+        ),
       ),
     );
   }

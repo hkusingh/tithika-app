@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/app_location.dart';
 import '../models/app_settings.dart';
 import '../models/day_data.dart';
+import '../models/eclipse_info.dart';
 import '../models/hora_data.dart';
 import '../models/lunar_month.dart';
 import '../models/muhurta_data.dart';
@@ -376,4 +377,37 @@ final yearFestivalsProvider =
     }
   }
   return entries;
+});
+
+// ── Eclipses ─────────────────────────────────────────────────────────────────
+
+/// All solar and lunar eclipses with maximum eclipse in [year], evaluated
+/// for visibility/contact-times at the effective location. Cheap — only a
+/// handful of forward ephemeris searches per year, no per-day loop.
+final yearEclipsesProvider =
+    FutureProvider.family<List<EclipseInfo>, int>((ref, year) async {
+  final eclipseSvc = await ref.watch(svc.eclipseServiceProvider.future);
+  final location = ref.watch(effectiveLocationProvider);
+  return eclipseSvc.eclipsesForYear(year, location);
+});
+
+/// Eclipses whose [EclipseInfo.localDate] falls within the given Gregorian
+/// (year, month). Derives from [yearEclipsesProvider] so no extra ephemeris
+/// calls are made; handles eclipses near a year boundary since either
+/// adjacent year's list is consulted as needed.
+final monthEclipsesProvider =
+    FutureProvider.family<List<EclipseInfo>, (int, int)>((ref, args) async {
+  final (year, month) = args;
+  final yearList = await ref.watch(yearEclipsesProvider(year).future);
+  var candidates = yearList;
+  if (month == 1) {
+    final prevYearList = await ref.watch(yearEclipsesProvider(year - 1).future);
+    candidates = [...prevYearList, ...yearList];
+  } else if (month == 12) {
+    final nextYearList = await ref.watch(yearEclipsesProvider(year + 1).future);
+    candidates = [...yearList, ...nextYearList];
+  }
+  return candidates
+      .where((e) => e.localDate.year == year && e.localDate.month == month)
+      .toList();
 });

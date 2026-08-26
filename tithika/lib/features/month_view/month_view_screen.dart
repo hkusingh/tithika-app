@@ -13,6 +13,7 @@ import '../../models/paksha.dart';
 import '../../models/special_tithi.dart';
 import '../../state/providers.dart';
 import '../day_view/moon_phase_widget.dart';
+import '../eclipses/eclipse_detail_sheet.dart';
 import '../festivals/festival_detail_sheet.dart';
 import '../shared/starfield_background.dart';
 import '../shared/tithika_nav_bar.dart';
@@ -284,6 +285,12 @@ class _MonthGrid extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final selected = ref.watch(selectedDateProvider);
     final today = DateTime.now();
+    final eclipseDays = ref
+            .watch(monthEclipsesProvider((year, month)))
+            .valueOrNull
+            ?.map((e) => e.localDate.day)
+            .toSet() ??
+        const <int>{};
 
     final firstWeekday = DateTime(year, month, 1).weekday % 7;
     final daysInMonth = DateTime(year, month + 1, 0).day;
@@ -340,6 +347,7 @@ class _MonthGrid extends ConsumerWidget {
               isToday: isToday,
               isSelected: isSelected,
               hinduMonthLabel: monthLabels[day],
+              isEclipse: eclipseDays.contains(day),
             ),
           );
         },
@@ -356,6 +364,7 @@ class _MonthCell extends StatelessWidget {
   final bool isToday;
   final bool isSelected;
   final String? hinduMonthLabel;
+  final bool isEclipse;
 
   const _MonthCell({
     required this.day,
@@ -363,6 +372,7 @@ class _MonthCell extends StatelessWidget {
     required this.isToday,
     required this.isSelected,
     this.hinduMonthLabel,
+    this.isEclipse = false,
   });
 
   @override
@@ -377,6 +387,8 @@ class _MonthCell extends StatelessWidget {
       bgColor = colors.shukla.withValues(alpha: 0.20);
     } else if (isToday) {
       bgColor = colors.shukla.withValues(alpha: 0.14);
+    } else if (isEclipse) {
+      bgColor = colors.eclipse.withValues(alpha: 0.08);
     } else if (isFestival) {
       bgColor = colors.festival.withValues(alpha: 0.08);
     }
@@ -460,15 +472,33 @@ class _MonthCell extends StatelessWidget {
               ),
             ),
 
-          // Festival dot
-          if (isFestival)
-            Container(
-              width: 4,
-              height: 4,
-              margin: const EdgeInsets.only(top: 2),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: colors.festival,
+          // Festival / eclipse dots — shown side by side when both apply.
+          if (isFestival || isEclipse)
+            Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (isFestival)
+                    Container(
+                      width: 4,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: colors.festival,
+                      ),
+                    ),
+                  if (isFestival && isEclipse) const SizedBox(width: 3),
+                  if (isEclipse)
+                    Container(
+                      width: 4,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: colors.eclipse,
+                      ),
+                    ),
+                ],
               ),
             ),
 
@@ -513,7 +543,10 @@ class _MonthFestivalList extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = TithikaColors.of(context);
     final language = ref.watch(appSettingsProvider).language;
+    final location = ref.watch(effectiveLocationProvider);
     final daysInMonth = DateTime(year, month + 1, 0).day;
+    final eclipses =
+        ref.watch(monthEclipsesProvider((year, month))).valueOrNull ?? const [];
 
     final festivals = <({int day, String canonical, String name})>[];
     final ekadashis = <int>[];
@@ -541,7 +574,9 @@ class _MonthFestivalList extends ConsumerWidget {
       }
     }
 
-    if (festivals.isEmpty && ekadashis.isEmpty) return const SizedBox.shrink();
+    if (festivals.isEmpty && ekadashis.isEmpty && eclipses.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
     Iterable<Widget> buildRows(
       List<({int day, String canonical, String name})> items,
@@ -599,6 +634,78 @@ class _MonthFestivalList extends ConsumerWidget {
           );
         });
 
+    // tzOffsetAt expects a local calendar date, not a UTC instant —
+    // approximate via the fixed fallback offset to land on the right
+    // calendar date, then re-resolve the precise DST-aware offset for it.
+    Duration offsetFor(DateTime utc) {
+      final approx = utc.add(Duration(minutes: location.tzOffsetMinutes));
+      return location.tzOffsetAt(DateTime(approx.year, approx.month, approx.day));
+    }
+
+    Iterable<Widget> buildEclipseRows() => eclipses.map((e) {
+          final wd = AppStrings.weekdayShort(e.localDate.weekday, language);
+          final mo = AppStrings.gregMonthShort(e.localDate.month, language);
+          final startStr = formatLocalTime(e.startUtc, offsetFor(e.startUtc));
+          final endStr = formatLocalTime(e.endUtc, offsetFor(e.endUtc));
+          return GestureDetector(
+            onTap: () => showEclipseDetail(context, e, language, location),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 54,
+                    child: Text(
+                      '$wd ${e.localDate.day} $mo',
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            color: colors.inkSoft,
+                            fontSize: 10,
+                          ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    width: 3,
+                    height: 3,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: colors.eclipse,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          AppStrings.eclipseFullName(e.kind, e.subtype, language),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                        ),
+                        Text(
+                          e.visible
+                              ? '$startStr – $endStr'
+                              : AppStrings.eclipseNotVisible(language),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                fontSize: 10,
+                                color: colors.inkMuted,
+                              ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
+
     return Container(
       margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
       decoration: BoxDecoration(
@@ -625,7 +732,25 @@ class _MonthFestivalList extends ConsumerWidget {
             Divider(height: 1, color: colors.line),
             ...buildRows(festivals, colors.festival),
           ],
-          if (festivals.isNotEmpty && ekadashis.isNotEmpty)
+          if (festivals.isNotEmpty && eclipses.isNotEmpty)
+            Divider(height: 1, color: colors.line),
+          if (eclipses.isNotEmpty) ...[
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+              child: Text(
+                AppStrings.eclipses(language),
+                style: scriptStyle(
+                  language,
+                  Theme.of(context).textTheme.labelSmall,
+                  color: colors.eclipse,
+                  fontSize: 10,
+                ),
+              ),
+            ),
+            Divider(height: 1, color: colors.line),
+            ...buildEclipseRows(),
+          ],
+          if ((festivals.isNotEmpty || eclipses.isNotEmpty) && ekadashis.isNotEmpty)
             Divider(height: 1, color: colors.line),
           if (ekadashis.isNotEmpty) ...[
             Padding(

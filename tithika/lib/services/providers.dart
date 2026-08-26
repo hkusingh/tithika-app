@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'city_search_service.dart';
+import 'eclipse_service.dart';
 import 'ephemeris_service.dart';
 import 'settings_repository.dart';
 import 'sweph_ephemeris_service.dart';
@@ -27,6 +28,12 @@ final ephemerisServiceProvider = FutureProvider<EphemerisService>((ref) async {
 final tithiServiceProvider = FutureProvider<TithiService>((ref) async {
   final ephe = await ref.watch(ephemerisServiceProvider.future);
   return TithiService(ephe);
+});
+
+/// [EclipseService] backed by the live [EphemerisService].
+final eclipseServiceProvider = FutureProvider<EclipseService>((ref) async {
+  final ephe = await ref.watch(ephemerisServiceProvider.future);
+  return EclipseService(ephe);
 });
 
 /// Loaded city database for the city picker.
