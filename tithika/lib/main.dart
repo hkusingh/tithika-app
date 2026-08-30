@@ -11,7 +11,9 @@ import 'package:tithika/core/router.dart' show buildRouter;
 import 'package:tithika/core/theme.dart';
 import 'package:tithika/services/notification_service.dart';
 import 'package:tithika/services/providers.dart';
+import 'package:tithika/services/update_service.dart';
 import 'package:tithika/services/widget_data_service.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:tithika/state/providers.dart'
     show appSettingsProvider, dayDataProvider, effectiveLocationProvider, muhurtaProvider, selectedDateProvider, yearFestivalsProvider;
 
@@ -94,7 +96,12 @@ void main() async {
           prefs: prefs,
         );
       }
-    } catch (_) {}
+    } catch (e, st) {
+      // Never swallow this silently: a throw here means no notifications get
+      // scheduled at all, and an empty `catch` hid exactly that failure mode
+      // through several rounds of debugging.
+      debugPrint('checkAndRescheduleIfDue failed: $e\n$st');
+    }
   }());
 
   // Refresh Android home-screen widget data after providers resolve.
@@ -119,11 +126,55 @@ class TithikaApp extends ConsumerStatefulWidget {
 class _TithikaAppState extends ConsumerState<TithikaApp>
     with WidgetsBindingObserver {
   GoRouter? _router;
+  bool _checkedForUpdate = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+  }
+
+  /// Asks the store whether a newer build exists, once per launch, after the
+  /// first frame so it never delays startup.
+  ///
+  /// On Android this is a no-op from the app's perspective: Play runs its own
+  /// background-download flow, including the defer affordance. On iOS there is
+  /// no such API, so a version is returned and the app shows its own dialog
+  /// offering "Later" or a link to the App Store.
+  Future<void> _maybePromptForUpdate() async {
+    final update = await UpdateService.checkForUpdate();
+    if (update == null || !mounted) return;
+    UpdateService.markPrompted();
+
+    final colors = TithikaColors.of(context);
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: colors.panel,
+        title: const Text('Update available'),
+        content: Text(
+          'Version ${update.version} is available on the App Store.',
+          style: TextStyle(color: colors.inkSoft),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Later'),
+          ),
+          if (update.storeUrl != null)
+            TextButton(
+              onPressed: () {
+                Navigator.of(ctx).pop();
+                unawaited(launchUrl(
+                  Uri.parse(update.storeUrl!),
+                  mode: LaunchMode.externalApplication,
+                ));
+              },
+              child: Text('Update', style: TextStyle(color: colors.shukla)),
+            ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -146,6 +197,11 @@ class _TithikaAppState extends ConsumerState<TithikaApp>
     // so there is no blank-screen gap between splash and app content.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       FlutterNativeSplash.remove();
+      // Once per launch, after the first frame — never delays startup.
+      if (!_checkedForUpdate) {
+        _checkedForUpdate = true;
+        unawaited(_maybePromptForUpdate());
+      }
     });
     // Router is created once on first build (ref.listen is only valid in build).
     // Subsequent rebuilds reuse the cached instance, preventing nav reset.
