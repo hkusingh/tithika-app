@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/timezone.dart' as tz;
 
@@ -14,9 +16,25 @@ import 'festival_detector.dart';
 import 'muhurta_service.dart';
 import 'tithi_service.dart';
 
-const _channelDaily = 'tithika_daily';
-const _channelEvents = 'tithika_events';
+// v2: Android locks a channel's importance at creation and never lets the
+// app change it later — these were originally created at IMPORTANCE_DEFAULT
+// (silent, drawer-only, no heads-up banner). Renaming forces a fresh
+// channel at IMPORTANCE_HIGH for all users; the old channels become
+// orphaned (harmless — they just stop receiving new notifications).
+const _channelDaily = 'tithika_daily_v2';
+const _channelEvents = 'tithika_events_v2';
 const _rescheduleKey = 'notif_next_reschedule';
+
+/// Android scheduling mode used for every notification.
+///
+/// Deliberately inexact. Exact alarms (`exactAllowWhileIdle`) only buy
+/// punctuality — a few minutes — but require a Play-Store-restricted
+/// permission that is denied by default on Android 14+, and the plugin's
+/// native layer *throws* when an exact mode is requested without it. Since
+/// [NotificationService.scheduleAll] cancels everything before rescheduling,
+/// such a throw left users with no notifications at all, silently. Inexact
+/// scheduling needs no permission and cannot fail that way.
+const _scheduleMode = AndroidScheduleMode.inexactAllowWhileIdle;
 
 // Notification ID ranges:
 // 0–6:     daily reminders (7 days)
@@ -28,8 +46,12 @@ const _dailyDetails = NotificationDetails(
     _channelDaily,
     'Daily Panchanga',
     channelDescription: 'Daily Hindu calendar reminder',
-    importance: Importance.defaultImportance,
-    priority: Priority.defaultPriority,
+    // IMPORTANCE_DEFAULT posts silently to the drawer with no heads-up
+    // banner — confirmed via emulator testing (notification only visible
+    // after manually pulling down the shade). IMPORTANCE_HIGH is required
+    // for the pop-up/heads-up presentation.
+    importance: Importance.high,
+    priority: Priority.high,
   ),
   iOS: DarwinNotificationDetails(),
 );
@@ -39,8 +61,8 @@ const _eventDetails = NotificationDetails(
     _channelEvents,
     'Festivals & Observances',
     channelDescription: 'Hindu festival and observance alerts',
-    importance: Importance.defaultImportance,
-    priority: Priority.defaultPriority,
+    importance: Importance.high,
+    priority: Priority.high,
   ),
   iOS: DarwinNotificationDetails(),
 );
@@ -72,9 +94,24 @@ class NotificationService {
     final android = _plugin.resolvePlatformSpecificImplementation<
         AndroidFlutterLocalNotificationsPlugin>();
     if (android != null) {
+      // No exact-alarm permission request: scheduling uses [_scheduleMode]
+      // (inexact), which needs none.
       return await android.requestNotificationsPermission() ?? false;
     }
     return true;
+  }
+
+  /// Prompts the user to exempt the app from battery optimization, on
+  /// Android only. Several OEMs (Samsung One UI, ColorOS/Realme, MIUI)
+  /// aggressively kill background processes even when AlarmManager is used
+  /// correctly, silently preventing scheduled notifications from ever
+  /// posting — this is the standard, Play-Store-compliant way to ask for an
+  /// exemption. No-ops on iOS and when already granted.
+  static Future<void> requestBatteryOptimizationExemption() async {
+    if (!Platform.isAndroid) return;
+    final status = await Permission.ignoreBatteryOptimizations.status;
+    if (status.isGranted) return;
+    await Permission.ignoreBatteryOptimizations.request();
   }
 
   static Future<void> cancelAll() => _plugin.cancelAll();
@@ -228,7 +265,7 @@ class NotificationService {
         body,
         scheduled,
         _dailyDetails,
-        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        androidScheduleMode: _scheduleMode,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
       );
@@ -277,7 +314,7 @@ class NotificationService {
           'Wishing you a blessed celebration!',
           scheduleTime,
           _eventDetails,
-          androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+          androidScheduleMode: _scheduleMode,
           uiLocalNotificationDateInterpretation:
               UILocalNotificationDateInterpretation.absoluteTime,
         );
@@ -318,7 +355,7 @@ class NotificationService {
         'An auspicious day for fasting and devotion',
         scheduleTime,
         _eventDetails,
-        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        androidScheduleMode: _scheduleMode,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
       );

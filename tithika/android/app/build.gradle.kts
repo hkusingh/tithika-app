@@ -16,8 +16,10 @@ if (keyPropertiesFile.exists()) {
 
 android {
     namespace = "app.tithika"
-    compileSdk = flutter.compileSdkVersion
-    ndkVersion = "27.0.12077973"  // NDK r27b — required for 16 KB page-size alignment
+    // permission_handler_android requires compileSdk 37; override Flutter's
+    // own default (36) explicitly rather than waiting for a Flutter bump.
+    compileSdk = 37
+    ndkVersion = "28.2.13676358"  // NDK r27b — required for 16 KB page-size alignment
 
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
@@ -53,6 +55,15 @@ android {
     buildTypes {
         release {
             signingConfig = signingConfigs.getByName("release")
+            // proguard-rules.pro carries the Gson `-keepattributes Signature`
+            // rules that flutter_local_notifications needs. Without them R8
+            // strips generic signatures and the plugin throws "Missing type
+            // parameter" at runtime, breaking notifications in release builds
+            // only — which is why this never reproduced on a debug emulator.
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
         }
     }
 }

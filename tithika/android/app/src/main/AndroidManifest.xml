@@ -3,6 +3,19 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Deliberately NO exact-alarm permissions (SCHEDULE_EXACT_ALARM /
+         USE_EXACT_ALARM). Notifications use inexactAllowWhileIdle, which
+         needs no permission and cannot fail: exact alarms only improve
+         punctuality (a few minutes), but they are Play-Store-restricted,
+         denied by default on Android 14+, and make zonedSchedule *throw*
+         when unavailable — which previously cancelled every notification
+         and scheduled nothing in its place. A panchanga reminder arriving
+         at 7:04 instead of 7:00 is fine; one that never arrives is not. -->
+    <!-- Lets the app ask the user to exempt it from battery optimization —
+         several OEMs (Samsung One UI, ColorOS/Realme, MIUI) otherwise kill
+         the process in the background before scheduled notification alarms
+         can fire, even when AlarmManager itself is used correctly. -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
     <application
         android:label="tithika"
         android:name="${applicationName}"

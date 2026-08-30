@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
@@ -128,6 +130,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         );
         return;
       }
+      // Several OEMs (Samsung, ColorOS/Realme, MIUI) kill the app in the
+      // background before scheduled notifications can fire unless the app
+      // is exempted from battery optimization — ask right after the
+      // notification permission, while the user is already in this flow.
+      await NotificationService.requestBatteryOptimizationExemption();
     }
     final current = ref.read(appSettingsProvider).notificationSettings;
     await ref
