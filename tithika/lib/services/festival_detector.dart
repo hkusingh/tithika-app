@@ -64,51 +64,11 @@ abstract final class FestivalDetector {
       if (tomorrowStillSame) effectivePrimary = null;
     }
 
-    // Purnima (tithi 15) is an exception to the last-day rule above, but only
-    // when it is genuinely vruddhi (spans two sunrises), so the plain sunrise
-    // rule can't tell day 1 from day 2 on its own. It then follows the
-    // Purvahna/Madhyahna Vyapini convention instead — observed on whichever
-    // day Purnima prevails at Madhyahna (sunrise-to-sunset midpoint),
-    // preferring the FIRST qualifying day if both do (Purva Vyapini
-    // tie-break — astronomically rare but possible, since tithi 15 can last
-    // up to ~26.3h against a ~24h sunrise-to-sunrise gap). This overrides the
-    // vruddhi suppression in both directions: it can un-suppress day 1 (when
-    // Purnima doesn't survive to day 2's Madhyahna, as in Guru Purnima 2026
-    // for Fremont: Purnima rules both Jul 28 and Jul 29 sunrise but ends at
-    // 07:35 on the 29th, before that day's Madhyahna) or suppress day 2 (when
-    // day 1 already qualified).
+    // Purnima (tithi 15) is an exception to the last-day rule above — see
+    // [isObservedPurnima] for the Purvahna/Madhyahna Vyapini convention it
+    // follows instead.
     if (primary != null && day.tithi.number == 15) {
-      final sunrise = day.sunriseUtc;
-      final sunset = day.sunsetUtc;
-      // Today is genuinely day 2 of a tithi-15 vruddhi span only if tithi 15
-      // was already ruling at YESTERDAY's sunrise too (approximated as
-      // today's sunrise minus 1 day — accurate to within the day-to-day
-      // drift of sunrise times, at most a couple of minutes). Only then does
-      // checking yesterday's Madhyahna for the tie-break make sense; e.g. if
-      // tithi 15 only began mid-day yesterday (ordinary non-vruddhi case),
-      // yesterday was never a tithi-15 day and must not be treated as an
-      // already-qualified day 1.
-      final isDayTwoOfVruddhi = sunrise != null &&
-          day.tithi.start.isBefore(sunrise.subtract(const Duration(days: 1)));
-      // Today is day 1 of a vruddhi span when secondaryTithi is null — the
-      // sunrise tithi continues past tomorrow's sunrise too (mirrors the
-      // generic vruddhi check above).
-      final isDayOneOfVruddhi = day.secondaryTithi == null;
-      if (!isDayOneOfVruddhi && !isDayTwoOfVruddhi) {
-        // Ordinary single-sunrise Purnima day — no vruddhi ambiguity to
-        // resolve, so the plain sunrise rule (primary) is already correct.
-        // E.g. Raksha Bandhan 2026: tithi 15 rules only Aug 28's sunrise and
-        // ends at 04:19 UTC that day (secondaryTithi != null), well before
-        // Aug 28's Madhyahna (06:20 UTC) — an unconditional Madhyahna check
-        // would incorrectly null out the correct day.
-      } else {
-        final yesterdayAlreadyQualified = isDayTwoOfVruddhi &&
-            sunset != null &&
-            _tithiActiveAt(day, 15, sunrise.subtract(sunset.difference(sunrise) ~/ 2));
-        effectivePrimary = (!yesterdayAlreadyQualified && _tithiActiveAtMadhyahna(day, 15))
-            ? primary
-            : null;
-      }
+      effectivePrimary = isObservedPurnima(day) ? primary : null;
     }
 
     // Only check secondary for festivals when it is a true kshaya tithi —
@@ -129,6 +89,63 @@ abstract final class FestivalDetector {
     final all = detectAll(day, tomorrow);
     return all.isEmpty ? null : all.first;
   }
+
+  /// True when [day] is the day Purnima is observed.
+  ///
+  /// Assumes [day]'s sunrise tithi is 15; callers must check that first.
+  ///
+  /// Purnima is an exception to the generic vruddhi last-day rule, but only
+  /// when it is genuinely vruddhi (spans two sunrises), so the plain sunrise
+  /// rule can't tell day 1 from day 2 on its own. It then follows the
+  /// Purvahna/Madhyahna Vyapini convention instead — observed on whichever
+  /// day Purnima prevails at Madhyahna (sunrise-to-sunset midpoint),
+  /// preferring the FIRST qualifying day if both do (Purva Vyapini
+  /// tie-break — astronomically rare but possible, since tithi 15 can last
+  /// up to ~26.3h against a ~24h sunrise-to-sunrise gap). This overrides the
+  /// vruddhi suppression in both directions: it can un-suppress day 1 (when
+  /// Purnima doesn't survive to day 2's Madhyahna, as in Guru Purnima 2026
+  /// for Fremont: Purnima rules both Jul 28 and Jul 29 sunrise but ends at
+  /// 07:35 on the 29th, before that day's Madhyahna) or suppress day 2 (when
+  /// day 1 already qualified).
+  static bool isObservedPurnima(DayData day) {
+    final sunrise = day.sunriseUtc;
+    final sunset = day.sunsetUtc;
+    // Today is genuinely day 2 of a tithi-15 vruddhi span only if tithi 15
+    // was already ruling at YESTERDAY's sunrise too (approximated as
+    // today's sunrise minus 1 day — accurate to within the day-to-day
+    // drift of sunrise times, at most a couple of minutes). Only then does
+    // checking yesterday's Madhyahna for the tie-break make sense; e.g. if
+    // tithi 15 only began mid-day yesterday (ordinary non-vruddhi case),
+    // yesterday was never a tithi-15 day and must not be treated as an
+    // already-qualified day 1.
+    final isDayTwoOfVruddhi = sunrise != null &&
+        day.tithi.start.isBefore(sunrise.subtract(const Duration(days: 1)));
+    // Today is day 1 of a vruddhi span when secondaryTithi is null — the
+    // sunrise tithi continues past tomorrow's sunrise too (mirrors the
+    // generic vruddhi check in detectAll).
+    final isDayOneOfVruddhi = day.secondaryTithi == null;
+    if (!isDayOneOfVruddhi && !isDayTwoOfVruddhi) {
+      // Ordinary single-sunrise Purnima day — no vruddhi ambiguity to
+      // resolve, so the plain sunrise rule is already correct.
+      // E.g. Raksha Bandhan 2026: tithi 15 rules only Aug 28's sunrise and
+      // ends at 04:19 UTC that day (secondaryTithi != null), well before
+      // Aug 28's Madhyahna (06:20 UTC) — an unconditional Madhyahna check
+      // would incorrectly reject the correct day.
+      return true;
+    }
+    final yesterdayAlreadyQualified = isDayTwoOfVruddhi &&
+        sunset != null &&
+        _tithiActiveAt(
+            day, 15, sunrise.subtract(sunset.difference(sunrise) ~/ 2));
+    return !yesterdayAlreadyQualified && _tithiActiveAtMadhyahna(day, 15);
+  }
+
+  /// True when [day] is the day Amavasya is observed.
+  ///
+  /// Amavasya (tithi 30) is short enough that it never spans two sunrises,
+  /// so the plain sunrise rule is correct with no vruddhi tie-break. Exposed
+  /// alongside [isObservedPurnima] so callers have one call shape for both.
+  static bool isObservedAmavasya(DayData day) => day.tithi.number == 30;
 
   // ── Special-window festivals ───────────────────────────────────────────────
   //

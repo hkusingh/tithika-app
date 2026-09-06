@@ -11,8 +11,27 @@ import '../../models/festival_content.dart';
 import '../../models/lunar_month.dart';
 import '../../services/festival_content_service.dart';
 import '../../state/providers.dart';
+import 'festival_bell.dart';
 
 const _kHeaderHeight = 240.0;
+
+/// Header controls sit on arbitrary festival photography — some of it bright,
+/// pale or busy — so they carry their own scrim and rim rather than relying on
+/// the image behind them for contrast.
+final _headerButtonDecoration = BoxDecoration(
+  color: Colors.black.withValues(alpha: 0.6),
+  shape: BoxShape.circle,
+  border: Border.all(color: Colors.white.withValues(alpha: 0.35), width: 0.5),
+  boxShadow: [
+    BoxShadow(
+      color: Colors.black.withValues(alpha: 0.35),
+      blurRadius: 6,
+      offset: const Offset(0, 1),
+    ),
+  ],
+);
+
+const _headerIconShadows = [Shadow(blurRadius: 4, color: Colors.black87)];
 
 // Canonical festival keys that have a bundled image asset.
 // Value = base filename without extension. The loader tries .png then .jpg.
@@ -124,7 +143,7 @@ class _FestivalDetailPageState extends ConsumerState<_FestivalDetailPage> {
   @override
   Widget build(BuildContext context) {
     final colors = TithikaColors.of(context);
-    final lang = ref.watch(appSettingsProvider).language;
+    final lang = ref.watch(appSettingsProvider.select((s) => s.language));
     final topPad = MediaQuery.paddingOf(context).top;
     final bottomPad = MediaQuery.paddingOf(context).bottom;
 
@@ -201,12 +220,34 @@ class _FestivalDetailPageState extends ConsumerState<_FestivalDetailPage> {
                     child: Container(
                       width: 30,
                       height: 30,
-                      decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.45),
-                        shape: BoxShape.circle,
+                      decoration: _headerButtonDecoration,
+                      child: const Icon(
+                        Icons.close_rounded,
+                        color: Colors.white,
+                        size: 16,
+                        shadows: _headerIconShadows,
                       ),
-                      child: const Icon(Icons.close_rounded,
-                          color: Colors.white, size: 16),
+                    ),
+                  ),
+                ),
+
+                // Reminder bell, in the header so it appears no matter which
+                // surface opened this page (festivals list, day view badge,
+                // month view list). Sits left of the close button; the title
+                // block below is already inset right: 56, so this is clear.
+                Positioned(
+                  top: topPad + 10,
+                  right: 52,
+                  child: Container(
+                    width: 30,
+                    height: 30,
+                    decoration: _headerButtonDecoration,
+                    child: Center(
+                      child: FestivalBell(
+                        canonicalKey: widget.canonicalKey,
+                        size: 17,
+                        onDarkOverlay: true,
+                      ),
                     ),
                   ),
                 ),

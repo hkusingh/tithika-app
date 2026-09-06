@@ -159,6 +159,105 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     }
   }
 
+  Future<void> _pickAlertTime() async {
+    final current = ref.read(appSettingsProvider).notificationSettings;
+    final picked = await showTimePicker(
+      context: context,
+      initialTime:
+          TimeOfDay(hour: current.alertHour, minute: current.alertMinute),
+    );
+    if (picked != null && mounted) {
+      await ref.read(appSettingsProvider.notifier).setNotificationSettings(
+            current.copyWith(
+              alertHour: picked.hour,
+              alertMinute: picked.minute,
+            ),
+          );
+    }
+  }
+
+  Future<void> _pickAlertDays() async {
+    final colors = TithikaColors.of(context);
+    final current = ref.read(appSettingsProvider).notificationSettings;
+    final picked = await showModalBottomSheet<int>(
+      context: context,
+      backgroundColor: colors.panel,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 36,
+              height: 4,
+              margin: const EdgeInsets.symmetric(vertical: 10),
+              decoration: BoxDecoration(
+                color: colors.lineStrong,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            for (var d = 0; d <= maxAlertDaysBefore; d++)
+              ListTile(
+                title: Text(
+                  _NotifSubGroup.alertDaysLabel(d),
+                  style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(
+                        color: colors.ink,
+                        fontWeight: d == current.alertDaysBefore
+                            ? FontWeight.w600
+                            : FontWeight.w400,
+                      ),
+                ),
+                trailing: d == current.alertDaysBefore
+                    ? Icon(Icons.check_rounded, size: 18, color: colors.shukla)
+                    : null,
+                onTap: () => Navigator.of(ctx).pop(d),
+              ),
+          ],
+        ),
+      ),
+    );
+    if (picked != null && mounted) {
+      await ref
+          .read(appSettingsProvider.notifier)
+          .setNotificationSettings(current.copyWith(alertDaysBefore: picked));
+    }
+  }
+
+  /// Turning the master switch on is a widening change the user should
+  /// understand — it supersedes any individual bells (which are preserved,
+  /// and take effect again when it is switched back off).
+  Future<void> _setFestivalAlerts(bool enable) async {
+    final current = ref.read(appSettingsProvider).notificationSettings;
+    if (enable) {
+      final ok = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Notify for all festivals?'),
+          content: const Text(
+            "You'll be notified for every festival. To choose individual "
+            'festivals instead, leave this off and tap the bell on any '
+            'festival.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(true),
+              child: const Text('Turn on'),
+            ),
+          ],
+        ),
+      );
+      if (ok != true || !mounted) return;
+    }
+    await ref.read(appSettingsProvider.notifier).setNotificationSettings(
+        current.copyWith(festivalAlertsEnabled: enable));
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = TithikaColors.of(context);
@@ -273,7 +372,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       ),
                       if (notif.enabled) ...[
                         const SizedBox(height: 8),
-                        _NotifSubGroup(
+                        _DailyReminderGroup(
                           notif: notif,
                           switchStyle: switchStyle,
                           onDailyChanged: (v) => ref
@@ -281,14 +380,27 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               .setNotificationSettings(
                                   notif.copyWith(dailyReminderEnabled: v)),
                           onTimeTap: _pickReminderTime,
-                          onFestivalChanged: (v) => ref
-                              .read(appSettingsProvider.notifier)
-                              .setNotificationSettings(
-                                  notif.copyWith(festivalAlertsEnabled: v)),
+                        ),
+                        const SizedBox(height: 20),
+                        _SectionLabel('FESTIVALS & OBSERVANCES'),
+                        _NotifSubGroup(
+                          notif: notif,
+                          switchStyle: switchStyle,
+                          onAlertDaysTap: _pickAlertDays,
+                          onAlertTimeTap: _pickAlertTime,
+                          onFestivalChanged: _setFestivalAlerts,
                           onEkadashiChanged: (v) => ref
                               .read(appSettingsProvider.notifier)
                               .setNotificationSettings(
                                   notif.copyWith(ekadashiAlertsEnabled: v)),
+                          onPurnimaChanged: (v) => ref
+                              .read(appSettingsProvider.notifier)
+                              .setNotificationSettings(
+                                  notif.copyWith(purnimaAlertsEnabled: v)),
+                          onAmavasyaChanged: (v) => ref
+                              .read(appSettingsProvider.notifier)
+                              .setNotificationSettings(
+                                  notif.copyWith(amavasyaAlertsEnabled: v)),
                         ),
                       ],
 
@@ -668,30 +780,12 @@ class _LanguagePickerRow extends StatelessWidget {
 
 // ── Notification sub-options card ─────────────────────────────────────────────
 
-class _NotifSubGroup extends StatelessWidget {
-  final NotificationSettings notif;
-  final _SwitchStyle switchStyle;
-  final ValueChanged<bool> onDailyChanged;
-  final VoidCallback onTimeTap;
-  final ValueChanged<bool> onFestivalChanged;
-  final ValueChanged<bool> onEkadashiChanged;
+/// Card shell shared by the notification sub-groups, matching the other
+/// settings sections.
+class _GroupCard extends StatelessWidget {
+  final List<Widget> children;
 
-  const _NotifSubGroup({
-    required this.notif,
-    required this.switchStyle,
-    required this.onDailyChanged,
-    required this.onTimeTap,
-    required this.onFestivalChanged,
-    required this.onEkadashiChanged,
-  });
-
-  String _fmtTime() {
-    final h = notif.dailyReminderHour;
-    final m = notif.dailyReminderMinute;
-    final suffix = h < 12 ? 'AM' : 'PM';
-    final h12 = h % 12 == 0 ? 12 : h % 12;
-    return '$h12:${m.toString().padLeft(2, '0')} $suffix';
-  }
+  const _GroupCard({required this.children});
 
   @override
   Widget build(BuildContext context) {
@@ -702,68 +796,182 @@ class _NotifSubGroup extends StatelessWidget {
         border: Border.all(color: colors.line),
         borderRadius: BorderRadius.circular(10),
       ),
-      child: Column(
-        children: [
+      child: Column(children: children),
+    );
+  }
+}
+
+/// The daily panchanga reminder and its time. Independent of the festival and
+/// observance alerts below, so it gets its own card.
+class _DailyReminderGroup extends StatelessWidget {
+  final NotificationSettings notif;
+  final _SwitchStyle switchStyle;
+  final ValueChanged<bool> onDailyChanged;
+  final VoidCallback onTimeTap;
+
+  const _DailyReminderGroup({
+    required this.notif,
+    required this.switchStyle,
+    required this.onDailyChanged,
+    required this.onTimeTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return _GroupCard(
+      children: [
+        _SubRow(
+          label: 'Daily panchanga reminder',
+          trailing: _NotifSubGroup.styledSwitch(
+              switchStyle, notif.dailyReminderEnabled, onDailyChanged),
+          // Only divides when the time row follows it.
+          divider: notif.dailyReminderEnabled,
+        ),
+        if (notif.dailyReminderEnabled)
           _SubRow(
-            label: 'Daily panchanga reminder',
-            trailing: Switch(
-              value: notif.dailyReminderEnabled,
-              onChanged: onDailyChanged,
-              activeThumbColor: switchStyle.activeThumb,
-              activeTrackColor: switchStyle.activeTrack,
-              inactiveThumbColor: switchStyle.inactiveThumb,
-              inactiveTrackColor: switchStyle.inactiveTrack,
-              trackOutlineColor: WidgetStatePropertyAll(switchStyle.trackOutline),
-              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
-            divider: true,
-          ),
-          if (notif.dailyReminderEnabled)
-            _SubRow(
-              label: 'Reminder time',
-              trailing: GestureDetector(
-                onTap: onTimeTap,
-                child: Text(
-                  _fmtTime(),
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: colors.shukla,
-                        fontWeight: FontWeight.w600,
-                      ),
-                ),
-              ),
-              divider: true,
-            ),
-          _SubRow(
-            label: 'Festival alerts',
-            subtitle: 'Notified the day before at 6 AM',
-            trailing: Switch(
-              value: notif.festivalAlertsEnabled,
-              onChanged: onFestivalChanged,
-              activeThumbColor: switchStyle.activeThumb,
-              activeTrackColor: switchStyle.activeTrack,
-              inactiveThumbColor: switchStyle.inactiveThumb,
-              inactiveTrackColor: switchStyle.inactiveTrack,
-              trackOutlineColor: WidgetStatePropertyAll(switchStyle.trackOutline),
-              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
-            divider: true,
-          ),
-          _SubRow(
-            label: 'Ekadashi alerts',
-            subtitle: 'Notified the day before at 6 AM',
-            trailing: Switch(
-              value: notif.ekadashiAlertsEnabled,
-              onChanged: onEkadashiChanged,
-              activeThumbColor: switchStyle.activeThumb,
-              activeTrackColor: switchStyle.activeTrack,
-              inactiveThumbColor: switchStyle.inactiveThumb,
-              inactiveTrackColor: switchStyle.inactiveTrack,
-              trackOutlineColor: WidgetStatePropertyAll(switchStyle.trackOutline),
+            label: 'Reminder time',
+            trailing: _NotifSubGroup.valueLabel(
+              context,
+              _NotifSubGroup.fmtTime(
+                  notif.dailyReminderHour, notif.dailyReminderMinute),
+              onTimeTap,
             ),
             divider: false,
           ),
+      ],
+    );
+  }
+}
+
+/// Festival, Ekadashi, Purnima and Amavasya alerts, plus the timing that
+/// governs all four.
+class _NotifSubGroup extends StatelessWidget {
+  final NotificationSettings notif;
+  final _SwitchStyle switchStyle;
+  final VoidCallback onAlertDaysTap;
+  final VoidCallback onAlertTimeTap;
+  final ValueChanged<bool> onFestivalChanged;
+  final ValueChanged<bool> onEkadashiChanged;
+  final ValueChanged<bool> onPurnimaChanged;
+  final ValueChanged<bool> onAmavasyaChanged;
+
+  const _NotifSubGroup({
+    required this.notif,
+    required this.switchStyle,
+    required this.onAlertDaysTap,
+    required this.onAlertTimeTap,
+    required this.onFestivalChanged,
+    required this.onEkadashiChanged,
+    required this.onPurnimaChanged,
+    required this.onAmavasyaChanged,
+  });
+
+  static String fmtTime(int h, int m) {
+    final suffix = h < 12 ? 'AM' : 'PM';
+    final h12 = h % 12 == 0 ? 12 : h % 12;
+    return '$h12:${m.toString().padLeft(2, '0')} $suffix';
+  }
+
+  static String alertDaysLabel(int days) => switch (days) {
+        0 => 'On the day',
+        1 => '1 day before',
+        _ => '$days days before',
+      };
+
+  static Widget styledSwitch(
+          _SwitchStyle style, bool value, ValueChanged<bool> onChanged) =>
+      Switch(
+        value: value,
+        onChanged: onChanged,
+        activeThumbColor: style.activeThumb,
+        activeTrackColor: style.activeTrack,
+        inactiveThumbColor: style.inactiveThumb,
+        inactiveTrackColor: style.inactiveTrack,
+        trackOutlineColor: WidgetStatePropertyAll(style.trackOutline),
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      );
+
+  static Widget valueLabel(
+      BuildContext context, String text, VoidCallback onTap) {
+    final colors = TithikaColors.of(context);
+    return GestureDetector(
+      onTap: onTap,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            text,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: colors.shukla,
+                  fontWeight: FontWeight.w600,
+                ),
+          ),
+          const SizedBox(width: 2),
+          Icon(Icons.chevron_right_rounded, size: 16, color: colors.inkMuted),
         ],
       ),
+    );
+  }
+
+  Widget _switch(bool value, ValueChanged<bool> onChanged) =>
+      styledSwitch(switchStyle, value, onChanged);
+
+  /// Honest report of what the festival setting will actually do — the master
+  /// switch alone can't say, since "off" means "individually chosen" rather
+  /// than "silent".
+  String get _festivalSubtitle {
+    if (notif.festivalAlertsEnabled) return 'All festivals';
+    final n = notif.selectedFestivals.length;
+    if (n == 0) return 'None selected — choose on the Festivals page';
+    return n == 1 ? '1 festival selected' : '$n festivals selected';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _GroupCard(
+      children: [
+        // Timing sits above the categories it governs.
+        _SubRow(
+          label: 'Alert me',
+          subtitle: 'For festivals, Ekadashi, Purnima, Amavasya',
+          trailing: valueLabel(
+            context,
+            alertDaysLabel(notif.alertDaysBefore),
+            onAlertDaysTap,
+          ),
+          divider: true,
+        ),
+        _SubRow(
+          label: 'Alert time',
+          trailing: valueLabel(
+            context,
+            fmtTime(notif.alertHour, notif.alertMinute),
+            onAlertTimeTap,
+          ),
+          divider: true,
+        ),
+        _SubRow(
+          label: 'All festivals',
+          subtitle: _festivalSubtitle,
+          trailing: _switch(notif.festivalAlertsEnabled, onFestivalChanged),
+          divider: true,
+        ),
+        _SubRow(
+          label: 'Ekadashi alerts',
+          trailing: _switch(notif.ekadashiAlertsEnabled, onEkadashiChanged),
+          divider: true,
+        ),
+        _SubRow(
+          label: 'Purnima alerts',
+          trailing: _switch(notif.purnimaAlertsEnabled, onPurnimaChanged),
+          divider: true,
+        ),
+        _SubRow(
+          label: 'Amavasya alerts',
+          trailing: _switch(notif.amavasyaAlertsEnabled, onAmavasyaChanged),
+          divider: false,
+        ),
+      ],
     );
   }
 }
@@ -794,26 +1002,31 @@ class _SubRow extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyMedium
-                    ?.copyWith(fontWeight: FontWeight.w500),
-              ),
-              if (subtitle != null)
+          // Flexible so a long subtitle wraps instead of pushing [trailing]
+          // off the right edge.
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 Text(
-                  subtitle!,
+                  label,
                   style: Theme.of(context)
                       .textTheme
-                      .bodySmall
-                      ?.copyWith(color: colors.inkMuted),
+                      .bodyMedium
+                      ?.copyWith(fontWeight: FontWeight.w500),
                 ),
-            ],
+                if (subtitle != null)
+                  Text(
+                    subtitle!,
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.copyWith(color: colors.inkMuted),
+                  ),
+              ],
+            ),
           ),
+          const SizedBox(width: 12),
           trailing,
         ],
       ),

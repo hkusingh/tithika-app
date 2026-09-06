@@ -1,3 +1,10 @@
 .DS_Store
 *.pyc
 __pycache__/
+
+# Editor / tooling (matches at any depth, incl. tithika/)
+.claude/
+.vscode/
+
+# Simulator captures
+Simulator Screenshot*.png

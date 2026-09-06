@@ -11,8 +11,16 @@ const _keyNotifEnabled = 'notif_enabled';
 const _keyNotifDailyEnabled = 'notif_daily_enabled';
 const _keyNotifDailyHour = 'notif_daily_hour';
 const _keyNotifDailyMinute = 'notif_daily_minute';
+// Retains its original key: the stored value carries over on upgrade, only
+// its meaning widens from "festival alerts on/off" to "all festivals".
 const _keyNotifFestival = 'notif_festival';
 const _keyNotifEkadashi = 'notif_ekadashi';
+const _keyNotifPurnima = 'notif_purnima';
+const _keyNotifAmavasya = 'notif_amavasya';
+const _keyNotifSelFests = 'notif_selected_festivals';
+const _keyNotifAlertDays = 'notif_alert_days';
+const _keyNotifAlertHour = 'notif_alert_hour';
+const _keyNotifAlertMinute = 'notif_alert_minute';
 
 class SettingsRepository {
   final SharedPreferences _prefs;
@@ -33,6 +41,16 @@ class SettingsRepository {
         dailyReminderMinute: _prefs.getInt(_keyNotifDailyMinute) ?? 0,
         festivalAlertsEnabled: _prefs.getBool(_keyNotifFestival) ?? true,
         ekadashiAlertsEnabled: _prefs.getBool(_keyNotifEkadashi) ?? true,
+        purnimaAlertsEnabled: _prefs.getBool(_keyNotifPurnima) ?? true,
+        amavasyaAlertsEnabled: _prefs.getBool(_keyNotifAmavasya) ?? true,
+        selectedFestivals:
+            _prefs.getStringList(_keyNotifSelFests)?.toSet() ?? const <String>{},
+        // Clamped so a corrupted or future-version pref can't blow out the
+        // scheduling lookahead.
+        alertDaysBefore: (_prefs.getInt(_keyNotifAlertDays) ?? 1)
+            .clamp(0, maxAlertDaysBefore),
+        alertHour: (_prefs.getInt(_keyNotifAlertHour) ?? 6).clamp(0, 23),
+        alertMinute: (_prefs.getInt(_keyNotifAlertMinute) ?? 0).clamp(0, 59),
       ),
     );
   }
@@ -64,5 +82,14 @@ class SettingsRepository {
     await _prefs.setInt(_keyNotifDailyMinute, s.dailyReminderMinute);
     await _prefs.setBool(_keyNotifFestival, s.festivalAlertsEnabled);
     await _prefs.setBool(_keyNotifEkadashi, s.ekadashiAlertsEnabled);
+    await _prefs.setBool(_keyNotifPurnima, s.purnimaAlertsEnabled);
+    await _prefs.setBool(_keyNotifAmavasya, s.amavasyaAlertsEnabled);
+    // Stored independently of the master switch, so a master on/off round
+    // trip restores the user's individual selection rather than losing it.
+    await _prefs.setStringList(
+        _keyNotifSelFests, s.selectedFestivals.toList());
+    await _prefs.setInt(_keyNotifAlertDays, s.alertDaysBefore);
+    await _prefs.setInt(_keyNotifAlertHour, s.alertHour);
+    await _prefs.setInt(_keyNotifAlertMinute, s.alertMinute);
   }
 }

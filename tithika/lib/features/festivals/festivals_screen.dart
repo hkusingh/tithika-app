@@ -11,6 +11,7 @@ import '../shared/starfield_background.dart';
 import '../shared/page_title_bar.dart';
 import '../shared/tithika_nav_bar.dart';
 import '../shared/tithika_tab_bar.dart';
+import 'festival_bell.dart';
 import 'festival_detail_sheet.dart';
 
 const _weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -146,7 +147,8 @@ class _FestivalsScreenState extends ConsumerState<FestivalsScreen> {
   @override
   Widget build(BuildContext context) {
     final colors = TithikaColors.of(context);
-    final language = ref.watch(appSettingsProvider).language;
+    final language =
+        ref.watch(appSettingsProvider.select((s) => s.language));
     final now = DateTime.now();
     final year = now.year;
     final currentMonth = now.month;
@@ -595,7 +597,8 @@ class _FestivalRow extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = TithikaColors.of(context);
-    final language = ref.watch(appSettingsProvider).language;
+    final language =
+        ref.watch(appSettingsProvider.select((s) => s.language));
     final date = entry.date;
     final canonical = entry.data.festivalName ?? 'Ekadashi';
     final name = FestivalNames.localize(canonical, language) ?? canonical;
@@ -676,9 +679,17 @@ class _FestivalRow extends ConsumerWidget {
                     fontSize: 11.5,
                   ),
             ),
-            const SizedBox(width: 4),
-            Icon(Icons.chevron_right_rounded,
-                size: 16, color: colors.inkMuted),
+            // Takes the trailing chevron's slot rather than adding to the
+            // row — the row has no spare width, and it stays tappable as a
+            // whole, so the chevron was only redundant signage. Generic
+            // Ekadashi entries share one canonical key, so they get no bell.
+            if (entry.inFestivals)
+              FestivalBell(canonicalKey: canonical)
+            else ...[
+              const SizedBox(width: 4),
+              Icon(Icons.chevron_right_rounded,
+                  size: 16, color: colors.inkMuted),
+            ],
           ],
         ),
       ),

@@ -46,12 +46,13 @@ final selectedDateProvider = StateProvider<DateTime>(
 
 /// The effective location: user's saved location, or Ujjain as fallback.
 final effectiveLocationProvider = Provider<AppLocation>((ref) {
-  return ref.watch(appSettingsProvider).location ?? AppLocation.ujjain;
+  return ref.watch(appSettingsProvider.select((s) => s.location)) ??
+      AppLocation.ujjain;
 });
 
 /// True once the user has explicitly set a location (not using Ujjain fallback).
 final locationIsSetProvider = Provider<bool>((ref) {
-  return ref.watch(appSettingsProvider).hasLocation;
+  return ref.watch(appSettingsProvider.select((s) => s.hasLocation));
 });
 
 // ── Day data ──────────────────────────────────────────────────────────────────
@@ -62,7 +63,8 @@ final dayDataProvider = FutureProvider<DayData?>((ref) async {
   final tithiSvc = await ref.watch(svc.tithiServiceProvider.future);
   final date = ref.watch(selectedDateProvider);
   final location = ref.watch(effectiveLocationProvider);
-  final monthSystem = ref.watch(appSettingsProvider).monthSystem;
+  final monthSystem =
+      ref.watch(appSettingsProvider.select((s) => s.monthSystem));
 
   final raw = tithiSvc.calculateForDate(
     localDate: date,
@@ -91,7 +93,8 @@ final stripDaysProvider = FutureProvider<List<DayData>>((ref) async {
   final tithiSvc = await ref.watch(svc.tithiServiceProvider.future);
   final selected = ref.watch(selectedDateProvider);
   final location = ref.watch(effectiveLocationProvider);
-  final monthSystem = ref.watch(appSettingsProvider).monthSystem;
+  final monthSystem =
+      ref.watch(appSettingsProvider.select((s) => s.monthSystem));
   return List.generate(4, (i) {
     final date = DateTime(selected.year, selected.month, selected.day)
         .add(Duration(days: i - 1));
@@ -135,7 +138,8 @@ final monthDataProvider =
     FutureProvider.family<Map<int, DayData>, (int, int)>((ref, args) async {
   final tithiSvc = await ref.watch(svc.tithiServiceProvider.future);
   final location = ref.watch(effectiveLocationProvider);
-  final monthSystem = ref.watch(appSettingsProvider).monthSystem;
+  final monthSystem =
+      ref.watch(appSettingsProvider.select((s) => s.monthSystem));
   final (year, month) = args;
   final daysInMonth = DateTime(year, month + 1, 0).day;
   return {
@@ -311,7 +315,8 @@ final yearFestivalsProvider =
     FutureProvider.family<List<FestivalEntry>, int>((ref, year) async {
   final tithiSvc = await ref.watch(svc.tithiServiceProvider.future);
   final location = ref.watch(effectiveLocationProvider);
-  final monthSystem = ref.watch(appSettingsProvider).monthSystem;
+  final monthSystem =
+      ref.watch(appSettingsProvider.select((s) => s.monthSystem));
 
   final entries = <FestivalEntry>[];
   for (var month = 1; month <= 12; month++) {
