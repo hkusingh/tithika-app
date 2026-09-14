@@ -44,15 +44,17 @@ DayData _day(
 }) {
   final sunrise = DateTime.utc(date.year, date.month, date.day, 1, 0);
   final sunset = DateTime.utc(date.year, date.month, date.day, 13, 0);
+  // Starts before sunrise and ends after sunset: rules the whole day, so it
+  // is neither vruddhi (secondaryTithi below decides that) nor kshaya.
+  final primaryTithi = _tithi(
+    tithiNumber,
+    sunrise.subtract(const Duration(hours: 3)),
+    sunset.add(const Duration(hours: 3)),
+  );
   return DayData(
     localDate: date,
-    // Starts before sunrise and ends after sunset: rules the whole day, so
-    // it is neither vruddhi (secondaryTithi below decides that) nor kshaya.
-    tithi: _tithi(
-      tithiNumber,
-      sunrise.subtract(const Duration(hours: 3)),
-      sunset.add(const Duration(hours: 3)),
-    ),
+    tithi: primaryTithi,
+    rawTithi: primaryTithi,
     nakshatra: NakshatraInfo(number: 1, end: date.add(const Duration(days: 1))),
     lunarMonth: lunarMonth,
     sunZodiacSign: 4,

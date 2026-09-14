@@ -345,4 +345,74 @@ void main() {
       expect(ti.number, inInclusiveRange(1, 30));
     });
   });
+
+  group('Vruddhi (expanded-tithi) last-day promotion', () {
+    // yesterdayTithiNumber simulates the caller reporting that the previous
+    // calendar day's sunrise was ALSO ruled by this same tithi — i.e. a
+    // genuine two-sunrise vruddhi span, day 2. TithiService must then
+    // advance the displayed tithi to whatever comes next, per the Hindu
+    // calendar convention confirmed against a temple panchang: the tithi
+    // that already labelled yesterday cannot label today too.
+    test(
+      'when yesterdayTithiNumber matches today\'s raw sunrise tithi, '
+      'DayData.tithi advances to the next tithi',
+      () {
+        final data = svc.calculateForDate(
+          localDate: DateTime(2024, 11, 1),
+          lat: _mumbaiLat,
+          lon: _mumbaiLon,
+          tzOffset: _mumbaiTz,
+          yesterdayTithiNumber: 30, // Diwali 2024 raw sunrise tithi is 30.
+        );
+        expect(data.rawTithi.number, 30,
+            reason: 'rawTithi must still report what actually ruled sunrise');
+        expect(data.tithi.number, 1,
+            reason: 'tithi must advance past the vruddhi tithi to the next one');
+      },
+    );
+
+    test(
+      'when yesterdayTithiNumber does NOT match today\'s raw sunrise tithi, '
+      'DayData.tithi is unchanged (rawTithi == tithi)',
+      () {
+        final data = svc.calculateForDate(
+          localDate: DateTime(2024, 11, 1),
+          lat: _mumbaiLat,
+          lon: _mumbaiLon,
+          tzOffset: _mumbaiTz,
+          yesterdayTithiNumber: 29, // Different tithi — no vruddhi condition.
+        );
+        expect(data.tithi.number, 30);
+        expect(data.rawTithi.number, 30);
+      },
+    );
+
+    test('when yesterdayTithiNumber is null, no promotion is applied', () {
+      final data = svc.calculateForDate(
+        localDate: DateTime(2024, 11, 1),
+        lat: _mumbaiLat,
+        lon: _mumbaiLon,
+        tzOffset: _mumbaiTz,
+      );
+      expect(data.tithi.number, 30);
+      expect(data.rawTithi.number, 30);
+    });
+
+    test(
+      'Purnima (tithi 15) is exempt from promotion — it keeps its own '
+      'Purvahna/Madhyahna Vyapini rule in FestivalDetector instead',
+      () {
+        final data = svc.calculateForDate(
+          localDate: DateTime(2025, 3, 14),
+          lat: _mumbaiLat,
+          lon: _mumbaiLon,
+          tzOffset: _mumbaiTz,
+          yesterdayTithiNumber: 15, // Holi 2025 raw sunrise tithi is 15.
+        );
+        expect(data.tithi.number, 15,
+            reason: 'Purnima must not be promoted even when yesterday matches');
+        expect(data.rawTithi.number, 15);
+      },
+    );
+  });
 }

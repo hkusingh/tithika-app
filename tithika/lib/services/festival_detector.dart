@@ -20,11 +20,11 @@ abstract final class FestivalDetector {
   /// becomes [DayData.secondaryTithi].  This method checks both tithis so
   /// the festival is never silently dropped for western time-zones.
   ///
-  /// [tomorrow] is tomorrow's [DayData] at the same location, used to resolve
-  /// vruddhi (expanded) tithis — see the comment below.  Pass null only when
-  /// tomorrow's data is genuinely unavailable; the vruddhi check is then
-  /// skipped and the festival may be reported a day early.
-  static List<String> detectAll(DayData day, [DayData? tomorrow]) {
+  /// Vruddhi (expanded-tithi) resolution happens upstream, in
+  /// [DayData.tithi] itself — see `TithiService.calculateForDate`'s
+  /// `yesterdayTithiNumber` parameter — except for Purnima (tithi 15),
+  /// which this method still resolves itself via [isObservedPurnima].
+  static List<String> detectAll(DayData day) {
     // ── Solar festivals ──────────────────────────────────────────────────────
     if (day.sunZodiacEntryToday) {
       final solar = switch (day.sunZodiacSign) {
@@ -50,23 +50,19 @@ abstract final class FestivalDetector {
     final m = day.lunarMonth;
     final primary   = _byTithi(m, day.tithi.number);
 
-    // Vruddhi (expanded) tithi: when secondaryTithi is null, TODAY's tithi
-    // continues past the next sunrise, meaning it will also rule tomorrow.
-    // Drik panchang observes the festival on the LAST such day, so suppress
-    // primary here — but only when a sunrise-rule festival actually matched
-    // today's tithi; an unrelated vruddhi tithi elsewhere in the day must not
-    // blank out the whole day (this previously caused sunrise-rule festivals
-    // like Hartalika Teej to disappear whenever the sunrise tithi happened to
-    // be vruddhi, even though the festival's own tithi was unaffected).
+    // [day.tithi] already reflects the vruddhi (expanded-tithi) last-day
+    // correction applied upstream by TithiService.calculateForDate — a tithi
+    // that rules two consecutive sunrises is only ever [day.tithi] on the
+    // FIRST such day; the second day's [day.tithi] has already been advanced
+    // to the next tithi. So [primary] above needs no separate suppression
+    // for the general case.
     var effectivePrimary = primary;
-    if (primary != null && day.secondaryTithi == null) {
-      final tomorrowStillSame = tomorrow?.tithi.number == day.tithi.number;
-      if (tomorrowStillSame) effectivePrimary = null;
-    }
 
-    // Purnima (tithi 15) is an exception to the last-day rule above — see
-    // [isObservedPurnima] for the Purvahna/Madhyahna Vyapini convention it
-    // follows instead.
+    // Purnima (tithi 15) is exempt from that upstream correction — it
+    // follows its own Purvahna/Madhyahna Vyapini convention instead (see
+    // [isObservedPurnima]), which can even choose to keep Purnima on the
+    // second vruddhi day rather than always advancing, so it still needs
+    // this dedicated check.
     if (primary != null && day.tithi.number == 15) {
       effectivePrimary = isObservedPurnima(day) ? primary : null;
     }
@@ -85,8 +81,8 @@ abstract final class FestivalDetector {
   /// [detectAll], or null. Prefer [detectAll] wherever the UI renders or
   /// links festival names, so multiple same-day festivals are never merged
   /// into one unlinkable string.
-  static String? detect(DayData day, [DayData? tomorrow]) {
-    final all = detectAll(day, tomorrow);
+  static String? detect(DayData day) {
+    final all = detectAll(day);
     return all.isEmpty ? null : all.first;
   }
 
@@ -151,12 +147,29 @@ abstract final class FestivalDetector {
   //
   // These festivals are prescribed for a specific moment other than sunrise:
   //
-  //   Sunset window
+  //   Sunset / night window
   //     • Diwali             — Amavasya    (tithi 30) active at sunset
   //     • Maha Shivaratri    — Chaturdashi (tithi 29) active at sunset
+  //     • Maha Ashtami       — Ashtami     (tithi  8) active at sunset (Navratri
+  //                            puja is a night rite, so the sunrise rule alone
+  //                            can misplace it — see Maha Navami below)
+  //     • Maha Navami        — Navami      (tithi  9) active at sunset
   //
   //   Madhyahna window  (midpoint of the sunrise–sunset arc)
   //     • Ganesh Chaturthi   — Chaturthi   (tithi  4) active at Madhyahna
+  //
+  //   Aparahna window  (3rd quarter of the sunrise–sunset arc)
+  //     • Vijayadashami      — Dashami     (tithi 10) active at Aparahna
+  //
+  // Maha Ashtami/Navami use sunset rather than the plain sunrise rule because
+  // Navratri puja is a night rite: whichever of the two tithis is active at
+  // sunset is the one whose puja belongs to that calendar day. Confirmed
+  // against a local (Patna) temple panchang for Oct 2026: Ashtami begins
+  // 8:29am Oct 18 → observed Oct 18 (that night is Ashtami night); Navami
+  // begins 10:52am Oct 19 → observed Oct 19. Note this convention disagrees
+  // with Drik Panchang, which places both on Oct 19 via a Sandhi Puja
+  // (Ashtami→Navami junction) exception — the user confirmed the temple
+  // panchang, not Drik, is the source of truth here.
   //
   // Polar-region fallback: if sunriseUtc or sunsetUtc is null (sun does not
   // rise or set), skip special-window detection entirely and fall back to the
@@ -167,6 +180,7 @@ abstract final class FestivalDetector {
     if (sunrise == null || sunset == null) return null;
 
     final madhyahna = sunrise.add(sunset.difference(sunrise) ~/ 2);
+    final aparahna  = sunrise.add((sunset.difference(sunrise) * 3) ~/ 4);
     final m = day.lunarMonth;
 
     // Kartika sunset-window festivals.
@@ -182,6 +196,19 @@ abstract final class FestivalDetector {
     // Maha Shivaratri — sunset / night rule (Phalguna Krishna 14 = tithi 29).
     if (m == LunarMonth.phalguna && _tithiActiveAt(day, 29, sunset)) {
       return 'Maha Shivaratri';
+    }
+
+    // Chaitra Navratri — Maha Ashtami, night rule (Chaitra Shukla 8).
+    if (m == LunarMonth.chaitra && _tithiActiveAt(day, 8, sunset)) {
+      return 'Maha Ashtami';
+    }
+
+    // Sharad Navratri / Durga Puja — Maha Ashtami & Maha Navami, night rule;
+    // Vijayadashami, Aparahna rule (Ashwina Shukla 8/9/10).
+    if (m == LunarMonth.ashwina) {
+      if (_tithiActiveAt(day, 8, sunset)) return 'Maha Ashtami';
+      if (_tithiActiveAt(day, 9, sunset)) return 'Maha Navami';
+      if (_tithiActiveAt(day, 10, aparahna)) return 'Vijayadashami';
     }
 
     return null;
@@ -236,7 +263,7 @@ abstract final class FestivalDetector {
     return switch ((m, t)) {
       // Chaitra
       (LunarMonth.chaitra, 1)  => 'Gudi Padwa / Ugadi / Chaitra Navratri',
-      (LunarMonth.chaitra, 8)  => 'Maha Ashtami',
+      // Maha Ashtami (Chaitra 8) → _specialWindowFestival (night rule)
       (LunarMonth.chaitra, 9)  => 'Ram Navami',           // Shukla 9
       (LunarMonth.chaitra, 15) => 'Hanuman Jayanti',      // Purnima
       (LunarMonth.chaitra, 16) => 'Holi',                 // Krishna 1 = Rangwali Holi
@@ -271,9 +298,8 @@ abstract final class FestivalDetector {
       (LunarMonth.ashwina, 1)  => 'Sharad Navratri',
       (LunarMonth.ashwina, 23) => 'Jivitputrika Vrat (Jitiya)', // Krishna 8
       (LunarMonth.ashwina, 30) => 'Mahalaya Amavasya',
-      (LunarMonth.ashwina, 8)  => 'Maha Ashtami',
-      (LunarMonth.ashwina, 9)  => 'Maha Navami',
-      (LunarMonth.ashwina, 10) => 'Vijayadashami',
+      // Maha Ashtami / Maha Navami (Ashwina 8/9) → _specialWindowFestival (night rule)
+      // Vijayadashami (Ashwina 10) → _specialWindowFestival (aparahna rule)
       (LunarMonth.ashwina, 15) => 'Sharad Purnima',
 
       // Kartika — Krishna paksha (tithi 16–30) and Shukla (1–15) all in same month.

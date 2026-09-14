@@ -234,22 +234,32 @@ class NotificationService {
   ) async {
     final now = tz.TZDateTime.now(tzLocation);
 
+    final yesterday = DateTime.now().subtract(const Duration(days: 1));
+    var prevTithiNumber = tithiService.calculateForDate(
+      localDate: yesterday, lat: location.lat, lon: location.lon,
+      tzOffset: location.tzOffsetAt(yesterday),
+    ).tithi.number;
+
     for (var i = 0; i < 7; i++) {
       final date = DateTime.now().add(Duration(days: i));
       final scheduled = tz.TZDateTime(
         tzLocation, date.year, date.month, date.day,
         settings.dailyReminderHour, settings.dailyReminderMinute,
       );
-      if (scheduled.isBefore(now)) continue;
 
       final raw = tithiService.calculateForDate(
         localDate: date, lat: location.lat, lon: location.lon,
         tzOffset: location.tzOffsetAt(date),
+        yesterdayTithiNumber: prevTithiNumber,
       );
+      prevTithiNumber = raw.tithi.number;
+      if (scheduled.isBefore(now)) continue;
+
       final nextDate = date.add(const Duration(days: 1));
       final nextRaw = tithiService.calculateForDate(
         localDate: nextDate, lat: location.lat, lon: location.lon,
         tzOffset: location.tzOffsetAt(nextDate),
+        yesterdayTithiNumber: raw.tithi.number,
       );
 
       String body = '${raw.tithi.fullNameEn} · ${raw.nakshatra.nameEn}';
@@ -266,7 +276,7 @@ class NotificationService {
         body += ' · Rahu Kaal ${_fmtTime(rahuStart)}–${_fmtTime(rahuEnd)}';
       }
 
-      final festivals = FestivalDetector.detectAll(_purnimanta(raw), _purnimanta(nextRaw));
+      final festivals = FestivalDetector.detectAll(_purnimanta(raw));
       if (festivals.isNotEmpty) body += ' · ${festivals.join(', ')}';
 
       await _plugin.zonedSchedule(
@@ -300,17 +310,40 @@ class NotificationService {
     // Each day is looked up twice — once as the event day, once as the
     // previous iteration's lookahead — so cache to halve the ephemeris work.
     final cache = <DateTime, DayData>{};
+    // planObservanceAlerts requests dates in non-decreasing order but can
+    // skip a leading run of days (those whose fire time has already
+    // passed), so the day immediately before a request is not always
+    // already cached — fetch it on demand whenever there's a gap, rather
+    // than assuming a single seed covers the whole scan.
+    DateTime? lastFetchedDate;
+    int? lastFetchedTithiNumber;
+    int? yesterdayTithiNumberFor(DateTime date) {
+      final yesterday = date.subtract(const Duration(days: 1));
+      if (lastFetchedDate == yesterday) return lastFetchedTithiNumber;
+      return tithiService.calculateForDate(
+        localDate: yesterday,
+        lat: location.lat,
+        lon: location.lon,
+        tzOffset: location.tzOffsetAt(yesterday),
+      ).tithi.number;
+    }
 
     final plan = planObservanceAlerts(
       settings: settings,
       dayData: (date) => cache.putIfAbsent(
         DateTime(date.year, date.month, date.day),
-        () => tithiService.calculateForDate(
-          localDate: date,
-          lat: location.lat,
-          lon: location.lon,
-          tzOffset: location.tzOffsetAt(date),
-        ),
+        () {
+          final raw = tithiService.calculateForDate(
+            localDate: date,
+            lat: location.lat,
+            lon: location.lon,
+            tzOffset: location.tzOffsetAt(date),
+            yesterdayTithiNumber: yesterdayTithiNumberFor(date),
+          );
+          lastFetchedDate = DateTime(date.year, date.month, date.day);
+          lastFetchedTithiNumber = raw.tithi.number;
+          return raw;
+        },
       ),
       tzLocation: tzLocation,
       now: tz.TZDateTime.now(tzLocation),
@@ -396,8 +429,7 @@ List<PlannedAlert> planObservanceAlerts({
     final nextRaw = dayData(date.add(const Duration(days: 1)));
 
     final day = _purnimanta(raw);
-    final nextDay = _purnimanta(nextRaw);
-    final festivalNames = FestivalDetector.detectAll(day, nextDay);
+    final festivalNames = FestivalDetector.detectAll(day);
     // Named festivals the user will actually be told about. A festival that
     // is not subscribed doesn't suppress the generic Purnima/Amavasya alert.
     final notifiedNames =
@@ -420,10 +452,14 @@ List<PlannedAlert> planObservanceAlerts({
           (raw.secondaryIsKshaya &&
               raw.secondaryTithi?.special == SpecialTithi.ekadashi);
       // Vruddhi first day: skip — the alert fires on the second day instead.
-      // The tomorrow-lookahead is more robust than `secondaryTithi == null`
-      // alone, which misses an Ekadashi ending just before the next sunrise.
+      // Compares against rawTithi, not the display-corrected tithi —
+      // tomorrow's tithi has already been advanced past Ekadashi by
+      // TithiService's own vruddhi correction in exactly this case, so
+      // comparing display tithis here would never match. The tomorrow-
+      // lookahead is more robust than `secondaryTithi == null` alone, which
+      // misses an Ekadashi ending just before the next sunrise.
       final isVruddhiFirstDay = raw.tithi.special == SpecialTithi.ekadashi &&
-          nextRaw.tithi.special == SpecialTithi.ekadashi;
+          nextRaw.rawTithi.special == SpecialTithi.ekadashi;
       if (isEkadashi && !isVruddhiFirstDay) {
         alerts.add(PlannedAlert(
           id: ekadashiId++,

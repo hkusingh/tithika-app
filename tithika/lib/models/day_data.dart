@@ -10,8 +10,19 @@ import 'tithi_info.dart';
 class DayData {
   final DateTime localDate;
 
-  /// Tithi active at local sunrise — defines the calendar day.
+  /// Tithi active at local sunrise, after the vruddhi (expanded-tithi)
+  /// last-day correction — defines the calendar day. See [rawTithi] for the
+  /// uncorrected value.
   final TithiInfo tithi;
+
+  /// Tithi literally active at local sunrise, before any vruddhi correction.
+  /// Equal to [tithi] on every day except the second of a two-sunrise
+  /// (vruddhi) tithi span, where [tithi] has been advanced to the next
+  /// tithi but [rawTithi] still reflects the tithi astronomically ruling
+  /// this sunrise. Exists for callers that need to detect vruddhi spans
+  /// themselves (e.g. Ekadashi's own last-day observance rule) rather than
+  /// relying on the display correction already applied to [tithi].
+  final TithiInfo rawTithi;
 
   /// Nakshatra active at local sunrise.
   final NakshatraInfo nakshatra;
@@ -70,6 +81,7 @@ class DayData {
   const DayData({
     required this.localDate,
     required this.tithi,
+    required this.rawTithi,
     required this.nakshatra,
     this.sunriseUtc,
     this.sunsetUtc,
@@ -101,6 +113,7 @@ class DayData {
     return DayData(
       localDate: localDate,
       tithi: tithi,
+      rawTithi: rawTithi,
       nakshatra: nakshatra,
       sunriseUtc: sunriseUtc,
       sunsetUtc: sunsetUtc,

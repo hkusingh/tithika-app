@@ -199,24 +199,24 @@ class _DayPageContent extends ConsumerWidget {
         ),
       ),
       data: (tithiSvc) {
+        final yesterday = date.subtract(const Duration(days: 1));
+        final rawYesterday = tithiSvc.calculateForDate(
+          localDate: yesterday,
+          lat: location.lat,
+          lon: location.lon,
+          tzOffset: location.tzOffsetAt(yesterday),
+        );
         final raw = tithiSvc.calculateForDate(
           localDate: date,
           lat: location.lat,
           lon: location.lon,
           tzOffset: location.tzOffsetAt(date),
-        );
-        final tomorrow = date.add(const Duration(days: 1));
-        final rawTomorrow = tithiSvc.calculateForDate(
-          localDate: tomorrow,
-          lat: location.lat,
-          lon: location.lon,
-          tzOffset: location.tzOffsetAt(tomorrow),
+          yesterdayTithiNumber: rawYesterday.tithi.number,
         );
         final adjusted = _applyMonthSystem(raw, monthSystem);
         final purnimanta = _applyMonthSystem(raw, MonthSystem.purnimanta);
-        final purnimantaTomorrow = _applyMonthSystem(rawTomorrow, MonthSystem.purnimanta);
         final data = adjusted.copyWith(
-          festivalNames: FestivalDetector.detectAll(purnimanta, purnimantaTomorrow),
+          festivalNames: FestivalDetector.detectAll(purnimanta),
         );
         return _DayContent(data: data, date: date);
       },

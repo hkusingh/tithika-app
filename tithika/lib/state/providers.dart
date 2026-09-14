@@ -66,24 +66,24 @@ final dayDataProvider = FutureProvider<DayData?>((ref) async {
   final monthSystem =
       ref.watch(appSettingsProvider.select((s) => s.monthSystem));
 
+  final yesterday = date.subtract(const Duration(days: 1));
+  final rawYesterday = tithiSvc.calculateForDate(
+    localDate: yesterday,
+    lat: location.lat,
+    lon: location.lon,
+    tzOffset: location.tzOffsetAt(yesterday),
+  );
   final raw = tithiSvc.calculateForDate(
     localDate: date,
     lat: location.lat,
     lon: location.lon,
     tzOffset: location.tzOffsetAt(date),
-  );
-  final tomorrow = date.add(const Duration(days: 1));
-  final rawTomorrow = tithiSvc.calculateForDate(
-    localDate: tomorrow,
-    lat: location.lat,
-    lon: location.lon,
-    tzOffset: location.tzOffsetAt(tomorrow),
+    yesterdayTithiNumber: rawYesterday.tithi.number,
   );
 
   final adjusted = _applyMonthSystem(raw, monthSystem);
   final purnimanta = _applyMonthSystem(raw, MonthSystem.purnimanta);
-  final purnimantaTomorrow = _applyMonthSystem(rawTomorrow, MonthSystem.purnimanta);
-  final festivalNames = FestivalDetector.detectAll(purnimanta, purnimantaTomorrow);
+  final festivalNames = FestivalDetector.detectAll(purnimanta);
   return adjusted.copyWith(festivalNames: festivalNames);
 });
 
@@ -95,27 +95,37 @@ final stripDaysProvider = FutureProvider<List<DayData>>((ref) async {
   final location = ref.watch(effectiveLocationProvider);
   final monthSystem =
       ref.watch(appSettingsProvider.select((s) => s.monthSystem));
-  return List.generate(4, (i) {
-    final date = DateTime(selected.year, selected.month, selected.day)
-        .add(Duration(days: i - 1));
+
+  final firstDate = DateTime(selected.year, selected.month, selected.day)
+      .subtract(const Duration(days: 1));
+  final beforeFirst = firstDate.subtract(const Duration(days: 1));
+  var prevTithiNumber = tithiSvc.calculateForDate(
+    localDate: beforeFirst,
+    lat: location.lat,
+    lon: location.lon,
+    tzOffset: location.tzOffsetAt(beforeFirst),
+  ).tithi.number;
+
+  final raws = <DayData>[];
+  for (var i = 0; i < 4; i++) {
+    final date = firstDate.add(Duration(days: i));
     final raw = tithiSvc.calculateForDate(
       localDate: date,
       lat: location.lat,
       lon: location.lon,
       tzOffset: location.tzOffsetAt(date),
+      yesterdayTithiNumber: prevTithiNumber,
     );
-    final tomorrow = date.add(const Duration(days: 1));
-    final rawTomorrow = tithiSvc.calculateForDate(
-      localDate: tomorrow,
-      lat: location.lat,
-      lon: location.lon,
-      tzOffset: location.tzOffsetAt(tomorrow),
-    );
+    raws.add(raw);
+    prevTithiNumber = raw.tithi.number;
+  }
+
+  return List.generate(4, (i) {
+    final raw = raws[i];
     final adjusted = _applyMonthSystem(raw, monthSystem);
     final purnimanta = _applyMonthSystem(raw, MonthSystem.purnimanta);
-    final purnimantaTomorrow = _applyMonthSystem(rawTomorrow, MonthSystem.purnimanta);
     return adjusted.copyWith(
-      festivalNames: FestivalDetector.detectAll(purnimanta, purnimantaTomorrow),
+      festivalNames: FestivalDetector.detectAll(purnimanta),
     );
   });
 });
@@ -142,28 +152,38 @@ final monthDataProvider =
       ref.watch(appSettingsProvider.select((s) => s.monthSystem));
   final (year, month) = args;
   final daysInMonth = DateTime(year, month + 1, 0).day;
+
+  final dayBeforeFirst = DateTime(year, month, 1).subtract(const Duration(days: 1));
+  var prevTithiNumber = tithiSvc.calculateForDate(
+    localDate: dayBeforeFirst,
+    lat: location.lat,
+    lon: location.lon,
+    tzOffset: location.tzOffsetAt(dayBeforeFirst),
+  ).tithi.number;
+
+  final raws = <DateTime, DayData>{};
+  for (var d = 1; d <= daysInMonth; d++) {
+    final date = DateTime(year, month, d);
+    final raw = tithiSvc.calculateForDate(
+      localDate: date,
+      lat: location.lat,
+      lon: location.lon,
+      tzOffset: location.tzOffsetAt(date),
+      yesterdayTithiNumber: prevTithiNumber,
+    );
+    raws[date] = raw;
+    prevTithiNumber = raw.tithi.number;
+  }
+
   return {
     for (var d = 1; d <= daysInMonth; d++)
       d: () {
         final date = DateTime(year, month, d);
-        final raw = tithiSvc.calculateForDate(
-          localDate: date,
-          lat: location.lat,
-          lon: location.lon,
-          tzOffset: location.tzOffsetAt(date),
-        );
-        final tomorrow = date.add(const Duration(days: 1));
-        final rawTomorrow = tithiSvc.calculateForDate(
-          localDate: tomorrow,
-          lat: location.lat,
-          lon: location.lon,
-          tzOffset: location.tzOffsetAt(tomorrow),
-        );
+        final raw = raws[date]!;
         final adjusted = _applyMonthSystem(raw, monthSystem);
         final purnimanta = _applyMonthSystem(raw, MonthSystem.purnimanta);
-        final purnimantaTomorrow = _applyMonthSystem(rawTomorrow, MonthSystem.purnimanta);
         return adjusted.copyWith(
-          festivalNames: FestivalDetector.detectAll(purnimanta, purnimantaTomorrow),
+          festivalNames: FestivalDetector.detectAll(purnimanta),
         );
       }(),
   };
@@ -318,6 +338,14 @@ final yearFestivalsProvider =
   final monthSystem =
       ref.watch(appSettingsProvider.select((s) => s.monthSystem));
 
+  final dayBeforeYear = DateTime(year - 1, 12, 31);
+  var prevTithiNumber = tithiSvc.calculateForDate(
+    localDate: dayBeforeYear,
+    lat: location.lat,
+    lon: location.lon,
+    tzOffset: location.tzOffsetAt(dayBeforeYear),
+  ).tithi.number;
+
   final entries = <FestivalEntry>[];
   for (var month = 1; month <= 12; month++) {
     final daysInMonth = DateTime(year, month + 1, 0).day;
@@ -328,7 +356,9 @@ final yearFestivalsProvider =
         lat: location.lat,
         lon: location.lon,
         tzOffset: location.tzOffsetAt(date),
+        yesterdayTithiNumber: prevTithiNumber,
       );
+      prevTithiNumber = raw.tithi.number;
       final adjusted = _applyMonthSystem(raw, monthSystem);
       final purnimanta = _applyMonthSystem(raw, MonthSystem.purnimanta);
       final tomorrow = date.add(const Duration(days: 1));
@@ -337,19 +367,23 @@ final yearFestivalsProvider =
         lat: location.lat,
         lon: location.lon,
         tzOffset: location.tzOffsetAt(tomorrow),
+        yesterdayTithiNumber: raw.tithi.number,
       );
-      final purnimantaTomorrow = _applyMonthSystem(rawTomorrow, MonthSystem.purnimanta);
       final primaryIsEkadashi = raw.tithi.special == SpecialTithi.ekadashi;
       final kshayaIsEkadashi = raw.secondaryIsKshaya &&
           raw.secondaryTithi?.special == SpecialTithi.ekadashi;
       final isEkadashiDay = primaryIsEkadashi || kshayaIsEkadashi;
-      // Vruddhi: look ahead — if tomorrow also has Ekadashi as primary, today
-      // is Day 1 and should be suppressed (observe on Day 2).  Lookahead is
-      // more robust than secondaryTithi == null alone, which can miss the case
-      // where Ekadashi ends minutes before the next sunrise.
+      // Vruddhi: look ahead — if tomorrow's tithi is ALSO (raw, pre-display-
+      // correction) Ekadashi, today is Day 1 and should be suppressed
+      // (observe on Day 2). Must compare against rawTithi, not the
+      // display-corrected tithi — tomorrow's tithi has already been advanced
+      // past Ekadashi by TithiService's own vruddhi correction in exactly
+      // this case, so comparing display tithis here would never match.
+      // Lookahead is more robust than secondaryTithi == null alone, which
+      // can miss the case where Ekadashi ends minutes before the next sunrise.
       final isVruddhiFirstDay =
-          primaryIsEkadashi && rawTomorrow.tithi.special == SpecialTithi.ekadashi;
-      final detectedNames = FestivalDetector.detectAll(purnimanta, purnimantaTomorrow);
+          primaryIsEkadashi && rawTomorrow.rawTithi.special == SpecialTithi.ekadashi;
+      final detectedNames = FestivalDetector.detectAll(purnimanta);
       final isObservedEkadashi = isEkadashiDay && !isVruddhiFirstDay;
 
       // One FestivalEntry per detected name — each links to its own

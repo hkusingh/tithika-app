@@ -27,6 +27,7 @@ DayData _day({
   return DayData(
     localDate: DateTime(2026, 9, 1),
     tithi: tithi,
+    rawTithi: tithi,
     nakshatra: NakshatraInfo(number: 1, end: DateTime.utc(2026, 9, 2)),
     lunarMonth: lunarMonth,
     sunZodiacSign: 4,
@@ -38,52 +39,20 @@ DayData _day({
 }
 
 void main() {
-  group('FestivalDetector.detect — vridhi handling', () {
+  group('FestivalDetector.detect — vruddhi handling', () {
+    // Vruddhi (expanded-tithi) resolution now happens upstream, in
+    // TithiService.calculateForDate (see its `yesterdayTithiNumber`
+    // parameter and tithi_service_test.dart) — by the time a DayData
+    // reaches FestivalDetector, [day.tithi] is already the correct display
+    // tithi for that calendar day. So detect()/detectAll() only need to key
+    // off day.tithi.number directly; there is no separate suppression logic
+    // left to test here, for either a genuine vruddhi span or a
+    // false-positive like the Bangalore Tritiya/Chaturthi case that used to
+    // need special-casing.
     test(
-      'Hartalika Teej (Bhadrapada Shukla Tritiya) is reported when Tritiya is '
-      'vridhi (secondaryTithi null) but tomorrow is a DIFFERENT tithi '
-      '(Bangalore-style case: this is not actually a two-day vridhi span for '
-      'Tritiya itself, so the festival must not be suppressed)',
-      () {
-        final today = _day(
-          lunarMonth: LunarMonth.bhadrapada,
-          tithi: _tithi(3, DateTime.utc(2026, 8, 31, 20), DateTime.utc(2026, 9, 2, 3)),
-          secondaryTithi: null,
-        );
-        final tomorrow = _day(
-          lunarMonth: LunarMonth.bhadrapada,
-          tithi: _tithi(4, DateTime.utc(2026, 9, 2, 3), DateTime.utc(2026, 9, 3, 6)),
-          secondaryTithi: null,
-        );
-
-        expect(FestivalDetector.detect(today, tomorrow), 'Hartalika Teej');
-      },
-    );
-
-    test(
-      'Hartalika Teej is suppressed on day 1 of a genuine two-day Tritiya '
-      'vridhi span (tomorrow is still Tritiya) and appears on day 2 instead',
-      () {
-        final day1 = _day(
-          lunarMonth: LunarMonth.bhadrapada,
-          tithi: _tithi(3, DateTime.utc(2026, 8, 31, 20), DateTime.utc(2026, 9, 2, 3)),
-          secondaryTithi: null,
-        );
-        final day2 = _day(
-          lunarMonth: LunarMonth.bhadrapada,
-          tithi: _tithi(3, DateTime.utc(2026, 8, 31, 20), DateTime.utc(2026, 9, 2, 3)),
-          secondaryTithi: _tithi(4, DateTime.utc(2026, 9, 2, 3), DateTime.utc(2026, 9, 3, 6)),
-        );
-
-        expect(FestivalDetector.detect(day1, day2), isNull);
-        expect(FestivalDetector.detect(day2, null), 'Hartalika Teej');
-      },
-    );
-
-    test(
-      'when tomorrow is unavailable, the festival is reported rather than '
-      'silently dropped — callers that care about vridhi correctness should '
-      'pass tomorrow explicitly',
+      'Hartalika Teej (Bhadrapada Shukla Tritiya) is reported directly from '
+      'day.tithi.number, whether or not that day happens to also carry a '
+      'raw secondaryTithi',
       () {
         final today = _day(
           lunarMonth: LunarMonth.bhadrapada,
@@ -92,6 +61,24 @@ void main() {
         );
 
         expect(FestivalDetector.detect(today), 'Hartalika Teej');
+      },
+    );
+
+    test(
+      'the SECOND day of a two-day Tritiya vruddhi span no longer reports '
+      'Hartalika Teej, because day.tithi has already been advanced to '
+      'Chaturthi upstream (TithiService promotes it; FestivalDetector just '
+      "reads the result — Chaturthi itself needs sunrise/sunset data for "
+      "Ganesh Chaturthi's Madhyahna rule, not provided by this fixture, so "
+      'the day is simply ordinary here)',
+      () {
+        final day2 = _day(
+          lunarMonth: LunarMonth.bhadrapada,
+          tithi: _tithi(4, DateTime.utc(2026, 9, 2, 3), DateTime.utc(2026, 9, 3, 6)),
+          secondaryTithi: null,
+        );
+
+        expect(FestivalDetector.detect(day2), isNull);
       },
     );
 
@@ -136,8 +123,8 @@ void main() {
           sunsetUtc: DateTime.utc(2026, 7, 30, 3, 31),
         );
 
-        expect(FestivalDetector.detect(jul28, jul29), 'Guru Purnima');
-        expect(FestivalDetector.detect(jul29, null), isNull);
+        expect(FestivalDetector.detect(jul28), 'Guru Purnima');
+        expect(FestivalDetector.detect(jul29), isNull);
       },
     );
 
@@ -162,8 +149,8 @@ void main() {
           sunsetUtc: DateTime.utc(2026, 7, 30, 3),
         );
 
-        expect(FestivalDetector.detect(day1, day2), isNull);
-        expect(FestivalDetector.detect(day2, null), 'Guru Purnima');
+        expect(FestivalDetector.detect(day1), isNull);
+        expect(FestivalDetector.detect(day2), 'Guru Purnima');
       },
     );
 
@@ -198,17 +185,8 @@ void main() {
           sunriseUtc: DateTime.utc(2026, 8, 27, 23, 58),
           sunsetUtc: DateTime.utc(2026, 8, 28, 12, 43),
         );
-        final aug29 = _day(
-          lunarMonth: LunarMonth.bhadrapada,
-          tithi: _tithi(16, DateTime.utc(2026, 8, 28, 4, 19),
-              DateTime.utc(2026, 8, 29, 8, 30)),
-          secondaryTithi: null,
-          sunriseUtc: DateTime.utc(2026, 8, 28, 23, 58),
-          sunsetUtc: DateTime.utc(2026, 8, 29, 12, 42),
-        );
-
-        expect(FestivalDetector.detect(aug27, aug28), isNull);
-        expect(FestivalDetector.detect(aug28, aug29), 'Raksha Bandhan');
+        expect(FestivalDetector.detect(aug27), isNull);
+        expect(FestivalDetector.detect(aug28), 'Raksha Bandhan');
       },
     );
   });

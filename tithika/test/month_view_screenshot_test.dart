@@ -35,6 +35,7 @@ Map<int, DayData> _fakeOctober2026() {
     data[d] = DayData(
       localDate: DateTime(2026, 10, d),
       tithi: _tithi(),
+      rawTithi: _tithi(),
       nakshatra: NakshatraInfo(number: 1, end: DateTime.utc(2026, 10, d + 1)),
       lunarMonth: month,
       sunZodiacSign: 5,

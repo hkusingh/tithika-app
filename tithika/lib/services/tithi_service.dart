@@ -26,11 +26,22 @@ class TithiService {
   ///
   /// [localDate] should be a date-only value (time component is ignored).
   /// All returned UTC times can be converted to local using [tzOffset].
+  ///
+  /// [yesterdayTithiNumber] is the tithi number that ruled the PREVIOUS
+  /// calendar day's sunrise, when known. A tithi that rules two consecutive
+  /// sunrises (vruddhi) is displayed on the first day, but the calendar
+  /// convention advances to the NEXT tithi on the second day even though the
+  /// vruddhi tithi is technically still active for the first few minutes
+  /// after that second sunrise — it cannot be shown as the label two days in
+  /// a row. Pass null when the previous day's tithi is unknown/unavailable;
+  /// the correction is then skipped and a vruddhi day may show the same
+  /// tithi as the day before it.
   DayData calculateForDate({
     required DateTime localDate,
     required double lat,
     required double lon,
     required Duration tzOffset,
+    int? yesterdayTithiNumber,
   }) {
     // UTC midnight for this local date.
     final utcMidnight = DateTime.utc(
@@ -50,10 +61,10 @@ class TithiService {
     final referenceUtc = sunriseUtc ?? utcMidnight.add(const Duration(hours: 6));
     final referenceJd = _ephe.julianDayFromUtc(referenceUtc);
 
-    final tithi = _tithiAt(referenceJd);
+    final rawTithi = _tithiAt(referenceJd);
     final nakshatra = _nakshatraAt(referenceJd);
     final sunZodiacSign = _sunZodiacSign(referenceJd);
-    final (lunarMonth, isAdhika) = _lunarMonthAndAdhika(referenceJd, tithi.number);
+    final (lunarMonth, isAdhika) = _lunarMonthAndAdhika(referenceJd, rawTithi.number);
     final sunZodiacEntryToday =
         _sunZodiacSign(referenceJd - 1.0) != sunZodiacSign;
 
@@ -63,11 +74,33 @@ class TithiService {
     final tropSun    = _ephe.sunLongitude(referenceJd);
     final tropElong  = (tropMoon - tropSun + 360.0) % 360.0;
 
-    // Check for a secondary (kshaya) tithi: if the sunrise tithi ends before
-    // the next sunrise, a second tithi begins within this calendar day.
     final nextDayUtcMidnight = utcMidnight.add(const Duration(days: 1));
     final nextSunriseUtc = _ephe.sunrise(nextDayUtcMidnight, lat, lon)
         ?? nextDayUtcMidnight.add(const Duration(hours: 6));
+
+    // Vruddhi (expanded) tithi: [rawTithi] already ruled yesterday's sunrise
+    // too, so it cannot be the label two days running — advance to the next
+    // tithi, which starts right after [rawTithi] ends. A tithi that rules
+    // two consecutive sunrises always ends before this calendar day is out
+    // (it cannot span a third sunrise), so this lookup is always available.
+    //
+    // Purnima (15) is exempt: it follows its own Purvahna/Madhyahna Vyapini
+    // convention (see FestivalDetector.isObservedPurnima), which can even
+    // choose to keep Purnima on day 2 rather than always advancing — a
+    // blanket promotion here would pre-empt that decision before it runs.
+    final TithiInfo tithi;
+    if (yesterdayTithiNumber == rawTithi.number && rawTithi.number != 15) {
+      final promotedJd = _ephe.julianDayFromUtc(
+        rawTithi.end.add(const Duration(minutes: 1)),
+      );
+      tithi = _tithiAt(promotedJd);
+    } else {
+      tithi = rawTithi;
+    }
+
+    // Check for a secondary (kshaya) tithi: if [tithi] (the day's displayed
+    // tithi, after any vruddhi promotion above) ends before the next
+    // sunrise, a second tithi begins within this calendar day.
     TithiInfo? secondaryTithi;
     var secondaryIsKshaya = false;
     if (tithi.end.isBefore(nextSunriseUtc)) {
@@ -83,6 +116,7 @@ class TithiService {
     return DayData(
       localDate: DateTime(localDate.year, localDate.month, localDate.day),
       tithi: tithi,
+      rawTithi: rawTithi,
       nakshatra: nakshatra,
       sunriseUtc: sunriseUtc,
       sunsetUtc: sunsetUtc,
