@@ -1,14 +1,17 @@
 import 'app_settings.dart';
 
-/// The 12 Purnimanta lunar months, keyed by the sidereal sun sign at Purnima.
+/// The 12 lunar months, keyed by the sidereal sun sign at the Amavasya that
+/// STARTS the month (the Amanta base — see TithiService._lunarMonthAndAdhika,
+/// the only place that assigns this enum from astronomical data). Purnimanta
+/// display names are derived from this base in providers.dart's
+/// _applyMonthSystem: a non-Adhika Krishna-paksha day belongs to the NEXT
+/// Amanta month's name, since a Purnimanta month spans Purnima→Purnima and so
+/// crosses the Amavasya a Purnimanta month earlier than its Amanta namesake.
+/// (e.g. Diwali/Kartika Amavasya: Amanta name is Ashwina, since Amanta
+/// Kartika only begins the next day — but Purnimanta already calls it
+/// Kartika, since Purnimanta Kartika started at the PRIOR Purnima.)
 ///
-/// The moon is in the nakshatra that names the month at each Full Moon; the sun
-/// is therefore ~180° away, i.e. one sign "behind":
-///   Mesha sun → moon in Krittika/Rohini area → Vaishakha
-///   Vrishabha sun → Jyeshtha … and so on.
-///
-/// Index = sidereal sun sign (0 = Mesha … 11 = Meena) at the Purnima that
-/// ENDS the current Purnimanta month.
+/// Index = sidereal sun sign (0 = Mesha … 11 = Meena) at that Amavasya.
 enum LunarMonth {
   vaishakha,    // Sun in Mesha  (sign 0) at Purnima
   jyeshtha,     // Sun in Vrishabha (1)

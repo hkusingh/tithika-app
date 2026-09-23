@@ -249,15 +249,20 @@ void main() {
   });
 
   group('Lunar month', () {
-    test('Diwali 2024 is Kartika (sun in Vrishchika at Purnima)', () {
-      final data = svc.calculateForDate(
-        localDate: DateTime(2024, 11, 1),
-        lat: _mumbaiLat,
-        lon: _mumbaiLon,
-        tzOffset: _mumbaiTz,
-      );
-      expect(data.lunarMonth, LunarMonth.kartika);
-    });
+    test(
+      'Diwali 2024 is Ashwina in the raw Amanta base '
+      '(Purnimanta conversion to Kartika happens later, in '
+      '_applyMonthSystem — TithiService itself always returns Amanta)',
+      () {
+        final data = svc.calculateForDate(
+          localDate: DateTime(2024, 11, 1),
+          lat: _mumbaiLat,
+          lon: _mumbaiLon,
+          tzOffset: _mumbaiTz,
+        );
+        expect(data.lunarMonth, LunarMonth.ashwina);
+      },
+    );
 
     test('Holi 2025 is Phalguna (sun in Meena at Purnima)', () {
       final data = svc.calculateForDate(

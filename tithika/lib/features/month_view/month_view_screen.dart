@@ -558,8 +558,18 @@ class _MonthFestivalList extends ConsumerWidget {
       final kshayaIsEk = data.secondaryIsKshaya &&
           data.secondaryTithi?.special == SpecialTithi.ekadashi;
       final isEkadashiDay = primaryIsEk || kshayaIsEk;
-      final tomorrowIsEk = monthData[d + 1]?.tithi.special == SpecialTithi.ekadashi;
+      // Must compare tomorrow's rawTithi, not its (display-corrected) tithi —
+      // if tomorrow really is Day 2 of a vruddhi span, its display tithi has
+      // already been promoted past Ekadashi, so comparing display tithis here
+      // would never match.
+      final tomorrowIsEk =
+          monthData[d + 1]?.rawTithi.special == SpecialTithi.ekadashi;
       final isVruddhiFirstDay = primaryIsEk && tomorrowIsEk;
+      // Vruddhi Day 2: today's raw tithi is Ekadashi but the display tithi
+      // was already promoted past it (yesterday's sunrise was also
+      // Ekadashi) — this is where the suppressed Day 1 hands observance off.
+      final isVruddhiSecondDay =
+          !primaryIsEk && data.rawTithi.special == SpecialTithi.ekadashi;
       // One row per detected name — unrelated same-day festivals must never
       // be merged into a single row, or the detail-sheet link breaks.
       for (final canonical in data.festivalNames) {
@@ -569,7 +579,7 @@ class _MonthFestivalList extends ConsumerWidget {
           name: FestivalNames.localize(canonical, language)!,
         ));
       }
-      if (!isVruddhiFirstDay && isEkadashiDay) {
+      if ((!isVruddhiFirstDay && isEkadashiDay) || isVruddhiSecondDay) {
         ekadashis.add(d);
       }
     }

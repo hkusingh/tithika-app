@@ -383,8 +383,18 @@ final yearFestivalsProvider =
       // can miss the case where Ekadashi ends minutes before the next sunrise.
       final isVruddhiFirstDay =
           primaryIsEkadashi && rawTomorrow.rawTithi.special == SpecialTithi.ekadashi;
+      // Vruddhi Day 2: today's raw (astronomical) tithi is Ekadashi but the
+      // display tithi has already been promoted past it by TithiService's
+      // own vruddhi correction (yesterday's sunrise was also Ekadashi) — this
+      // is the day the suppressed Day 1 above hands observance off to. Without
+      // this, a two-sunrise Ekadashi was dropped entirely: Day 1 suppressed
+      // and Day 2 never flagged since primaryIsEkadashi only looks at the
+      // (already-promoted) display tithi.
+      final isVruddhiSecondDay =
+          !primaryIsEkadashi && raw.rawTithi.special == SpecialTithi.ekadashi;
       final detectedNames = FestivalDetector.detectAll(purnimanta);
-      final isObservedEkadashi = isEkadashiDay && !isVruddhiFirstDay;
+      final isObservedEkadashi =
+          (isEkadashiDay && !isVruddhiFirstDay) || isVruddhiSecondDay;
 
       // One FestivalEntry per detected name — each links to its own
       // description, so unrelated same-day festivals must never be merged.

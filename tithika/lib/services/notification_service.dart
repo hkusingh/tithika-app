@@ -448,7 +448,8 @@ List<PlannedAlert> planObservanceAlerts({
     }
 
     if (wantEkadashi && ekadashiId <= _idEkadashiLast) {
-      final isEkadashi = raw.tithi.special == SpecialTithi.ekadashi ||
+      final primaryIsEkadashi = raw.tithi.special == SpecialTithi.ekadashi;
+      final isEkadashi = primaryIsEkadashi ||
           (raw.secondaryIsKshaya &&
               raw.secondaryTithi?.special == SpecialTithi.ekadashi);
       // Vruddhi first day: skip — the alert fires on the second day instead.
@@ -458,9 +459,15 @@ List<PlannedAlert> planObservanceAlerts({
       // comparing display tithis here would never match. The tomorrow-
       // lookahead is more robust than `secondaryTithi == null` alone, which
       // misses an Ekadashi ending just before the next sunrise.
-      final isVruddhiFirstDay = raw.tithi.special == SpecialTithi.ekadashi &&
-          nextRaw.rawTithi.special == SpecialTithi.ekadashi;
-      if (isEkadashi && !isVruddhiFirstDay) {
+      final isVruddhiFirstDay =
+          primaryIsEkadashi && nextRaw.rawTithi.special == SpecialTithi.ekadashi;
+      // Vruddhi second day: today's raw tithi is Ekadashi but the display
+      // tithi was already promoted past it (yesterday's sunrise was also
+      // Ekadashi) — this is where the suppressed Day 1 hands the alert off.
+      // Without this, a two-sunrise Ekadashi got no alert on either day.
+      final isVruddhiSecondDay = !primaryIsEkadashi &&
+          raw.rawTithi.special == SpecialTithi.ekadashi;
+      if ((isEkadashi && !isVruddhiFirstDay) || isVruddhiSecondDay) {
         alerts.add(PlannedAlert(
           id: ekadashiId++,
           title: 'Ekadashi ${_whenSuffix(settings.alertDaysBefore)}',

@@ -320,6 +320,63 @@ void main() {
       expect(plan.map((a) => a.title),
           containsAll(['Purnima tomorrow', 'Amavasya tomorrow']));
     });
+
+    test(
+        'vruddhi Ekadashi (rules two sunrises) still alerts once, on day 2 '
+        'not day 1', () {
+      // Day +3: raw and display tithi both 11 (Day 1 of the vruddhi span).
+      final day1Date = today.add(const Duration(days: 3));
+      final day1 = _day(day1Date, tithiNumber: 11, lunarMonth: LunarMonth.chaitra);
+
+      // Day +4: raw tithi is still 11 (Ekadashi ruled this sunrise too), but
+      // the display tithi has already been promoted to 12 by TithiService's
+      // own vruddhi correction — mirrors what calculateForDate produces for
+      // a genuine two-sunrise Ekadashi.
+      final day2Date = today.add(const Duration(days: 4));
+      final day2Sunrise = DateTime.utc(day2Date.year, day2Date.month, day2Date.day, 1, 0);
+      final day2Sunset = DateTime.utc(day2Date.year, day2Date.month, day2Date.day, 13, 0);
+      final day2Raw = _tithi(11, day1.rawTithi.end.subtract(const Duration(hours: 1)),
+          day2Sunrise.add(const Duration(hours: 2)));
+      final day2Display = _tithi(12, day2Raw.end,
+          day2Sunset.add(const Duration(hours: 3)));
+      final day2 = DayData(
+        localDate: day2Date,
+        tithi: day2Display,
+        rawTithi: day2Raw,
+        nakshatra: NakshatraInfo(number: 1, end: day2Date.add(const Duration(days: 1))),
+        lunarMonth: LunarMonth.chaitra,
+        sunZodiacSign: 4,
+        secondaryTithi: _tithi(13, day2Sunset.add(const Duration(hours: 3)),
+            day2Sunset.add(const Duration(hours: 9))),
+        sunriseUtc: day2Sunrise,
+        sunsetUtc: day2Sunset,
+      );
+
+      final plan = planObservanceAlerts(
+        settings: const NotificationSettings(
+          enabled: true,
+          festivalAlertsEnabled: false,
+          ekadashiAlertsEnabled: true,
+          purnimaAlertsEnabled: false,
+          amavasyaAlertsEnabled: false,
+        ),
+        dayData: plainDays(overrides: {3: day1, 4: day2}),
+        tzLocation: kolkata,
+        now: now,
+        today: today,
+      );
+
+      final ekadashiAlerts =
+          plan.where((a) => a.title.startsWith('Ekadashi')).toList();
+      expect(ekadashiAlerts, hasLength(1),
+          reason: 'a vruddhi Ekadashi must alert exactly once, not zero or '
+              'two times');
+      // Default alertDaysBefore is 1 day: an alert anchored to day 2 (offset
+      // +4) fires the day before it, i.e. offset +3 — same fire day as day1,
+      // but distinguishing zero-alert (the bug) from one-alert (fixed) is
+      // the point of the hasLength(1) check above.
+      expect(ekadashiAlerts.single.fireTime.day, day1Date.day);
+    });
   });
 
   group('overlap suppression', () {
