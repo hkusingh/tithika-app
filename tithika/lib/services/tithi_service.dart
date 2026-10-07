@@ -27,9 +27,13 @@ class TithiService {
   /// [localDate] should be a date-only value (time component is ignored).
   /// All returned UTC times can be converted to local using [tzOffset].
   ///
-  /// [yesterdayTithiNumber] is the tithi number that ruled the PREVIOUS
-  /// calendar day's sunrise, when known. A tithi that rules two consecutive
-  /// sunrises (vruddhi) is displayed on the first day, but the calendar
+  /// [yesterdayTithiNumber] is the tithi number that astronomically ruled
+  /// the PREVIOUS calendar day's sunrise — yesterday's [DayData.rawTithi],
+  /// NOT its (possibly advanced) [DayData.tithi]. Chaining the advanced value
+  /// makes the correction cascade: every following day gets advanced too,
+  /// shifting the whole calendar a day early until the next Purnima.
+  ///
+  /// A tithi that rules two consecutive sunrises (vruddhi) is displayed on the first day, but the calendar
   /// convention advances to the NEXT tithi on the second day even though the
   /// vruddhi tithi is technically still active for the first few minutes
   /// after that second sunrise — it cannot be shown as the label two days in
@@ -64,7 +68,8 @@ class TithiService {
     final rawTithi = _tithiAt(referenceJd);
     final nakshatra = _nakshatraAt(referenceJd);
     final sunZodiacSign = _sunZodiacSign(referenceJd);
-    final (lunarMonth, isAdhika) = _lunarMonthAndAdhika(referenceJd, rawTithi.number);
+    final (lunarMonth, isAdhika, followsAdhika) =
+        _lunarMonthAndAdhika(referenceJd, rawTithi.number);
     final sunZodiacEntryToday =
         _sunZodiacSign(referenceJd - 1.0) != sunZodiacSign;
 
@@ -113,6 +118,9 @@ class TithiService {
       secondaryIsKshaya = secondaryTithi.end.isBefore(nextSunriseUtc);
     }
 
+    final shuklaShashthiOffset =
+        _shuklaShashthiOffset(rawTithi, utcMidnight, lat, lon);
+
     return DayData(
       localDate: DateTime(localDate.year, localDate.month, localDate.day),
       tithi: tithi,
@@ -128,10 +136,52 @@ class TithiService {
       secondaryTithi: secondaryTithi,
       secondaryIsKshaya: secondaryIsKshaya,
       isAdhika: isAdhika,
+      followsAdhika: followsAdhika,
+      shuklaShashthiOffset: shuklaShashthiOffset,
       sidSunLonDeg: sidSunLon,
       sidMoonLonDeg: sidMoonLon,
       tropElongDeg: tropElong,
     );
+  }
+
+  /// Days from this calendar day to the observance day of the nearby Shukla
+  /// Shashthi (tithi 6), when that day is within [-1, 2] of it; else null.
+  ///
+  /// The observance day is the first day whose sunrise Shashthi rules, or —
+  /// when Shashthi is kshaya and rules no sunrise — the day it falls within.
+  /// Anchors multi-day observances that must stay on consecutive days
+  /// regardless of how the surrounding tithis expand or contract (Chhath:
+  /// Nahay Khay at offset 2, Kharna 1, Sandhya Arghya 0, Usha Arghya −1),
+  /// which a per-tithi rule can't guarantee. Only computed near Shukla 6, so
+  /// it adds no ephemeris work on most days.
+  int? _shuklaShashthiOffset(
+      TithiInfo rawTithi, DateTime utcMidnight, double lat, double lon) {
+    if (rawTithi.number < 2 || rawTithi.number > 8) return null;
+    var shashthi = rawTithi;
+    while (shashthi.number < 6) {
+      shashthi = _tithiAt(_ephe.julianDayFromUtc(
+          shashthi.end.add(const Duration(minutes: 1))));
+    }
+    while (shashthi.number > 6) {
+      shashthi = _tithiAt(_ephe.julianDayFromUtc(
+          shashthi.start.subtract(const Duration(minutes: 1))));
+    }
+    DateTime sunriseOn(int offset) {
+      final midnight = utcMidnight.add(Duration(days: offset));
+      return _ephe.sunrise(midnight, lat, lon) ??
+          midnight.add(const Duration(hours: 6));
+    }
+
+    // First sunrise at or after Shashthi begins: that day is the observance
+    // day, unless Shashthi had already ended by then (kshaya) — then it is
+    // the day before, within which Shashthi began and ended.
+    for (var k = -2; k <= 3; k++) {
+      final sunrise = sunriseOn(k);
+      if (sunrise.isBefore(shashthi.start)) continue;
+      final offset = sunrise.isBefore(shashthi.end) ? k : k - 1;
+      return (offset >= -1 && offset <= 2) ? offset : null;
+    }
+    return null;
   }
 
   /// Tithi active at an arbitrary UTC moment (used by the Day View to show
@@ -216,13 +266,15 @@ class TithiService {
 
   // ── Lunar month (Purnimanta + Adhika detection) ──────────────────────────────
 
-  /// Determines the Amanta lunar month for [sunriseJd] and whether it is an
-  /// Adhika (intercalary) month.
+  /// Determines the Amanta lunar month for [sunriseJd], whether it is an
+  /// Adhika (intercalary) month, and whether it is the Nija month directly
+  /// after one (the previous month was Adhika).
   ///
   /// Rule (Wikipedia / drikpanchang): a month is Adhika when the sun does NOT
   /// transit into a new sidereal rashi between two consecutive Amavasyas.
   /// Month name = sun sign at the previous Amavasya (Amanta base).
-  (LunarMonth, bool) _lunarMonthAndAdhika(double sunriseJd, int tithiNum) {
+  (LunarMonth, bool, bool) _lunarMonthAndAdhika(
+      double sunriseJd, int tithiNum) {
     final curElong = _elongation(sunriseJd);
 
     // Find previous Amavasya (elongation = 0°).
@@ -245,9 +297,24 @@ class TithiService {
     // Same rashi at both new moons = no Sankranti within = Adhika month.
     final isAdhika = signAtPrev == signAtNext;
 
+    // The previous month was Adhika when the Amavasya before prevAmavasya
+    // had the same rashi as prevAmavasya. Two Adhika months are never
+    // consecutive, so only a non-Adhika month needs the extra search.
+    var followsAdhika = false;
+    if (!isAdhika) {
+      final prevPrevAmavasyaJd = _nextBoundaryJd(
+        prevAmavasyaJd - 360.0 / _elongationRatePerDay - 2.0, 0.0, _elongation,
+        maxDays: 5.0);
+      final signAtPrevPrev = (_ephe.siderealSunLongitude(prevPrevAmavasyaJd) /
+              30.0)
+          .floor()
+          .clamp(0, 11);
+      followsAdhika = signAtPrevPrev == signAtPrev;
+    }
+
     // Month name = prevAmavasya sign (Amanta base).
     // Correct for regular months, Adhika months, and Nija months after Adhika.
-    return (LunarMonth.values[signAtPrev], isAdhika);
+    return (LunarMonth.values[signAtPrev], isAdhika, followsAdhika);
   }
 
   // ── Binary search ───────────────────────────────────────────────────────────

@@ -67,6 +67,11 @@ class DayData {
   /// i.e. no solar Sankranti occurs between two consecutive Purnimas.
   final bool isAdhika;
 
+  /// True if this day falls within the Nija (regular) month directly after
+  /// an Adhika month — e.g. Nija Jyeshtha after Adhika Jyeshtha. Lets a
+  /// festival observed in the Adhika month skip its usual Nija-month date.
+  final bool followsAdhika;
+
   /// Sidereal (Lahiri) ecliptic longitude of the Sun at sunrise, in degrees.
   /// Used for Yoga calculation (sum of sun + moon sidereal longitudes).
   final double? sidSunLonDeg;
@@ -77,6 +82,12 @@ class DayData {
   /// Tropical Moon–Sun elongation at sunrise, in degrees (0–360).
   /// Used for Karana calculation (each Karana spans 6° of elongation).
   final double? tropElongDeg;
+
+  /// Days from this day to the nearby Shukla Shashthi observance day (the
+  /// first day whose sunrise Shashthi rules, or the day it falls within when
+  /// kshaya): 2 = two days before it, 0 = that day, −1 = the day after. Null
+  /// outside that window. Anchors Chhath's four consecutive days.
+  final int? shuklaShashthiOffset;
 
   const DayData({
     required this.localDate,
@@ -94,9 +105,11 @@ class DayData {
     this.secondaryTithi,
     this.secondaryIsKshaya = false,
     this.isAdhika = false,
+    this.followsAdhika = false,
     this.sidSunLonDeg,
     this.sidMoonLonDeg,
     this.tropElongDeg,
+    this.shuklaShashthiOffset,
   });
 
   /// [festivalName] sets a single-name [festivalNames] list (shorthand for
@@ -127,9 +140,11 @@ class DayData {
       secondaryTithi: secondaryTithi ?? this.secondaryTithi,
       secondaryIsKshaya: secondaryIsKshaya ?? this.secondaryIsKshaya,
       isAdhika: isAdhika ?? this.isAdhika,
+      followsAdhika: followsAdhika,
       sidSunLonDeg: sidSunLonDeg,
       sidMoonLonDeg: sidMoonLonDeg,
       tropElongDeg: tropElongDeg,
+      shuklaShashthiOffset: shuklaShashthiOffset,
     );
   }
 }

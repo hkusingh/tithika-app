@@ -37,8 +37,8 @@ abstract final class FestivalDetector {
     }
 
     // ── Tithi-based festivals ────────────────────────────────────────────────
-    // No tithi-based festivals in Adhika (intercalary) months.
-    if (day.isAdhika) return const [];
+    // No tithi-based festivals in Adhika (intercalary) months, except the few
+    // in [_adhikaObserved] — filtered at the end, after normal detection.
 
     // Special-window festivals are computed alongside the sunrise rule (not as
     // an early return) so a special-window festival and a sunrise-rule
@@ -58,6 +58,16 @@ abstract final class FestivalDetector {
     // for the general case.
     var effectivePrimary = primary;
 
+    // The flip side of that advance: on the vruddhi second day the advanced
+    // tithi is usually ALSO tomorrow's sunrise tithi (it has no secondary,
+    // i.e. it outlasts the next sunrise), so it would fire its festival on
+    // both days. Leave it to tomorrow, the day it actually rules sunrise —
+    // e.g. Chhath Kharna 2026 Fremont, or Devutthana Ekadashi 2027 Patna.
+    // When the advanced tithi ends before the next sunrise instead, today is
+    // the only day it is ever shown, so it still fires here.
+    final isAdvancedDay = day.tithi.number != day.rawTithi.number;
+    if (isAdvancedDay && day.secondaryTithi == null) effectivePrimary = null;
+
     // Purnima (tithi 15) is exempt from that upstream correction — it
     // follows its own Purvahna/Madhyahna Vyapini convention instead (see
     // [isObservedPurnima]), which can even choose to keep Purnima on the
@@ -73,8 +83,22 @@ abstract final class FestivalDetector {
         ? _byTithi(m, day.secondaryTithi!.number)
         : null;
 
-    return [special, effectivePrimary, secondary].whereType<String>().toSet().toList();
+    return [special, _chhath(day), effectivePrimary, secondary]
+        .whereType<String>()
+        .where((name) => day.isAdhika
+            ? _adhikaObserved.contains(name)
+            // Already observed in the Adhika month just before, so its
+            // usual date in the Nija month that follows is skipped.
+            : !(day.followsAdhika && _adhikaObserved.contains(name)))
+        .toSet()
+        .toList();
   }
+
+  /// Festivals observed in an Adhika month instead of the Nija month that
+  /// follows it — exceptions to the rule that Adhika months carry no
+  /// festivals. Ganga Dussehra 2026 fell on May 25 (Adhika Jyeshtha Shukla
+  /// 10), not Jun 23/24 (Nija Jyeshtha).
+  static const _adhikaObserved = {'Ganga Dussehra'};
 
   /// Convenience wrapper for callers that only need a single name (e.g. to
   /// test "is this day a festival day at all"). Returns the first name from
@@ -214,6 +238,21 @@ abstract final class FestivalDetector {
     return null;
   }
 
+  /// Chhath's four days are one continuous observance anchored on Sandhya
+  /// Arghya (Kartika Shukla Shashthi), so they're placed by day offset from
+  /// that anchor rather than each by its own tithi — per-tithi placement
+  /// leaves gaps or doubles whenever Chaturthi–Saptami expand or contract.
+  static String? _chhath(DayData day) {
+    if (day.lunarMonth != LunarMonth.kartika) return null;
+    return switch (day.shuklaShashthiOffset) {
+      2  => 'Chhath — Nahay Khay',
+      1  => 'Chhath — Kharna',
+      0  => 'Chhath — Sandhya Arghya',
+      -1 => 'Chhath — Usha Arghya',
+      _  => null,
+    };
+  }
+
   /// Returns true if [tithiNumber] is active at [day]'s Madhyahna (the
   /// sunrise-to-sunset midpoint). Used for the Purnima Purvahna/Madhyahna
   /// Vyapini rule. Falls back to true (defer to the sunrise rule) when
@@ -310,10 +349,7 @@ abstract final class FestivalDetector {
       // Diwali (Kartika 30) → _specialWindowFestival
       (LunarMonth.kartika, 1)  => 'Govardhan Puja',          // Shukla 1
       (LunarMonth.kartika, 2)  => 'Bhai Dooj',               // Shukla 2
-      (LunarMonth.kartika, 4)  => 'Chhath — Nahay Khay',     // Shukla 4
-      (LunarMonth.kartika, 5)  => 'Chhath — Kharna',         // Shukla 5
-      (LunarMonth.kartika, 6)  => 'Chhath — Sandhya Arghya', // Shukla 6
-      (LunarMonth.kartika, 7)  => 'Chhath — Usha Arghya',    // Shukla 7
+      // Chhath (Kartika Shukla 4–7) → _chhath (anchored on Shashthi)
       (LunarMonth.kartika, 11) => 'Devutthana Ekadashi',     // Shukla 11
       (LunarMonth.kartika, 12) => 'Tulsi Vivah',             // Shukla 12
       (LunarMonth.kartika, 15) => 'Kartik Purnima',

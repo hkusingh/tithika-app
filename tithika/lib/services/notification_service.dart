@@ -238,7 +238,7 @@ class NotificationService {
     var prevTithiNumber = tithiService.calculateForDate(
       localDate: yesterday, lat: location.lat, lon: location.lon,
       tzOffset: location.tzOffsetAt(yesterday),
-    ).tithi.number;
+    ).rawTithi.number;
 
     for (var i = 0; i < 7; i++) {
       final date = DateTime.now().add(Duration(days: i));
@@ -252,14 +252,14 @@ class NotificationService {
         tzOffset: location.tzOffsetAt(date),
         yesterdayTithiNumber: prevTithiNumber,
       );
-      prevTithiNumber = raw.tithi.number;
+      prevTithiNumber = raw.rawTithi.number;
       if (scheduled.isBefore(now)) continue;
 
       final nextDate = date.add(const Duration(days: 1));
       final nextRaw = tithiService.calculateForDate(
         localDate: nextDate, lat: location.lat, lon: location.lon,
         tzOffset: location.tzOffsetAt(nextDate),
-        yesterdayTithiNumber: raw.tithi.number,
+        yesterdayTithiNumber: raw.rawTithi.number,
       );
 
       String body = '${raw.tithi.fullNameEn} · ${raw.nakshatra.nameEn}';
@@ -325,7 +325,7 @@ class NotificationService {
         lat: location.lat,
         lon: location.lon,
         tzOffset: location.tzOffsetAt(yesterday),
-      ).tithi.number;
+      ).rawTithi.number;
     }
 
     final plan = planObservanceAlerts(
@@ -341,7 +341,7 @@ class NotificationService {
             yesterdayTithiNumber: yesterdayTithiNumberFor(date),
           );
           lastFetchedDate = DateTime(date.year, date.month, date.day);
-          lastFetchedTithiNumber = raw.tithi.number;
+          lastFetchedTithiNumber = raw.rawTithi.number;
           return raw;
         },
       ),

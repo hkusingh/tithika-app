@@ -19,15 +19,22 @@ TithiInfo _tithi(int number, DateTime start, DateTime end) {
 DayData _day({
   required LunarMonth lunarMonth,
   required TithiInfo tithi,
+  TithiInfo? rawTithi,
   TithiInfo? secondaryTithi,
   bool secondaryIsKshaya = false,
   DateTime? sunriseUtc,
   DateTime? sunsetUtc,
+  int? shuklaShashthiOffset,
+  bool isAdhika = false,
+  bool followsAdhika = false,
 }) {
   return DayData(
     localDate: DateTime(2026, 9, 1),
     tithi: tithi,
-    rawTithi: tithi,
+    rawTithi: rawTithi ?? tithi,
+    shuklaShashthiOffset: shuklaShashthiOffset,
+    isAdhika: isAdhika,
+    followsAdhika: followsAdhika,
     nakshatra: NakshatraInfo(number: 1, end: DateTime.utc(2026, 9, 2)),
     lunarMonth: lunarMonth,
     sunZodiacSign: 4,
@@ -45,10 +52,9 @@ void main() {
     // parameter and tithi_service_test.dart) — by the time a DayData
     // reaches FestivalDetector, [day.tithi] is already the correct display
     // tithi for that calendar day. So detect()/detectAll() only need to key
-    // off day.tithi.number directly; there is no separate suppression logic
-    // left to test here, for either a genuine vruddhi span or a
-    // false-positive like the Bangalore Tritiya/Chaturthi case that used to
-    // need special-casing.
+    // off day.tithi.number directly, except on the advanced vruddhi day
+    // itself (tested below), where the advanced tithi usually also rules
+    // tomorrow's sunrise and must not fire on both days.
     test(
       'Hartalika Teej (Bhadrapada Shukla Tritiya) is reported directly from '
       'day.tithi.number, whether or not that day happens to also carry a '
@@ -91,6 +97,111 @@ void main() {
       );
 
       expect(FestivalDetector.detect(today), 'Hartalika Teej');
+    });
+  });
+
+  group('FestivalDetector.detect — advanced vruddhi day', () {
+    // Real Patna data, Devutthana Ekadashi 2027: Dashami rules both Nov 8
+    // and Nov 9 sunrise, so Nov 9 is advanced to Ekadashi — but Ekadashi
+    // also rules Nov 10 sunrise, so the festival belongs to Nov 10 only.
+    test(
+      'advanced tithi that also rules the next sunrise does not fire today',
+      () {
+        final nov9 = _day(
+          lunarMonth: LunarMonth.kartika,
+          rawTithi: _tithi(10, DateTime.utc(2027, 11, 7, 18), DateTime.utc(2027, 11, 9, 2)),
+          tithi: _tithi(11, DateTime.utc(2027, 11, 9, 2), DateTime.utc(2027, 11, 10, 4)),
+          secondaryTithi: null,
+        );
+        final nov10 = _day(
+          lunarMonth: LunarMonth.kartika,
+          tithi: _tithi(11, DateTime.utc(2027, 11, 9, 2), DateTime.utc(2027, 11, 10, 4)),
+          secondaryTithi: _tithi(12, DateTime.utc(2027, 11, 10, 4), DateTime.utc(2027, 11, 11, 5)),
+        );
+
+        expect(FestivalDetector.detectAll(nov9), isEmpty);
+        expect(FestivalDetector.detectAll(nov10), ['Devutthana Ekadashi']);
+      },
+    );
+
+    test(
+      'advanced tithi that ends before the next sunrise still fires — '
+      'today is the only day it is ever shown',
+      () {
+        final day = _day(
+          lunarMonth: LunarMonth.kartika,
+          rawTithi: _tithi(10, DateTime.utc(2027, 11, 7, 18), DateTime.utc(2027, 11, 9, 2)),
+          tithi: _tithi(11, DateTime.utc(2027, 11, 9, 2), DateTime.utc(2027, 11, 9, 23)),
+          secondaryTithi: _tithi(12, DateTime.utc(2027, 11, 9, 23), DateTime.utc(2027, 11, 11, 1)),
+        );
+
+        expect(FestivalDetector.detectAll(day), ['Devutthana Ekadashi']);
+      },
+    );
+  });
+
+  group('FestivalDetector.detectAll — Chhath', () {
+    // Fremont 2026: Chaturthi rules Nov 12 AND Nov 13 sunrise, so a per-tithi
+    // rule produced Kharna twice and split the observance. All four days are
+    // instead placed by offset from Shashthi (Nov 15), whatever the tithis.
+    DayData kartikaDay(int? offset, int tithiNumber) => _day(
+          lunarMonth: LunarMonth.kartika,
+          tithi: _tithi(tithiNumber, DateTime.utc(2026, 11, 13), DateTime.utc(2026, 11, 14, 14)),
+          shuklaShashthiOffset: offset,
+        );
+
+    test('four consecutive days by offset from Shashthi', () {
+      expect(FestivalDetector.detectAll(kartikaDay(2, 4)), ['Chhath — Nahay Khay']);
+      expect(FestivalDetector.detectAll(kartikaDay(1, 4)), ['Chhath — Kharna']);
+      expect(FestivalDetector.detectAll(kartikaDay(0, 6)), ['Chhath — Sandhya Arghya']);
+      expect(FestivalDetector.detectAll(kartikaDay(-1, 7)), ['Chhath — Usha Arghya']);
+    });
+
+    test('a Chhath tithi alone, without the anchor, no longer fires', () {
+      expect(FestivalDetector.detectAll(kartikaDay(null, 5)), isEmpty);
+    });
+
+    test('only in Kartika', () {
+      final ashwinaShashthi = _day(
+        lunarMonth: LunarMonth.ashwina,
+        tithi: _tithi(6, DateTime.utc(2026, 10, 16), DateTime.utc(2026, 10, 17)),
+        shuklaShashthiOffset: 0,
+      );
+      expect(FestivalDetector.detectAll(ashwinaShashthi), isEmpty);
+    });
+  });
+
+  group('FestivalDetector.detectAll — Adhika month', () {
+    // 2026 has Adhika Jyeshtha (May 17 – Jun 15) then Nija Jyeshtha.
+    // Ganga Dussehra is observed in the Adhika month (May 25), an exception
+    // to the rule that Adhika months carry no festivals.
+    DayData jyeshtha(int tithiNumber,
+            {bool isAdhika = false, bool followsAdhika = false}) =>
+        _day(
+          lunarMonth: LunarMonth.jyeshtha,
+          tithi: _tithi(tithiNumber, DateTime.utc(2026, 5, 25), DateTime.utc(2026, 5, 26)),
+          isAdhika: isAdhika,
+          followsAdhika: followsAdhika,
+        );
+
+    test('Ganga Dussehra fires in Adhika Jyeshtha', () {
+      expect(FestivalDetector.detectAll(jyeshtha(10, isAdhika: true)),
+          ['Ganga Dussehra']);
+    });
+
+    test('Ganga Dussehra is skipped in the Nija Jyeshtha after it', () {
+      expect(FestivalDetector.detectAll(jyeshtha(10, followsAdhika: true)),
+          isEmpty);
+    });
+
+    test('Ganga Dussehra fires in a normal (non-Adhika) year', () {
+      expect(FestivalDetector.detectAll(jyeshtha(10)), ['Ganga Dussehra']);
+    });
+
+    test('other festivals stay suppressed in Adhika and fire in Nija', () {
+      expect(FestivalDetector.detectAll(jyeshtha(11, isAdhika: true)), isEmpty);
+      expect(FestivalDetector.detectAll(jyeshtha(11, followsAdhika: true)),
+          ['Nirjala Ekadashi']);
     });
   });
 

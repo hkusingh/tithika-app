@@ -78,7 +78,7 @@ final dayDataProvider = FutureProvider<DayData?>((ref) async {
     lat: location.lat,
     lon: location.lon,
     tzOffset: location.tzOffsetAt(date),
-    yesterdayTithiNumber: rawYesterday.tithi.number,
+    yesterdayTithiNumber: rawYesterday.rawTithi.number,
   );
 
   final adjusted = _applyMonthSystem(raw, monthSystem);
@@ -104,7 +104,7 @@ final stripDaysProvider = FutureProvider<List<DayData>>((ref) async {
     lat: location.lat,
     lon: location.lon,
     tzOffset: location.tzOffsetAt(beforeFirst),
-  ).tithi.number;
+  ).rawTithi.number;
 
   final raws = <DayData>[];
   for (var i = 0; i < 4; i++) {
@@ -117,7 +117,7 @@ final stripDaysProvider = FutureProvider<List<DayData>>((ref) async {
       yesterdayTithiNumber: prevTithiNumber,
     );
     raws.add(raw);
-    prevTithiNumber = raw.tithi.number;
+    prevTithiNumber = raw.rawTithi.number;
   }
 
   return List.generate(4, (i) {
@@ -159,7 +159,7 @@ final monthDataProvider =
     lat: location.lat,
     lon: location.lon,
     tzOffset: location.tzOffsetAt(dayBeforeFirst),
-  ).tithi.number;
+  ).rawTithi.number;
 
   final raws = <DateTime, DayData>{};
   for (var d = 1; d <= daysInMonth; d++) {
@@ -172,7 +172,7 @@ final monthDataProvider =
       yesterdayTithiNumber: prevTithiNumber,
     );
     raws[date] = raw;
-    prevTithiNumber = raw.tithi.number;
+    prevTithiNumber = raw.rawTithi.number;
   }
 
   return {
@@ -344,7 +344,7 @@ final yearFestivalsProvider =
     lat: location.lat,
     lon: location.lon,
     tzOffset: location.tzOffsetAt(dayBeforeYear),
-  ).tithi.number;
+  ).rawTithi.number;
 
   final entries = <FestivalEntry>[];
   for (var month = 1; month <= 12; month++) {
@@ -358,7 +358,7 @@ final yearFestivalsProvider =
         tzOffset: location.tzOffsetAt(date),
         yesterdayTithiNumber: prevTithiNumber,
       );
-      prevTithiNumber = raw.tithi.number;
+      prevTithiNumber = raw.rawTithi.number;
       final adjusted = _applyMonthSystem(raw, monthSystem);
       final purnimanta = _applyMonthSystem(raw, MonthSystem.purnimanta);
       final tomorrow = date.add(const Duration(days: 1));
@@ -367,7 +367,7 @@ final yearFestivalsProvider =
         lat: location.lat,
         lon: location.lon,
         tzOffset: location.tzOffsetAt(tomorrow),
-        yesterdayTithiNumber: raw.tithi.number,
+        yesterdayTithiNumber: raw.rawTithi.number,
       );
       final primaryIsEkadashi = raw.tithi.special == SpecialTithi.ekadashi;
       final kshayaIsEkadashi = raw.secondaryIsKshaya &&

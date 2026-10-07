@@ -211,7 +211,7 @@ class _DayPageContent extends ConsumerWidget {
           lat: location.lat,
           lon: location.lon,
           tzOffset: location.tzOffsetAt(date),
-          yesterdayTithiNumber: rawYesterday.tithi.number,
+          yesterdayTithiNumber: rawYesterday.rawTithi.number,
         );
         final adjusted = _applyMonthSystem(raw, monthSystem);
         final purnimanta = _applyMonthSystem(raw, MonthSystem.purnimanta);

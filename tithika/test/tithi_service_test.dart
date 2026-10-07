@@ -420,4 +420,31 @@ void main() {
       },
     );
   });
+
+  group('shuklaShashthiOffset — Chhath anchor', () {
+    // From the Ashwin Shukla Ekadashi 2024 anchor (tithi 11 at Oct 13
+    // 00:00 UTC), the stub's linear motion puts Shashthi at Oct 8 01:52 –
+    // Oct 9 01:30 UTC; Mumbai sunrise is ~01:02 UTC, so Oct 9 is the only
+    // sunrise Shashthi rules — matching the real Durga Puja Shashthi 2024.
+    int? offsetOn(int day) => svc
+        .calculateForDate(
+          localDate: DateTime(2024, 10, day),
+          lat: _mumbaiLat,
+          lon: _mumbaiLon,
+          tzOffset: _mumbaiTz,
+        )
+        .shuklaShashthiOffset;
+
+    test('counts down to the Shashthi day across four consecutive days', () {
+      expect(offsetOn(7), 2);
+      expect(offsetOn(8), 1);
+      expect(offsetOn(9), 0);
+      expect(offsetOn(10), -1);
+    });
+
+    test('is null outside the [-1, 2] window', () {
+      expect(offsetOn(6), isNull);
+      expect(offsetOn(11), isNull);
+    });
+  });
 }
